@@ -92,15 +92,27 @@ git push
 
 ```yaml
 ---
+publish: true                 # 必填：不写就不会被同步
+slug: monthly-expense-reports # 可选但强烈建议：中文标题会生成中文 URL（分享时是一长串百分号编码）
 title: 你的处方标题
 summary: 一句话描述这个活是什么、用什么做了、效果如何。
 category: 财务 / 行政
-difficulty: 入门
+difficulty: 入门              # 入门 / 进阶 / 高阶
 setupMinutes: 40
 saveHoursPerWeek: 2.5
 publishedAt: 2026-09-02
 updatedAt: 2026-09-02
-tags: [发票, 行政]
+tags:
+  - 发票
+  - 行政
+
+# 可选：写了才会输出 FAQPage schema（抢 Google「大家也在问」富摘要）
+# 必须是读者真会问的问题，不要为了 SEO 硬造
+faqs:
+  - q: 这个需要装什么软件？
+    a: 装一个桌面 Agent 即可，不需要编程环境。
+  - q: 它会改我的原文件吗？
+    a: 不会，指令里限定只读原目录。
 ---
 
 ## 这个活到底烦在哪
