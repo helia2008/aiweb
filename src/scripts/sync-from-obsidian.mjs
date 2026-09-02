@@ -29,7 +29,9 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.resolve(__dirname, '../../../');
+// __dirname = <项目根>/src/scripts → 上两级才是项目根。
+// 注意：写成 '../../../' 会跳到项目根的父目录，文件被写到仓库外面（曾踩过）。
+const ROOT = path.resolve(__dirname, '../../');
 const VAULT = process.env.VAULT_PATH || path.join(ROOT, 'vault');
 const PUBLISH_DIR = process.env.PUBLISH_DIR || path.join(VAULT, 'Publish');
 const OUT_DIR = path.join(ROOT, 'src/content/prescriptions');
@@ -40,24 +42,101 @@ const warn = (...a) => console.warn('[sync][warn]', ...a);
 
 // ---------- 工具 ----------
 
-/** frontmatter 解析：只支持简单的 key: value 结构（YAML 子集） */
-function parseFrontmatter(src) {
-  const m = src.match(/^---\n([\s\S]*?)\n---\n?/);
-  if (!m) return { fm: {}, body: src };
-  const fm = {};
-  for (const line of m[1].split('\n')) {
-    const idx = line.indexOf(':');
-    if (idx < 0) continue;
-    const k = line.slice(0, idx).trim();
-    let v = line.slice(idx + 1).trim();
-    if (v === 'true') v = true;
-    else if (v === 'false') v = false;
-    else if (/^\d+$/.test(v)) v = Number(v);
-    else if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
-      v = v.slice(1, -1);
-    }
-    fm[k] = v;
+/** 标量解析：布尔 / 数字 / 引号字符串 / 原样字符串 */
+function parseScalar(v) {
+  v = String(v).trim();
+  if (v === 'true') return true;
+  if (v === 'false') return false;
+  if (/^-?\d+(\.\d+)?$/.test(v)) return Number(v);
+  if ((v.startsWith('"') && v.endsWith('"')) || (v.startsWith("'") && v.endsWith("'"))) {
+    return v.slice(1, -1);
   }
+  return v;
+}
+
+/**
+ * frontmatter 解析（YAML 子集，够 Obsidian 用）：
+ *   key: value                标量（true/false/数字/引号/字符串）
+ *   key: [a, b]               行内数组
+ *   key:                      块序列（标量数组）
+ *     - a
+ *     - b
+ *   key:                      块序列（对象数组，用于 faqs）
+ *     - q: 问题
+ *       a: 答案
+ */
+function parseFrontmatter(src) {
+  const m = src.match(/^\uFEFF?---\r?\n([\s\S]*?)\r?\n---[ \t]*\r?\n?/);
+  if (!m) return { fm: {}, body: src };
+
+  const fm = {};
+  const lines = m[1].split(/\r?\n/);
+  let key = null;
+  let i = 0;
+
+  while (i < lines.length) {
+    const raw = lines[i];
+    if (!raw.trim() || raw.trim().startsWith('#')) {
+      i++;
+      continue;
+    }
+
+    // 块序列（前面必须已有 key）
+    if (/^\s*-\s+/.test(raw) && key) {
+      const list = [];
+      while (i < lines.length && /^\s*-\s+/.test(lines[i])) {
+        const rest = lines[i].replace(/^\s*-\s+/, '');
+        const sub = rest.match(/^([A-Za-z_][\w-]*)\s*:\s*(.*)$/);
+        if (sub) {
+          // 对象项：首字段在本行，其余字段缩进对齐在后续行
+          const obj = { [sub[1]]: parseScalar(sub[2]) };
+          let j = i + 1;
+          while (
+            j < lines.length &&
+            !/^\s*-\s+/.test(lines[j]) &&
+            /^\s+[A-Za-z_][\w-]*\s*:/.test(lines[j])
+          ) {
+            const m2 = lines[j].match(/^\s+([A-Za-z_][\w-]*)\s*:\s*(.*)$/);
+            obj[m2[1]] = parseScalar(m2[2]);
+            j++;
+          }
+          list.push(obj);
+          i = j;
+        } else {
+          list.push(parseScalar(rest));
+          i++;
+        }
+      }
+      fm[key] = list;
+      continue;
+    }
+
+    const idx = raw.indexOf(':');
+    if (idx < 0) {
+      i++;
+      continue;
+    }
+    key = raw.slice(0, idx).trim();
+    const val = raw.slice(idx + 1).trim();
+
+    if (val === '') {
+      fm[key] = []; // 可能是块序列，下一轮填充
+      i++;
+      continue;
+    }
+    if (val.startsWith('[') && val.endsWith(']')) {
+      fm[key] = val
+        .slice(1, -1)
+        .split(',')
+        .map((s) => parseScalar(s))
+        .filter((s) => s !== '');
+      i++;
+      continue;
+    }
+    fm[key] = parseScalar(val);
+    i++;
+  }
+
   return { fm, body: src.slice(m[0].length) };
 }
 
@@ -72,18 +151,73 @@ function slugify(title) {
     .slice(0, 80) || 'untitled';
 }
 
-/** 写 frontmatter（保持原文顺序：补齐缺省字段） */
+/**
+ * 选 URL slug：frontmatter 里写了 slug 就用它，否则从标题生成。
+ * 中文标题生成的 URL 分享时会变成一长串百分号编码，
+ * 想让链接干净可读，就在笔记 frontmatter 里手写 slug（英文短横线）。
+ */
+function pickSlug(fm) {
+  const custom = String(fm.slug || '').trim();
+  if (custom) return slugify(custom);
+  return slugify(fm.title);
+}
+
+/** 写 frontmatter（固定字段顺序；缺省字段用默认值补齐） */
 function buildFrontmatter(extra) {
-  const required = ['title', 'summary', 'category', 'difficulty', 'setupMinutes', 'saveHoursPerWeek', 'publishedAt', 'updatedAt', 'draft', 'tags'];
-  for (const k of required) if (!(k in extra)) extra[k] = extra[k] ?? defaultFor(k);
-  const order = ['title', 'summary', 'category', 'difficulty', 'setupMinutes', 'saveHoursPerWeek', 'publishedAt', 'updatedAt', 'draft', 'tags'];
+  const order = [
+    'title',
+    'summary',
+    'category',
+    'difficulty',
+    'setupMinutes',
+    'saveHoursPerWeek',
+    'publishedAt',
+    'updatedAt',
+    'draft',
+    'tags',
+    'cover',
+  ];
+  for (const k of order) {
+    if (extra[k] === undefined || extra[k] === '') extra[k] = defaultFor(k);
+  }
+
   const lines = ['---'];
   for (const k of order) {
     const v = extra[k];
-    if (Array.isArray(v)) lines.push(`${k}: [${v.map((x) => JSON.stringify(x)).join(', ')}]`);
-    else if (typeof v === 'string') lines.push(`${k}: ${JSON.stringify(v)}`);
+    if (v === undefined || v === '') continue;
+
+    if (Array.isArray(v)) {
+      if (v.length === 0) {
+        lines.push(`${k}: []`);
+      } else if (typeof v[0] === 'string') {
+        lines.push(`${k}: [${v.map((x) => JSON.stringify(x)).join(', ')}]`);
+      } else {
+        // 对象数组（faqs）：写成 YAML 块序列
+        lines.push(`${k}:`);
+        for (const item of v) {
+          Object.entries(item).forEach(([ik, iv], n) => {
+            const text = JSON.stringify(String(iv ?? ''));
+            lines.push(n === 0 ? `  - ${ik}: ${text}` : `    ${ik}: ${text}`);
+          });
+        }
+      }
+      continue;
+    }
+    if (typeof v === 'string') lines.push(`${k}: ${JSON.stringify(v)}`);
     else if (typeof v === 'number' || typeof v === 'boolean') lines.push(`${k}: ${v}`);
   }
+
+  // faqs 单独追加（可选字段，没写就不输出，避免污染 frontmatter）
+  if (Array.isArray(extra.faqs) && extra.faqs.length > 0) {
+    lines.push('faqs:');
+    for (const item of extra.faqs) {
+      Object.entries(item).forEach(([ik, iv], n) => {
+        const text = JSON.stringify(String(iv ?? ''));
+        lines.push(n === 0 ? `  - ${ik}: ${text}` : `    ${ik}: ${text}`);
+      });
+    }
+  }
+
   lines.push('---', '');
   return lines.join('\n');
 }
@@ -173,7 +307,7 @@ async function main() {
   for (const f of files) {
     const src = await fs.readFile(path.join(PUBLISH_DIR, f), 'utf8');
     const { fm } = parseFrontmatter(src);
-    if (fm.title) knownSlugs.add(slugify(fm.title));
+    if (fm.title) knownSlugs.add(pickSlug(fm));
   }
   log(`已知发布笔记 ${knownSlugs.size} 个`);
 
@@ -207,7 +341,7 @@ async function main() {
     let outBody = rewriteWikilinks(body, knownSlugs);
     outBody = await rewriteImages(outBody, abs, knownFiles);
     // 写入
-    const outFile = path.join(OUT_DIR, `${slugify(fm.title)}.md`);
+    const outFile = path.join(OUT_DIR, `${pickSlug(fm)}.md`);
     await fs.writeFile(outFile, buildFrontmatter(merged) + outBody);
     log(`→ ${path.relative(ROOT, outFile)}`);
     wrote++;
