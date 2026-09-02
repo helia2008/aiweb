@@ -79,7 +79,7 @@ const FONT_URL =
       分析：只在生产域名加载，开发环境不埋点。
       部署前把 data-website-id 换成你的 umami / plausible 站点 ID。
     -->
-    {Astro.url.hostname === 'desktopagent.dev' && (
+    {Astro.url.hostname === 'aiwind.eu.cc' && (
       <script defer src="https://umami.example.com/script.js" data-website-id="REPLACE_ME" is:inline />
     )}
   </head>

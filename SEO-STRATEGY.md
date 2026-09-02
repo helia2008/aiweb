@@ -170,7 +170,7 @@
 | 优先级 | 项目 | 说明 |
 |---|---|---|
 | P0 | 提交 sitemap 到搜索引擎 | GSC + 百度搜索资源平台 + Bing Webmaster |
-| P0 | 替换 `desktopagent.dev` 为真实域名 | 涉及 `astro.config.mjs`、`robots.txt`、`README.md`、`BaseLayout.astro` |
+| P0 | ✅ 已完成 | 占位 `desktopagent.dev` → 正式域名 `https://aiwind.eu.cc`（`astro.config.mjs`/`robots.txt`/`site.yaml`/`site.js`/`BaseLayout`/`SEO` 全量替换） |
 | P0 | 替换 umami `REPLACE_ME` | 否则无数据，无法迭代 |
 | P1 | 类目聚合页 | `/prescriptions/category/[category]`，承接中量词 |
 | P1 | 每篇文章补 `faqs` frontmatter | 每篇 3-5 个真问题，输出 FAQPage schema |

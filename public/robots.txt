@@ -9,4 +9,4 @@ Disallow: /uploads/temp/
 Disallow: /*.json$
 
 # sitemap 声明（部署后请把域名替换为实际域名）
-Sitemap: https://desktopagent.dev/sitemap-index.xml
+Sitemap: https://aiwind.eu.cc/sitemap-index.xml

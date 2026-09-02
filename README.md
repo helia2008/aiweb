@@ -184,7 +184,7 @@ npx wrangler pages deploy dist --project-name=desktop-agent-handbook
 ## 下一步
 
 - [x] 替换 `public/hero-desk.svg` 为真实桌面图 → 已用 AI 生成 936×904 PNG
-- [x] 修占位 `desktopagent.dev` → 改用 CF Pages 默认 `desktop-agent-handbook.pages.dev`
+- [x] 修占位 `desktopagent.dev` → 改用自定义域名 `https://aiwind.eu.cc`（CF Pages 已绑定，状态 active）
 - [ ] 在 Cloudflare Pages 创建项目、连 GitHub、设 `SITE_URL` 环境变量、绑定自定义域名（可选）
 - [ ] 把你 vault 里的真实笔记丢进 `I:/AI知识库-Vault/Publish/`，跑 `VAULT_PATH=I:/AI知识库-Vault npm run sync` 验证
 - [ ] `git init && git add . && git commit -m "init"` → 推到 GitHub → 触发自动部署
