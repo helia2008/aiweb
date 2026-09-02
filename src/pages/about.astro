@@ -1,0 +1,73 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="关于 · 这个站怎么更新"
+  description="为什么做、写给谁、内容从哪来（WorkBuddy + Obsidian + ima 自动供血）、以及怎么持续更新。"
+  breadcrumbs={[
+    { name: '首页', url: '/' },
+    { name: '关于', url: '/about' },
+  ]}
+>
+  <section class="px-[120px] py-[80px] bg-paper">
+    <div class="flex flex-col gap-4 max-w-[820px]">
+      <p class="text-[13px] font-medium tracking-[1.8px] text-accent">关于</p>
+      <h1 class="text-[48px] leading-[60px] font-bold font-display">这个站怎么更新</h1>
+    </div>
+  </section>
+
+  <section class="px-[120px] pb-[100px] bg-paper flex justify-center">
+    <div class="article-prose w-[800px]">
+      <h2>为什么做</h2>
+      <p>
+        现在的 AI 工具站有两种：一种是给程序员的开发教程（Datawhale 的 Hello-Agents、微软的 AI Agents for Beginners 都做得很到位），另一种是给普通人的提示词技巧。
+        中间那层——<strong>让一个不懂代码的职场人，把每周重复的活交给电脑自己做</strong>——几乎没人写。
+      </p>
+      <p>
+        我自己是活样本：日常工作里一半时间是写作、运营、流程协调，另一半要写代码、跑部署。我把前者叫做"只有人能做"的事，后者叫"可以交出去"的事。
+        这个站只写后者。
+      </p>
+
+      <h2 id="pkm">内容从哪来：PKM 自动供血</h2>
+      <p>
+        我有一个 <strong>WorkBuddy + Obsidian + ima</strong> 的自动化知识库（也叫 PKM）。日常遇到能写进站里的事，我会先丢进 Obsidian 的 <code>Publish/</code> 目录，并打上
+        <code>publish: true</code> 的 frontmatter。
+      </p>
+      <p>
+        仓库里有一个 <code>scripts/sync-from-obsidian.mjs</code>，跑一次会做三件事：
+      </p>
+      <ol>
+        <li>扫 <code>vault/Publish/</code> 下所有 <code>publish: true</code> 的笔记；</li>
+        <li>把 <code>[[wikilink]]</code> 转成站内链接，把附件图复制到 <code>public/</code>，重写相对路径；</li>
+        <li>把渲染好的 Markdown 写到 <code>src/content/prescriptions/</code> 下，对应的 frontmatter 自动补齐。</li>
+      </ol>
+      <p>
+        写完 <code>git push</code>，Cloudflare Pages 自动构建、自动上线。这条流水线我跑过三轮，目前是站点不荒废的唯一原因——博客最大的死因是断更，断更的最大原因就是没把"写"和"发"接到自动化里。
+      </p>
+
+      <h2>我用的工具链（开诚布公）</h2>
+      <ul>
+        <li>写作与 PKM：<strong>Obsidian</strong>（Markdown 本地优先）+ <strong>WorkBuddy</strong>（桌面 Agent 工作台）+ <strong>ima</strong>（腾讯系知识库）</li>
+        <li>站点：<strong>Astro 5</strong> + <strong>Tailwind 4</strong>（静态站、零运行时）</li>
+        <li>托管：<strong>Cloudflare Pages</strong>（免费、全球 CDN、Git 直连）</li>
+        <li>设计：设计稿在 Ardot 里画，导出 token 落到 Tailwind 主题里</li>
+        <li>图片生成：<strong>Mureka / NanoBanana</strong>（站内配图我尽量用自己拍的，AI 图只用在首页 Hero）</li>
+      </ul>
+
+      <h2>什么不写</h2>
+      <ul>
+        <li>不写"AI 工具合集"、"年度十大"——同质化严重、衰减极快</li>
+        <li>不写没跑通的——所有处方我都用真实的活走过一遍</li>
+        <li>不写给程序员的——这是另一类站，<a href="https://datawhalechina.github.io/hello-agents" target="_blank" rel="noopener">Hello-Agents</a>已经做得很好</li>
+        <li>不接广告、不卖课、不做"知识星球"——让这个站安静一点</li>
+      </ul>
+
+      <h2>联系</h2>
+      <p>
+        想提交你每周最烦的那件事：<a href="mailto:hi@desktopagent.dev">hi@desktopagent.dev</a>，或用首页的"痛点门诊"。
+        想在贵公司内训讲这个，欢迎来邮；本站不卖课，但可合作内训。
+      </p>
+    </div>
+  </section>
+</BaseLayout>

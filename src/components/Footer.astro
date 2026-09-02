@@ -1,0 +1,39 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="bg-deep text-deep-ink px-[120px] pt-[70px] pb-[40px] flex flex-col gap-11">
+  <div class="flex justify-between gap-12">
+    <div class="max-w-[420px] flex flex-col gap-4">
+      <div class="flex items-center gap-[11px]">
+        <span class="block w-4 h-4 rounded-[4px] bg-accent" aria-hidden="true"></span>
+        <span class="text-[18px] font-bold font-display text-deep-ink">桌面 Agent 实战手册</span>
+      </div>
+      <p class="text-[14px] leading-6 text-deep-ink-3">写给不想学编程、但想把重复劳动交出去的人。</p>
+      <p class="text-[13px] leading-[22px] text-ink-3">内容源自我个人的 Obsidian 知识库，经人工复核后发布。</p>
+    </div>
+
+    <div class="flex gap-20">
+      <div class="flex flex-col gap-[14px]">
+        <h4 class="text-[13px] font-medium tracking-[1.2px] text-deep-ink-3">内容</h4>
+        <a href="/start-here" class="text-[14px] text-deep-ink-2 hover:text-deep-ink">Start Here 路线</a>
+        <a href="/prescriptions" class="text-[14px] text-deep-ink-2 hover:text-deep-ink">痛点处方</a>
+        <a href="/tools" class="text-[14px] text-deep-ink-2 hover:text-deep-ink">工具罗盘</a>
+        <a href="/rss.xml" class="text-[14px] text-deep-ink-2 hover:text-deep-ink">RSS</a>
+      </div>
+      <div class="flex flex-col gap-[14px]">
+        <h4 class="text-[13px] font-medium tracking-[1.2px] text-deep-ink-3">关于</h4>
+        <a href="/about" class="text-[14px] text-deep-ink-2 hover:text-deep-ink">这个站怎么更新</a>
+        <a href="/about#pkm" class="text-[14px] text-deep-ink-2 hover:text-deep-ink">我的工具链</a>
+        <a href="mailto:hi@desktopagent.dev" class="text-[14px] text-deep-ink-2 hover:text-deep-ink">联系与投稿</a>
+      </div>
+    </div>
+  </div>
+
+  <hr class="border-t border-deep-rule" />
+
+  <div class="flex justify-between items-center">
+    <p class="text-[13px] text-deep-ink-3">Copyright {year} · 桌面 Agent 实战手册</p>
+    <p class="text-[13px] text-deep-ink-3">Astro + Cloudflare Pages · 内容经 Obsidian 萃取后人工复核</p>
+  </div>
+</footer>

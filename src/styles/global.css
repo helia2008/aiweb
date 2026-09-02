@@ -1,0 +1,148 @@
+@import "tailwindcss";
+
+/* ============================================================
+   设计系统 · 纸感编辑风
+   规则：可读性优先 · 衬线标题 · 单一朱砂强调色
+   ============================================================ */
+
+@theme {
+  /* 色彩 */
+  --color-paper: #FBF9F4;
+  --color-paper-2: #F3EFE6;
+  --color-ink: #1A1917;
+  --color-ink-2: #57524A;
+  --color-ink-3: #8A8377;
+  --color-rule: #E5DFD2;
+  --color-accent: #B23A2B;
+  --color-accent-tint: #FBEEEB;
+  --color-deep: #1A1917;
+  --color-deep-2: #23211D;
+  --color-deep-3: #2A2722;
+  --color-deep-rule: #32302B;
+  --color-deep-ink: #FBF9F4;
+  --color-deep-ink-2: #E8E2D6;
+  --color-deep-ink-3: #A9A29A;
+
+  /* 字体 */
+  --font-display: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", Georgia, serif;
+  --font-sans: "Inter", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+
+  /* 圆角 */
+  --radius-card: 12px;
+  --radius-btn: 8px;
+  --radius-pill: 999px;
+}
+
+/* ============================================================
+   全局样式
+   ============================================================ */
+
+html {
+  font-family: var(--font-sans);
+  background: var(--color-paper);
+  color: var(--color-ink);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background: var(--color-paper);
+}
+
+/* 衬线标题 */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  color: var(--color-ink);
+  letter-spacing: -0.01em;
+}
+
+/* 选区 */
+::selection {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+/* 正文链接 */
+.prose-body a {
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  text-decoration-thickness: 1px;
+}
+.prose-body a:hover {
+  text-decoration-thickness: 2px;
+}
+
+/* 正文段落（仅作用于 article 容器内） */
+.article-prose p {
+  font-size: 1.0625rem; /* 17px */
+  line-height: 1.85;
+  color: var(--color-ink);
+  margin: 0 0 1.25rem;
+}
+.article-prose h2 {
+  font-size: 1.75rem;
+  line-height: 1.4;
+  font-weight: 700;
+  margin: 2.5rem 0 1rem;
+}
+.article-prose h3 {
+  font-size: 1.25rem;
+  line-height: 1.5;
+  font-weight: 600;
+  margin: 2rem 0 0.75rem;
+}
+.article-prose ul, .article-prose ol {
+  margin: 0 0 1.25rem 1.25rem;
+  line-height: 1.85;
+  color: var(--color-ink);
+}
+.article-prose li {
+  margin-bottom: 0.5rem;
+}
+.article-prose strong {
+  color: var(--color-accent);
+  font-weight: 600;
+}
+.article-prose blockquote {
+  border-left: 3px solid var(--color-accent);
+  background: var(--color-accent-tint);
+  padding: 1.1rem 1.25rem;
+  border-radius: 0 10px 10px 0;
+  margin: 1.5rem 0;
+  color: var(--color-ink-2);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+/* 代码块（指令块） */
+.instruction-block {
+  background: var(--color-deep);
+  color: var(--color-deep-ink-2);
+  border-radius: 10px;
+  padding: 1.25rem 1.4rem;
+  font-size: 0.875rem;
+  line-height: 1.7;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  margin: 1.5rem 0;
+  white-space: pre-wrap;
+}
+.instruction-block .label {
+  display: block;
+  font-family: var(--color-sans, var(--font-sans));
+  color: var(--color-deep-ink-3);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  margin-bottom: 0.5rem;
+}
+
+/* Tag 样式 */
+.tag {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px 11px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-weight: 500;
+}

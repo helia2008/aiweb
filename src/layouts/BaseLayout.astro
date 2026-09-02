@@ -1,0 +1,98 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+import Subscribe from '../components/Subscribe.astro';
+import SEO from '../components/SEO.astro';
+
+export interface Props {
+  title: string;
+  description?: string;
+  /** 是否显示订阅区 */
+  showSubscribe?: boolean;
+  /** 当前路径（用于高亮 nav） */
+  pathname?: string;
+  /** OG 图相对路径 */
+  ogImage?: string;
+  /** 页面类型：article 会输出 Article schema */
+  type?: 'website' | 'article';
+  publishedAt?: Date;
+  updatedAt?: Date;
+  tags?: string[];
+  /** 面包屑（同时输出 BreadcrumbList schema） */
+  breadcrumbs?: { name: string; url: string }[];
+  /** FAQ（输出 FAQPage schema，用于抢 People Also Ask 富摘要） */
+  faqs?: { q: string; a: string }[];
+}
+
+const {
+  title,
+  description = '写给不想学编程、但想把重复劳动交出去的人。痛点处方、工具罗盘、痛点门诊——只在跑通后写出来。',
+  showSubscribe = true,
+  pathname = Astro.url.pathname,
+  ogImage,
+  type = 'website',
+  publishedAt,
+  updatedAt,
+  tags,
+  breadcrumbs,
+  faqs,
+} = Astro.props;
+
+// 字体：Google Fonts 在国内访问不稳定且体积大，
+// 这里用 media="print" + onload 技巧异步加载，避免阻塞首屏渲染（LCP）。
+// 未加载完成时由 global.css 里的系统字体栈兜底（宋体 / 思源宋体 / Georgia）。
+const FONT_URL =
+  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700;800&display=swap';
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#FBF9F4" />
+
+    <SEO
+      title={title}
+      description={description}
+      ogImage={ogImage}
+      type={type}
+      publishedAt={publishedAt}
+      updatedAt={updatedAt}
+      tags={tags}
+      breadcrumbs={breadcrumbs}
+      faqs={faqs}
+    />
+
+    <!-- 字体：异步加载，不阻塞 LCP -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href={FONT_URL} media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href={FONT_URL} /></noscript>
+
+    <link rel="alternate" type="application/rss+xml" title="桌面 Agent 实战手册" href="/rss.xml" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!--
+      分析：只在生产域名加载，开发环境不埋点。
+      部署前把 data-website-id 换成你的 umami / plausible 站点 ID。
+    -->
+    {Astro.url.hostname === 'desktopagent.dev' && (
+      <script defer src="https://umami.example.com/script.js" data-website-id="REPLACE_ME" is:inline />
+    )}
+  </head>
+
+  <body class="bg-paper text-ink">
+    <Header pathname={pathname} />
+
+    <main>
+      <slot />
+    </main>
+
+    {showSubscribe && <Subscribe />}
+
+    <Footer />
+  </body>
+</html>

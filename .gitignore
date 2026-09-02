@@ -1,0 +1,33 @@
+# dependencies
+node_modules/
+.npm-cache/
+
+# build output
+dist/
+.astro/
+
+# env
+.env
+.env.production
+.env.local
+
+# os
+.DS_Store
+Thumbs.db
+
+# editor
+.vscode/
+.idea/
+*.swp
+
+# logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# wrangler
+.wrangler/
+
+# 不上传到站点、但本地可以留的稿件草稿
+src/content/_drafts/

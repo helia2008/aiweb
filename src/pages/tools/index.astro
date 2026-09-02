@@ -1,0 +1,80 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const tools = (await getCollection('tools')).sort((a, b) => a.data.order - b.data.order);
+---
+
+<BaseLayout
+  title="AI Agent 工具怎么选"
+  description="只收我自己真跑过的桌面 Agent。每张体检卡都标明：适合谁、不适合谁、上手要多久、成本多少、数据安全红线在哪。"
+  breadcrumbs={[
+    { name: '首页', url: '/' },
+    { name: '工具罗盘', url: '/tools' },
+  ]}
+>
+  <section class="px-[120px] py-[80px] bg-paper">
+    <div class="flex flex-col gap-3 max-w-[820px]">
+      <p class="text-[13px] font-medium tracking-[1.8px] text-accent">工具罗盘</p>
+      <h1 class="text-[48px] leading-[60px] font-bold font-display">只收我自己在用的，都标了不适合谁</h1>
+      <p class="text-[17px] leading-[31px] text-ink-2 mt-2">
+        工具站最大的问题是不说人话的坏处。这里每张体检卡都告诉你：什么情况下别用它。共 {tools.length} 个。
+      </p>
+    </div>
+  </section>
+
+  <section class="px-[120px] pb-[100px] bg-paper">
+    <div class="flex flex-col gap-6">
+      {tools.map((t) => (
+        <div class="bg-white border border-rule rounded-[12px] p-9 grid grid-cols-[1fr_280px] gap-10">
+          <div class="flex flex-col gap-5">
+            <div>
+              <h2 class="text-[28px] font-bold font-display text-ink">{t.data.name}</h2>
+              <p class="text-[13px] font-medium text-accent mt-1">{t.data.type} · {t.data.tag}</p>
+            </div>
+            <p class="text-[15px] leading-[27px] text-ink-2">{t.body}</p>
+
+            <div class="grid grid-cols-2 gap-6 mt-2">
+              <div>
+                <p class="text-[12px] font-medium tracking-[1.2px] text-ink-3 mb-2">适合</p>
+                <ul class="flex flex-col gap-1.5">
+                  {t.data.fit.map((f) => (
+                    <li class="text-[14px] text-ink-2 flex gap-2">
+                      <span class="text-accent">＋</span>{f}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              <div>
+                <p class="text-[12px] font-medium tracking-[1.2px] text-ink-3 mb-2">不适合</p>
+                <ul class="flex flex-col gap-1.5">
+                  {t.data.unfit.map((f) => (
+                    <li class="text-[14px] text-ink-2 flex gap-2">
+                      <span class="text-accent">－</span>{f}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <div class="flex flex-col gap-4 p-6 bg-paper-2 rounded-[10px] h-fit">
+            <p class="text-[12px] font-medium tracking-[1.2px] text-ink-3">体检卡</p>
+            <div>
+              <p class="text-[12px] text-ink-3">上手耗时</p>
+              <p class="text-[16px] font-semibold text-ink">{t.data.setupTime}</p>
+            </div>
+            <div>
+              <p class="text-[12px] text-ink-3">成本</p>
+              <p class="text-[16px] font-semibold text-ink">{t.data.cost}</p>
+            </div>
+            <div>
+              <p class="text-[12px] text-ink-3">数据安全红线</p>
+              <p class="text-[14px] leading-[22px] text-ink-2">{t.data.dataBoundary}</p>
+            </div>
+          </div>
+        </div>
+      ))}
+    </div>
+  </section>
+</BaseLayout>

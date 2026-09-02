@@ -1,0 +1,12 @@
+# 桌面 Agent 实战手册 · robots.txt
+# 允许所有合规爬虫抓取全站内容
+
+User-agent: *
+Allow: /
+
+# 不抓取构建产物与内部路径
+Disallow: /uploads/temp/
+Disallow: /*.json$
+
+# sitemap 声明（部署后请把域名替换为实际域名）
+Sitemap: https://desktopagent.dev/sitemap-index.xml

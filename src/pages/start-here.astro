@@ -1,0 +1,81 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout
+  title="7 天入门路线 · 从零用上 AI Agent"
+  description="三条 7 天路线：完全零基础、想干掉一份周报、带团队落地。每天 20-40 分钟，第七天手上会有一个真跑得起来的自动化。"
+  breadcrumbs={[
+    { name: '首页', url: '/' },
+    { name: 'Start Here', url: '/start-here' },
+  ]}
+>
+  <section class="px-[120px] py-[80px] bg-paper">
+    <div class="flex flex-col gap-4 max-w-[860px]">
+      <p class="text-[13px] font-medium tracking-[1.8px] text-accent">START HERE</p>
+      <h1 class="text-[48px] leading-[60px] font-bold font-display">挑一条路，七天后来验收</h1>
+      <p class="text-[17px] leading-[31px] text-ink-2 mt-2">
+        每条路线都按"周一到周日"分好了。每天 20-40 分钟，第七天你能拿出一个真跑得起来的自动化给你同事看。
+      </p>
+    </div>
+  </section>
+
+  <section class="px-[120px] pb-[80px] bg-paper flex flex-col gap-6">
+    <article id="p1" class="bg-white border border-rule rounded-[12px] p-10">
+      <div class="flex items-baseline gap-4 mb-4">
+        <span class="text-[42px] font-bold font-display text-accent">01</span>
+        <h2 class="text-[28px] font-bold font-display">我连提示词都写不明白</h2>
+      </div>
+      <p class="text-[15px] text-ink-3 mb-6">7 天 · 每天 20 分钟 · 零基础</p>
+      <p class="text-[16px] leading-[29px] text-ink-2 mb-6">从装好第一个桌面 Agent 开始，到让它帮你读完一份 40 页 PDF 并写出三段摘要。这一条只走图形界面，不碰命令行。</p>
+      <div class="grid grid-cols-7 gap-2 text-center">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <div class="border border-rule rounded-[8px] p-3">
+            <p class="text-[11px] font-medium text-ink-3">DAY {i + 1}</p>
+            <p class="text-[12px] text-ink-2 mt-1">
+              {['装好 Agent', '读 5 页 PDF', '让它总结', '改你的写法', '试一篇新闻', '贴一段代码', '周六自由练'][i]}
+            </p>
+          </div>
+        ))}
+      </div>
+    </article>
+
+    <article id="p2" class="bg-white border border-rule rounded-[12px] p-10">
+      <div class="flex items-baseline gap-4 mb-4">
+        <span class="text-[42px] font-bold font-display text-accent">02</span>
+        <h2 class="text-[28px] font-bold font-display">我想让它替我干掉一份周报</h2>
+      </div>
+      <p class="text-[15px] text-ink-3 mb-6">7 天 · 每天 30 分钟 · 会用 Excel</p>
+      <p class="text-[16px] leading-[29px] text-ink-2 mb-6">挑一件你每周必做、最厌烦的事，照着这一条的"拆解模板"把它拆成 Agent 能执行的步骤，最后得到一份可复用的指令模板。</p>
+      <div class="grid grid-cols-7 gap-2 text-center">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <div class="border border-rule rounded-[8px] p-3">
+            <p class="text-[11px] font-medium text-ink-3">DAY {i + 1}</p>
+            <p class="text-[12px] text-ink-2 mt-1">
+              {['选一件事', '手动做一遍', '拆成步骤', '写第一版指令', '跑一次', '改两版', '本周上线'][i]}
+            </p>
+          </div>
+        ))}
+      </div>
+    </article>
+
+    <article id="p3" class="bg-white border border-rule rounded-[12px] p-10">
+      <div class="flex items-baseline gap-4 mb-4">
+        <span class="text-[42px] font-bold font-display text-accent">03</span>
+        <h2 class="text-[28px] font-bold font-display">我们部门都想用起来</h2>
+      </div>
+      <p class="text-[15px] text-ink-3 mb-6">7 天 · 每天 40 分钟 · 带团队</p>
+      <p class="text-[16px] leading-[29px] text-ink-2 mb-6">从个人提效跨到团队落地。讲怎么选场景、怎么定红线、怎么让同事愿意跟着用、怎么在不被 IT 拦下的前提下接外部服务。</p>
+      <div class="grid grid-cols-7 gap-2 text-center">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <div class="border border-rule rounded-[8px] p-3">
+            <p class="text-[11px] font-medium text-ink-3">DAY {i + 1}</p>
+            <p class="text-[12px] text-ink-2 mt-1">
+              {['画现状流程', '挑 3 个场景', '定数据红线', '找一位同事试', '做一份手册', '开一次分享', '收集反馈'][i]}
+            </p>
+          </div>
+        ))}
+      </div>
+    </article>
+  </section>
+</BaseLayout>

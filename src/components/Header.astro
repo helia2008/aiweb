@@ -1,0 +1,48 @@
+---
+export interface Props {
+  pathname?: string;
+}
+const { pathname = '/' } = Astro.props;
+
+const navItems = [
+  { label: '首页', href: '/' },
+  { label: 'Start Here', href: '/start-here' },
+  { label: '痛点处方', href: '/prescriptions' },
+  { label: '工具罗盘', href: '/tools' },
+  { label: '关于', href: '/about' },
+];
+
+const isActive = (href: string) => {
+  if (href === '/') return pathname === '/';
+  return pathname.startsWith(href);
+};
+---
+
+<header class="h-[76px] px-[120px] bg-white border-b border-rule flex items-center justify-between">
+  <a href="/" class="flex items-center gap-[11px]">
+    <span class="block w-4 h-4 rounded-[4px] bg-accent" aria-hidden="true"></span>
+    <span class="text-[19px] font-bold font-display text-ink">桌面 Agent 实战手册</span>
+  </a>
+
+  <nav class="flex items-center gap-[34px]">
+    {
+      navItems.map((item) => (
+        <a
+          href={item.href}
+          class:list={[
+            'text-[15px] font-medium transition',
+            isActive(item.href) ? 'text-accent' : 'text-ink-2 hover:text-ink',
+          ]}
+        >{item.label}</a>
+      ))
+    }
+  </nav>
+
+  <div class="flex items-center gap-[18px]">
+    <a href="/rss.xml" class="text-[15px] font-medium text-ink-3 hover:text-ink">RSS</a>
+    <a
+      href="#subscribe"
+      class="h-[42px] px-[22px] inline-flex items-center bg-accent text-white text-[14px] font-medium rounded-[7px] hover:opacity-90 transition"
+    >订阅更新</a>
+  </div>
+</header>

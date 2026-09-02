@@ -1,0 +1,65 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const prescriptions = (await getCollection('prescriptions', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
+
+// 按 category 分组
+const grouped = prescriptions.reduce<Record<string, typeof prescriptions>>((acc, p) => {
+  (acc[p.data.category] ??= []).push(p);
+  return acc;
+}, {});
+
+const categories = Object.keys(grouped);
+---
+
+<BaseLayout
+  title="办公自动化处方 · 按岗位找"
+  description="按你烦的那件事找，不按工具找。每篇都是同一个结构：烦在哪 → 准备什么 → 一步步怎么配 → 直接能抄的指令 → 我踩过的坑。全部自己跑过一遍。"
+  breadcrumbs={[
+    { name: '首页', url: '/' },
+    { name: '痛点处方', url: '/prescriptions' },
+  ]}
+>
+  <section class="px-[120px] py-[80px] bg-paper">
+    <div class="flex flex-col gap-3 max-w-[820px]">
+      <p class="text-[13px] font-medium tracking-[1.8px] text-accent">痛点处方</p>
+      <h1 class="text-[48px] leading-[60px] font-bold font-display">按你烦的那件事找，不按工具找</h1>
+      <p class="text-[17px] leading-[31px] text-ink-2 mt-2">
+        共 {prescriptions.length} 篇，按使用场景分组。点进去，每篇都是同一个结构——你照着做就能用。
+      </p>
+    </div>
+  </section>
+
+  {
+    categories.map((cat) => (
+      <section class="px-[120px] py-[60px] bg-paper">
+        <div class="flex flex-col gap-7">
+          <h2 class="text-[24px] font-semibold font-display text-ink-2 flex items-baseline gap-3">
+            {cat}
+            <span class="text-[14px] text-ink-3 font-medium">{grouped[cat].length} 篇</span>
+          </h2>
+          <div class="grid grid-cols-2 gap-5">
+            {grouped[cat].map((p) => (
+              <a
+                href={`/prescriptions/${p.id}`}
+                class="bg-white border border-rule rounded-[12px] p-7 flex flex-col gap-3 hover:border-accent transition"
+              >
+                <div class="flex gap-2">
+                  <span class="tag bg-paper-2 text-ink-2">{p.data.difficulty}</span>
+                  <span class="tag bg-accent-tint text-accent">每周省 {p.data.saveHoursPerWeek} 小时</span>
+                </div>
+                <h3 class="text-[20px] leading-[30px] font-semibold font-display text-ink">{p.data.title}</h3>
+                <p class="text-[15px] leading-[26px] text-ink-2 line-clamp-2">{p.data.summary}</p>
+                <p class="text-[13px] text-ink-3 font-medium">
+                  {p.data.publishedAt.toISOString().slice(0, 10)} · 读完约 {Math.max(4, Math.round(p.data.setupMinutes / 3))} 分钟
+                </p>
+              </a>
+            ))}
+          </div>
+        </div>
+      </section>
+    ))
+  }
+</BaseLayout>

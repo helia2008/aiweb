@@ -1,0 +1,17 @@
+name: '桌面 Agent 实战手册'
+description: '写给不想学编程、但想把重复劳动交出去的人。'
+url: 'https://desktopagent.dev'
+locale: 'zh-CN'
+
+# 导航（用于面包屑与侧边栏）
+nav:
+  - label: '首页'
+    href: '/'
+  - label: 'Start Here'
+    href: '/start-here'
+  - label: '痛点处方'
+    href: '/prescriptions'
+  - label: '工具罗盘'
+    href: '/tools'
+  - label: '关于'
+    href: '/about'

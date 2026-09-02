@@ -1,0 +1,44 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const prescriptions = (await getCollection('prescriptions'))
+  .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime())
+  .slice(0, 5);
+---
+
+<BaseLayout
+  title="页面不存在"
+  description="这个页面不存在。看看最新的痛点处方，或者从 Start Here 选一条路线开始。"
+  showSubscribe={false}
+>
+  <section class="px-[120px] py-[100px] bg-paper">
+    <div class="max-w-[800px] flex flex-col gap-6">
+      <p class="text-[13px] font-medium tracking-[1.8px] text-accent">404</p>
+      <h1 class="text-[48px] leading-[60px] font-bold font-display">这个页面不存在</h1>
+      <p class="text-[17px] leading-[31px] text-ink-2">
+        可能是链接过期了，或者地址打错了。下面是最近更新的几篇处方，也许正是你要找的。
+      </p>
+
+      <ul class="mt-4 flex flex-col gap-3">
+        {prescriptions.map((p) => (
+          <li>
+            <a
+              href={`/prescriptions/${p.id}`}
+              class="block bg-white border border-rule rounded-[10px] p-5 hover:border-accent transition"
+            >
+              <p class="text-[13px] text-ink-3">{p.data.category} · 每周省 {p.data.saveHoursPerWeek} 小时</p>
+              <p class="text-[19px] font-semibold font-display text-ink mt-1">{p.data.title}</p>
+            </a>
+          </li>
+        ))}
+      </ul>
+
+      <div class="flex gap-4 mt-4">
+        <a href="/prescriptions" class="text-accent underline underline-offset-4">全部痛点处方</a>
+        <a href="/start-here" class="text-accent underline underline-offset-4">Start Here 路线</a>
+        <a href="/" class="text-accent underline underline-offset-4">回首页</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

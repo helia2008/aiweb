@@ -1,0 +1,211 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const prescriptions = (await getCollection('prescriptions', ({ data }) => !data.draft))
+  .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
+
+const featured = prescriptions.slice(0, 3);
+const tools = await getCollection('tools');
+---
+
+<BaseLayout
+  title="让 AI Agent 替你做每周重复的活"
+  description="不懂代码也能用。按岗位整理的可复现自动化处方：报销单、合同条款、简历初筛、周报、竞品监控——每一步都自己跑过一遍才写出来。"
+>
+  <!-- ============== HERO ============== -->
+  <section class="px-[120px] py-[104px] bg-paper flex items-center gap-[72px]">
+    <div class="w-[600px] flex flex-col gap-[30px]">
+      <span class="inline-flex items-center gap-[9px] px-[15px] py-[8px] rounded-full bg-accent-tint w-fit">
+        <span class="block w-[6px] h-[6px] rounded-full bg-accent"></span>
+        <span class="text-[13px] font-medium text-accent">只写自己跑通过的 · 每周三更新</span>
+      </span>
+
+      <h1 class="text-[58px] leading-[74px] font-bold font-display text-ink">
+        把你每周重复做的那件事，交给电脑自己做
+      </h1>
+
+      <p class="text-[17px] leading-[31px] text-ink-2">
+        这里不做工具评测，也不讲大模型原理。只记录一件事：一个不懂代码的普通人，怎么用桌面 Agent 把每周三小时的手工活，压缩成一次回车。
+      </p>
+
+      <div class="flex gap-[14px] mt-2">
+        <a href="/start-here" class="h-[52px] px-7 inline-flex items-center bg-accent text-white text-[16px] font-semibold rounded-[8px] hover:opacity-90">从 7 天路线开始</a>
+        <a href="/prescriptions" class="h-[52px] px-7 inline-flex items-center bg-paper border border-accent text-accent text-[16px] font-medium rounded-[8px] hover:bg-accent-tint">先看看能省多少时间</a>
+      </div>
+
+      <p class="text-[14px] text-ink-3 mt-2">
+        {prescriptions.length} 篇已验证处方 · 累计为读者省下 380 小时/月
+      </p>
+    </div>
+
+    <div class="flex-1">
+      <img
+        src="/hero-desk.png"
+        alt="桌面工作场景：木桌上的笔记本与手写便签"
+        class="w-[468px] h-[452px] object-cover rounded-[14px] shadow-[0_24px_60px_-20px_rgba(26,25,23,0.18)]"
+        loading="eager"
+        width="468"
+        height="452"
+      />
+    </div>
+  </section>
+
+  <!-- ============== BEFORE / AFTER ============== -->
+  <section class="px-[120px] py-[86px] bg-deep">
+    <div class="flex flex-col gap-[44px]">
+      <div class="flex flex-col gap-[14px]">
+        <p class="text-[13px] font-medium tracking-[1.6px] text-accent">为什么值得花这 7 天</p>
+        <h2 class="text-[38px] leading-[50px] font-bold font-display text-deep-ink">三个月前，和三个月后</h2>
+      </div>
+
+      <div class="grid grid-cols-2 gap-7">
+        <div class="bg-deep-2 rounded-[12px] p-[34px] flex flex-col gap-[22px]">
+          <p class="text-[12px] font-medium tracking-[2px] text-deep-ink-3">BEFORE</p>
+          <h3 class="text-[23px] leading-[34px] font-semibold font-display text-deep-ink">每周三下午，你还在手工对 400 行表格</h3>
+          <ul class="flex flex-col gap-[10px]">
+            <li class="flex gap-3 items-center text-[15px] leading-[26px] text-deep-ink-3"><span class="block w-[5px] h-[5px] rounded-full bg-deep-ink-3"></span>复制、粘贴、改格式，一坐就是三小时</li>
+            <li class="flex gap-3 items-center text-[15px] leading-[26px] text-deep-ink-3"><span class="block w-[5px] h-[5px] rounded-full bg-deep-ink-3"></span>换个人接手，流程又得从头讲一遍</li>
+            <li class="flex gap-3 items-center text-[15px] leading-[26px] text-deep-ink-3"><span class="block w-[5px] h-[5px] rounded-full bg-deep-ink-3"></span>AI 试过一次，答非所问，就再没打开过</li>
+          </ul>
+        </div>
+
+        <div class="bg-deep-3 border border-accent rounded-[12px] p-[34px] flex flex-col gap-[22px]">
+          <p class="text-[12px] font-medium tracking-[2px] text-accent">AFTER</p>
+          <h3 class="text-[23px] leading-[34px] font-semibold font-display text-deep-ink">你说一句，它跑完，你去泡杯咖啡</h3>
+          <ul class="flex flex-col gap-[10px]">
+            <li class="flex gap-3 items-center text-[15px] leading-[26px] text-deep-ink-2"><span class="block w-[5px] h-[5px] rounded-full bg-accent"></span>表格丢给 Agent，八分钟出结果，你只负责抽查</li>
+            <li class="flex gap-3 items-center text-[15px] leading-[26px] text-deep-ink-2"><span class="block w-[5px] h-[5px] rounded-full bg-accent"></span>流程写成一份说明书，谁接手都能照着跑</li>
+            <li class="flex gap-3 items-center text-[15px] leading-[26px] text-deep-ink-2"><span class="block w-[5px] h-[5px] rounded-full bg-accent"></span>省下的时间拿去做只有人能做的判断</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== START HERE ============== -->
+  <section class="px-[120px] py-[92px] bg-paper">
+    <div class="flex flex-col gap-[46px]">
+      <div class="flex flex-col gap-4">
+        <p class="text-[13px] font-medium tracking-[1.8px] text-accent">START HERE</p>
+        <h2 class="text-[40px] leading-[52px] font-bold font-display text-ink">挑一条路，七天后来验收</h2>
+        <p class="text-[16px] leading-[29px] text-ink-2 max-w-[920px]">
+          三条路线都实测过：跟着做，第七天手上会有一个真跑得起来的自动化。不需要懂代码，也不需要装任何付费软件。
+        </p>
+      </div>
+
+      <div class="grid grid-cols-3 gap-6">
+        <a href="/start-here#p1" class="bg-white border border-rule rounded-[12px] p-8 flex flex-col gap-4 hover:border-accent transition">
+          <span class="text-[42px] font-bold font-display text-rule">01</span>
+          <h3 class="text-[21px] leading-[31px] font-semibold font-display text-ink">我连提示词都写不明白</h3>
+          <p class="text-[15px] leading-[27px] text-ink-2">从装好第一个桌面 Agent 开始，到让它帮你读完一份 40 页 PDF 并写出摘要。全程鼠标操作。</p>
+          <div class="h-px bg-rule my-2"></div>
+          <p class="text-[13px] text-ink-3 font-medium">7 天 · 每天 20 分钟 · 零基础</p>
+        </a>
+        <a href="/start-here#p2" class="bg-white border border-rule rounded-[12px] p-8 flex flex-col gap-4 hover:border-accent transition">
+          <span class="text-[42px] font-bold font-display text-rule">02</span>
+          <h3 class="text-[21px] leading-[31px] font-semibold font-display text-ink">我想让它替我干掉一份周报</h3>
+          <p class="text-[15px] leading-[27px] text-ink-2">挑一件你每周必做、最厌烦的事，把它拆成 Agent 能执行的步骤，配上可复用的指令模板。</p>
+          <div class="h-px bg-rule my-2"></div>
+          <p class="text-[13px] text-ink-3 font-medium">7 天 · 每天 30 分钟 · 会用 Excel</p>
+        </a>
+        <a href="/start-here#p3" class="bg-white border border-rule rounded-[12px] p-8 flex flex-col gap-4 hover:border-accent transition">
+          <span class="text-[42px] font-bold font-display text-rule">03</span>
+          <h3 class="text-[21px] leading-[31px] font-semibold font-display text-ink">我们部门都想用起来</h3>
+          <p class="text-[15px] leading-[27px] text-ink-2">从个人提效跨到团队落地：怎么选场景、怎么定红线、怎么让同事愿意跟着用而不是偷偷抵触。</p>
+          <div class="h-px bg-rule my-2"></div>
+          <p class="text-[13px] text-ink-3 font-medium">7 天 · 每天 40 分钟 · 带团队</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== 痛点处方 ============== -->
+  <section class="px-[120px] py-[92px] bg-paper-2">
+    <div class="flex flex-col gap-[42px]">
+      <div class="flex items-end justify-between">
+        <div class="flex flex-col gap-4 max-w-[760px]">
+          <p class="text-[13px] font-medium tracking-[1.8px] text-accent">痛点处方</p>
+          <h2 class="text-[40px] leading-[52px] font-bold font-display text-ink">按你烦的那件事找，不按工具找</h2>
+          <p class="text-[16px] leading-[29px] text-ink-2">每篇都是同一个结构：这个活烦在哪 → 需要准备什么 → 一步步怎么配 → 直接能抄的指令 → 我踩过的坑。</p>
+        </div>
+        <a href="/prescriptions" class="text-[15px] font-medium text-accent hover:underline">查看全部 {prescriptions.length} 篇 →</a>
+      </div>
+
+      <div class="flex flex-col gap-[18px]">
+        {
+          featured.map((p) => (
+            <a
+              href={`/prescriptions/${p.id}`}
+              class="bg-white border border-rule rounded-[12px] p-[30px] flex items-center gap-7 hover:border-accent transition"
+            >
+              <div class="w-14 h-14 rounded-[12px] bg-accent-tint flex items-center justify-center">
+                <span class="text-accent text-[22px] font-bold font-display">处</span>
+              </div>
+              <div class="flex-1 flex flex-col gap-[11px]">
+                <div class="flex gap-2">
+                  <span class="tag bg-paper-2 text-ink-2">{p.data.category}</span>
+                  <span class="tag bg-accent-tint text-accent">上手 {p.data.setupMinutes} 分钟</span>
+                </div>
+                <h3 class="text-[23px] leading-[33px] font-semibold font-display text-ink">{p.data.title}</h3>
+                <p class="text-[15px] leading-[26px] text-ink-2 line-clamp-2">{p.data.summary}</p>
+                <p class="text-[13px] text-ink-3 font-medium">
+                  每周省 {p.data.saveHoursPerWeek} 小时 · 更新于 {p.data.updatedAt?.toISOString().slice(0, 10) ?? p.data.publishedAt.toISOString().slice(0, 10)}
+                </p>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== 工具罗盘 ============== -->
+  <section class="px-[120px] py-[92px] bg-paper">
+    <div class="flex flex-col gap-[42px]">
+      <div class="flex flex-col gap-4">
+        <p class="text-[13px] font-medium tracking-[1.8px] text-accent">工具罗盘</p>
+        <h2 class="text-[40px] leading-[52px] font-bold font-display text-ink">只收我自己在用的，并且都标了不适合谁</h2>
+        <p class="text-[16px] leading-[29px] text-ink-2">工具站最大的问题是不说人话的坏处。这里每张卡都会告诉你：什么情况下别用它。</p>
+      </div>
+
+      <div class="grid grid-cols-3 gap-6">
+        {
+          tools.map((t) => (
+            <a
+              href="/tools"
+              class="bg-white border border-rule rounded-[12px] p-[30px] flex flex-col gap-[11px] hover:border-accent transition"
+            >
+              <h3 class="text-[20px] font-semibold">{t.data.name}</h3>
+              <p class="text-[13px] font-medium text-accent">{t.data.tag}</p>
+              <p class="text-[14px] leading-[25px] text-ink-2 line-clamp-3">{t.data.fit[0]}</p>
+              <div class="h-px bg-rule my-2"></div>
+              <p class="text-[13px] font-medium text-ink-3">上手 {t.data.setupTime} · {t.data.cost}</p>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== 痛点门诊 ============== -->
+  <section class="px-[120px] py-[84px] bg-accent-tint">
+    <div class="flex flex-col gap-[26px] max-w-[920px]">
+      <p class="text-[13px] font-medium tracking-[1.8px] text-accent">痛点门诊</p>
+      <h2 class="text-[38px] leading-[50px] font-bold font-display text-ink">把你最烦的那件事丢过来</h2>
+      <p class="text-[16px] leading-[29px] text-ink-2">
+        描述你每周重复做的那件事，我来判断它值不值得自动化、大概能省多少时间，跑通了就写成一篇处方发出来。每周挑三个。
+      </p>
+      <form action="mailto:hi@desktopagent.dev" method="post" enctype="text/plain" class="flex gap-3">
+        <input
+          type="text"
+          name="pain"
+          placeholder="比如：每周一要把 12 家门店的销售表合成一张"
+          class="flex-1 h-[58px] px-[22px] rounded-[9px] bg-white border border-rule text-[15px] focus:outline-none focus:border-accent"
+        />
+        <button type="submit" class="h-[58px] px-8 rounded-[9px] bg-accent text-white text-[16px] font-semibold hover:opacity-90">提交</button>
+      </form>
+      <p class="text-[13px] font-medium text-ink-3">也可以直接写信到 hi@desktopagent.dev · 已收到 86 条，公开回复 24 条</p>
+    </div>
+  </section>
+</BaseLayout>

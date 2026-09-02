@@ -1,0 +1,23 @@
+# ============================================================
+# Cloudflare Pages 部署配置
+# ============================================================
+# 用法：
+# 1) 在 Cloudflare 控制台创建一个 Pages 项目，连接 GitHub 仓库
+# 2) Build command:   npm run build
+# 3) Build output:    dist
+# 4) Node version:    20 或更高（在环境变量里设 NODE_VERSION=20）
+# 5) 把 SITE_URL 设为你的生产域名（首用免费子域 `https://<name>.pages.dev`）
+# 6) 首次部署后，绑定自定义域名
+# 7) 后续每次 git push 到 main 分支，自动构建、自动部署
+#
+# 本文件是可选的（Cloudflare Pages 通过控制台已能完成配置），
+# 但保留它是为了在 CLI 部署时使用：
+#     npx wrangler pages deploy dist
+# ============================================================
+
+name = "desktop-agent-handbook"
+compatibility_date = "2024-09-23"
+pages_build_output_dir = "./dist"
+
+[vars]
+NODE_VERSION = "20"

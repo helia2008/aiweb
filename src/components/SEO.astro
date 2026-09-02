@@ -1,0 +1,157 @@
+---
+/**
+ * SEO 统一组件
+ *
+ * 集中处理：canonical / Open Graph / Twitter Card / JSON-LD 结构化数据。
+ * 所有页面通过 BaseLayout 传入参数即可，不要在各页面里手写 meta。
+ *
+ * 结构化数据策略（schema.org @graph）：
+ *   - 全站：Organization + WebSite
+ *   - 文章页：Article + BreadcrumbList
+ *   - 传了 faqs：FAQPage（这是拿 "People Also Ask" 富摘要的主要手段）
+ *
+ * 注意：og:image 必须是绝对 URL 且为 png/jpg（SVG 不被社交平台支持）。
+ */
+
+export interface Breadcrumb {
+  name: string;
+  url: string;
+}
+
+export interface Props {
+  title: string;
+  description: string;
+  /** 相对路径，如 /og-default.png；默认取站点 OG 图 */
+  ogImage?: string;
+  type?: 'website' | 'article';
+  publishedAt?: Date;
+  updatedAt?: Date;
+  tags?: string[];
+  breadcrumbs?: Breadcrumb[];
+  /** 传了就输出 FAQPage schema */
+  faqs?: { q: string; a: string }[];
+}
+
+const {
+  title,
+  description,
+  ogImage = '/og-default.png',
+  type = 'website',
+  publishedAt,
+  updatedAt,
+  tags = [],
+  breadcrumbs = [],
+  faqs = [],
+} = Astro.props;
+
+const SITE_NAME = '桌面 Agent 实战手册';
+const SITE_DESC = '写给不想学编程、但想把重复劳动交出去的人。';
+const site = Astro.site ?? new URL('https://desktopagent.dev');
+
+const canonical = new URL(Astro.url.pathname, site).toString();
+const ogImageUrl = new URL(ogImage, site).toString();
+const fullTitle = title === SITE_NAME ? title : `${title} · ${SITE_NAME}`;
+
+const iso = (d?: Date) => (d ? d.toISOString() : undefined);
+
+// ---------- 结构化数据 ----------
+
+const organization = {
+  '@type': 'Organization',
+  '@id': `${site}#organization`,
+  name: SITE_NAME,
+  url: site.toString(),
+  description: SITE_DESC,
+  logo: {
+    '@type': 'ImageObject',
+    url: new URL('/og-default.png', site).toString(),
+  },
+};
+
+const website = {
+  '@type': 'WebSite',
+  '@id': `${site}#website`,
+  url: site.toString(),
+  name: SITE_NAME,
+  description: SITE_DESC,
+  inLanguage: 'zh-CN',
+  publisher: { '@id': `${site}#organization` },
+};
+
+const breadcrumbSchema =
+  breadcrumbs.length > 0
+    ? {
+        '@type': 'BreadcrumbList',
+        itemListElement: breadcrumbs.map((b, i) => ({
+          '@type': 'ListItem',
+          position: i + 1,
+          name: b.name,
+          item: new URL(b.url, site).toString(),
+        })),
+      }
+    : null;
+
+const articleSchema =
+  type === 'article'
+    ? {
+        '@type': 'Article',
+        '@id': `${canonical}#article`,
+        headline: title,
+        description,
+        inLanguage: 'zh-CN',
+        datePublished: iso(publishedAt),
+        dateModified: iso(updatedAt ?? publishedAt),
+        mainEntityOfPage: { '@type': 'WebPage', '@id': canonical },
+        author: { '@type': 'Organization', name: SITE_NAME },
+        publisher: { '@id': `${site}#organization` },
+        image: ogImageUrl,
+        keywords: tags.length ? tags.join(', ') : undefined,
+      }
+    : null;
+
+const faqSchema =
+  faqs.length > 0
+    ? {
+        '@type': 'FAQPage',
+        mainEntity: faqs.map((f) => ({
+          '@type': 'Question',
+          name: f.q,
+          acceptedAnswer: { '@type': 'Answer', text: f.a },
+        })),
+      }
+    : null;
+
+const graph = {
+  '@context': 'https://schema.org',
+  '@graph': [organization, website, breadcrumbSchema, articleSchema, faqSchema].filter(Boolean),
+};
+---
+
+<link rel="canonical" href={canonical} />
+<title>{fullTitle}</title>
+<meta name="description" content={description} />
+{tags.length > 0 && <meta name="keywords" content={tags.join(', ')} />}
+
+<!-- Open Graph -->
+<meta property="og:type" content={type === 'article' ? 'article' : 'website'} />
+<meta property="og:title" content={fullTitle} />
+<meta property="og:description" content={description} />
+<meta property="og:url" content={canonical} />
+<meta property="og:image" content={ogImageUrl} />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta property="og:image:alt" content={title} />
+<meta property="og:locale" content="zh_CN" />
+<meta property="og:site_name" content={SITE_NAME} />
+{type === 'article' && publishedAt && <meta property="article:published_time" content={iso(publishedAt)} />}
+{type === 'article' && updatedAt && <meta property="article:modified_time" content={iso(updatedAt)} />}
+{type === 'article' && tags.map((t) => <meta property="article:tag" content={t} />)}
+
+<!-- Twitter -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={fullTitle} />
+<meta name="twitter:description" content={description} />
+<meta name="twitter:image" content={ogImageUrl} />
+
+<!-- 结构化数据 -->
+<script type="application/ld+json" set:html={JSON.stringify(graph)} is:inline />
