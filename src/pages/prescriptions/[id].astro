@@ -58,14 +58,14 @@ const faqs = entry.data.faqs ?? [];
 >
   <article class="pt-0 pb-[110px] bg-paper">
     <!-- 面包屑（与 BreadcrumbList schema 保持一致） -->
-    <nav aria-label="面包屑" class="px-[120px] pt-[30px] pb-2 flex items-center gap-[9px]">
+    <nav aria-label="面包屑" class="px-5 sm:px-8 lg:px-[120px] pt-[30px] pb-2 flex items-center gap-[9px]">
       <a href="/prescriptions" class="text-[13px] font-medium text-ink-3 hover:text-accent">痛点处方</a>
       <span class="text-ink-3" aria-hidden="true">/</span>
       <span class="text-[13px] font-medium text-ink-3">{entry.data.category}</span>
     </nav>
 
-    <div class="px-[120px] flex justify-center">
-      <div class="w-[800px] flex flex-col gap-[26px]">
+    <div class="px-5 sm:px-8 lg:px-[120px] flex justify-center">
+      <div class="w-full max-w-[800px] flex flex-col gap-[26px]">
         <div class="flex gap-2">
           <a href="/prescriptions" class="tag bg-paper-2 text-ink-2 hover:text-accent">{entry.data.category}</a>
           <span class="tag bg-accent-tint text-accent">
@@ -97,11 +97,11 @@ const faqs = entry.data.faqs ?? [];
         {related.length > 0 && (
           <section class="mt-2">
             <h2 class="text-[20px] font-bold font-display text-ink mb-4">相关的处方</h2>
-            <div class="grid grid-cols-3 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {related.map((r) => (
                 <a
                   href={`/prescriptions/${r.id}`}
-                  class="bg-white border border-rule rounded-[10px] p-5 flex flex-col gap-2 hover:border-accent transition"
+                  class="bg-white border border-rule rounded-[10px] ai-card p-5 flex flex-col gap-2 hover:border-accent transition"
                 >
                   <p class="text-[12px] text-ink-3">{r.data.category}</p>
                   <p class="text-[16px] leading-[24px] font-semibold font-display text-ink">{r.data.title}</p>
@@ -112,15 +112,15 @@ const faqs = entry.data.faqs ?? [];
           </section>
         )}
 
-        <div class="grid grid-cols-2 gap-5 mt-10">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 mt-10">
           {prev && (
-            <a href={`/prescriptions/${prev.id}`} class="bg-white border border-rule rounded-[10px] p-[22px] flex flex-col gap-2 hover:border-accent transition">
+            <a href={`/prescriptions/${prev.id}`} class="bg-white border border-rule rounded-[10px] ai-card p-[22px] flex flex-col gap-2 hover:border-accent transition">
               <p class="text-[12px] font-medium tracking-[1.2px] text-ink-3">上一篇</p>
               <p class="text-[17px] leading-[26px] font-semibold font-display text-ink">{prev.data.title}</p>
             </a>
           )}
           {next && (
-            <a href={`/prescriptions/${next.id}`} class="bg-white border border-rule rounded-[10px] p-[22px] flex flex-col gap-2 hover:border-accent transition">
+            <a href={`/prescriptions/${next.id}`} class="bg-white border border-rule rounded-[10px] ai-card p-[22px] flex flex-col gap-2 hover:border-accent transition">
               <p class="text-[12px] font-medium tracking-[1.2px] text-ink-3">下一篇</p>
               <p class="text-[17px] leading-[26px] font-semibold font-display text-ink">{next.data.title}</p>
             </a>

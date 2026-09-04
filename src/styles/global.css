@@ -146,3 +146,162 @@ h1, h2, h3, h4 {
   font-size: 12px;
   font-weight: 500;
 }
+
+/* ============================================================
+   AI 视觉层（2026-09-04 升级）
+   原则：保留浅色纸感底（职场读者友好）+ 注入科技感元素
+   ============================================================ */
+
+@theme {
+  /* AI 点缀色：靛蓝 → 紫 → 青，用于渐变、光晕、强调 */
+  --color-ai-1: #4F46E5;
+  --color-ai-2: #7C3AED;
+  --color-ai-3: #0891B2;
+  --color-ai-glow: #A5B4FC;
+  /* 等宽字体：技术感点缀（数字、指令、标签） */
+  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+}
+
+/* ---- 深色渐变 Hero（AI 感主视觉） ---- */
+.hero-ai {
+  position: relative;
+  background:
+    radial-gradient(ellipse 80% 60% at 15% 0%, rgba(79, 70, 229, 0.22), transparent 60%),
+    radial-gradient(ellipse 60% 50% at 85% 20%, rgba(124, 58, 237, 0.18), transparent 60%),
+    radial-gradient(ellipse 50% 40% at 50% 100%, rgba(8, 145, 178, 0.12), transparent 60%),
+    var(--color-deep);
+  overflow: hidden;
+}
+
+/* Hero 上的细网格纹理（科技感底纹） */
+.hero-ai::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+  background-size: 56px 56px;
+  mask-image: radial-gradient(ellipse 70% 70% at 50% 30%, #000 40%, transparent 100%);
+  pointer-events: none;
+}
+
+/* 浮动光晕球（纯装饰） */
+.ai-blob {
+  position: absolute;
+  border-radius: 9999px;
+  filter: blur(72px);
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+/* ---- 渐变文字 ---- */
+.gradient-text {
+  background: linear-gradient(100deg, var(--color-ai-1) 0%, var(--color-ai-2) 45%, var(--color-ai-3) 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.gradient-text-light {
+  background: linear-gradient(100deg, #C7D2FE 0%, #DDD6FE 40%, #A5F3FC 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* ---- 玻璃拟态卡片 ---- */
+.glass-card {
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  box-shadow: 0 1px 2px rgba(26, 25, 23, 0.04), 0 12px 32px -12px rgba(26, 25, 23, 0.12);
+}
+
+.glass-dark {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* ---- 卡片 hover 微动效（上浮 + 发光边框） ---- */
+.ai-card {
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+.ai-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(79, 70, 229, 0.45);
+  box-shadow: 0 16px 40px -16px rgba(79, 70, 229, 0.35);
+}
+
+/* ---- 等宽点缀标签（技术感） ---- */
+.mono-badge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* ---- 按钮：渐变主 CTA ---- */
+.btn-ai {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(100deg, var(--color-ai-1), var(--color-ai-2));
+  color: #fff;
+  font-weight: 600;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px -6px rgba(79, 70, 229, 0.6);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+}
+.btn-ai:hover {
+  transform: translateY(-1px);
+  opacity: 0.96;
+  box-shadow: 0 12px 28px -8px rgba(79, 70, 229, 0.7);
+}
+
+/* ---- 文章正文：指令代码块（核心卖点，必须醒目） ---- */
+.article-prose pre {
+  background: var(--color-deep);
+  color: var(--color-deep-ink-2);
+  border: 1px solid var(--color-deep-rule);
+  border-radius: 12px;
+  padding: 1.15rem 1.35rem;
+  font-family: var(--font-mono);
+  font-size: 0.86rem;
+  line-height: 1.72;
+  margin: 1.5rem 0;
+  overflow-x: auto;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+.article-prose code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  background: var(--color-paper-2);
+  border: 1px solid var(--color-rule);
+  border-radius: 5px;
+  padding: 2px 6px;
+  color: var(--color-ink);
+}
+.article-prose pre code {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: inherit;
+  color: inherit;
+}
+
+/* ---- 响应式兜底：小屏标题字号收敛 ---- */
+@media (max-width: 768px) {
+  h1 { font-size: 2rem !important; line-height: 1.28 !important; }
+  h2 { font-size: 1.55rem !important; line-height: 1.35 !important; }
+  .article-prose p { font-size: 1rem; line-height: 1.8; }
+  .article-prose h2 { font-size: 1.3rem !important; }
+}
+
+/* ---- 平滑滚动 + 锚点偏移（吸顶导航不遮挡） ---- */
+html { scroll-behavior: smooth; }
+[id] { scroll-margin-top: 92px; }

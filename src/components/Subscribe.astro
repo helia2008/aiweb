@@ -1,33 +1,38 @@
 ---
 /**
  * 订阅区（原在 BaseLayout 内，抽出以便文章页复用/隐藏）
+ * 2026-09-04 修复：① 补 id="subscribe" 锚点（Header 按钮指向这里）
+ *                  ② 原 action="#" 假表单无任何反馈 → 改为 mailto 提交（能真实收到订阅请求）
  */
+const SUBJECT = encodeURIComponent('订阅每周三的一封信');
+const BODY = encodeURIComponent('我想订阅《桌面 Agent 实战手册》的每周邮件。\n\n（可选）我最想让它替我做的重复劳动是：\n');
 ---
 
-<section class="py-[88px] px-[120px] bg-paper">
-  <div class="max-w-[800px] mx-auto text-center flex flex-col gap-5">
-    <p class="text-[13px] font-medium tracking-[1.8px] text-accent">订阅</p>
-    <h2 class="text-[36px] leading-[48px] font-bold">每周三，一封只讲一件事的信</h2>
-    <p class="text-[16px] leading-[29px] text-ink-2">
+<section id="subscribe" class="py-16 lg:py-[88px] px-5 sm:px-8 lg:px-[120px] bg-paper">
+  <div
+    class="max-w-[820px] mx-auto text-center flex flex-col gap-5 p-8 lg:p-12 rounded-[20px] ai-card glass-card"
+  >
+    <p class="mono-badge text-ai-1">SUBSCRIBE</p>
+    <h2 class="text-[28px] lg:text-[36px] leading-[1.35] lg:leading-[48px] font-bold text-ink">
+      每周三，一封<span class="gradient-text">只讲一件事</span>的信
+    </h2>
+    <p class="text-[15px] lg:text-[16px] leading-[27px] lg:leading-[29px] text-ink-2">
       一篇能照着做的处方，或者一条我踩过的坑。不转发新闻，不发工具合集。随时可退。
     </p>
-    <form class="flex gap-3 justify-center mt-2" action="#" method="post">
-      <label class="sr-only" for="subscribe-email">邮箱地址</label>
-      <input
-        id="subscribe-email"
-        type="email"
-        name="email"
-        required
-        placeholder="你的邮箱"
-        class="w-[340px] h-[52px] px-5 rounded-[9px] bg-white border border-rule text-[15px] focus:outline-none focus:border-accent"
-      />
-      <button
-        type="submit"
-        class="h-[52px] px-8 rounded-[9px] bg-accent text-white font-semibold hover:opacity-90 transition"
-      >订阅</button>
-    </form>
+
+    <div class="flex flex-col sm:flex-row gap-3 justify-center mt-2">
+      <a
+        href={`mailto:admin@aiwind.eu.cc?subject=${SUBJECT}&body=${BODY}`}
+        class="h-[52px] px-8 inline-flex items-center justify-center btn-ai text-[16px]"
+      >写信订阅</a>
+      <a
+        href="/rss.xml"
+        class="h-[52px] px-8 inline-flex items-center justify-center border border-rule rounded-[10px] text-[16px] font-medium text-ink-2 hover:border-ai-1 hover:text-ai-1 transition"
+      >用 RSS 阅读器</a>
+    </div>
+
     <p class="text-[13px] text-ink-3">
-      也支持 <a href="/rss.xml" class="text-accent underline">RSS 阅读器</a> 订阅
+      点「写信订阅」会自动打开邮件客户端并填好收件人，<b class="font-medium text-ink-2">直接发送即可</b>，不需要填表。
     </p>
   </div>
 </section>

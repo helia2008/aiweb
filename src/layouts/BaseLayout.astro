@@ -76,12 +76,14 @@ const FONT_URL =
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
 
     <!--
-      分析：只在生产域名加载，开发环境不埋点。
-      部署前把 data-website-id 换成你的 umami / plausible 站点 ID。
+      分析：2026-09-04 暂时移除。原代码在生产域名会加载 umami.example.com（占位地址，
+      每次访问都产生一次失败请求）。有真实统计站点后，把下面这段取消注释并填 ID 即可
+      （推荐 umami 自托管 / plausible，不用 GA 以保加载速度）：
+
+      {Astro.url.hostname === 'aiwind.eu.cc' && (
+        <script defer src="https://你的统计域名/script.js" data-website-id="你的站点ID" is:inline />
+      )}
     -->
-    {Astro.url.hostname === 'aiwind.eu.cc' && (
-      <script defer src="https://umami.example.com/script.js" data-website-id="REPLACE_ME" is:inline />
-    )}
   </head>
 
   <body class="bg-paper text-ink">
