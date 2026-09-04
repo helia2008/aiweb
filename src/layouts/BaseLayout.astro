@@ -38,12 +38,6 @@ const {
   breadcrumbs,
   faqs,
 } = Astro.props;
-
-// 字体：Google Fonts 在国内访问不稳定且体积大，
-// 这里用 media="print" + onload 技巧异步加载，避免阻塞首屏渲染（LCP）。
-// 未加载完成时由 global.css 里的系统字体栈兜底（宋体 / 思源宋体 / Georgia）。
-const FONT_URL =
-  'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Serif+SC:wght@500;600;700;800&display=swap';
 ---
 
 <!doctype html>
@@ -66,11 +60,12 @@ const FONT_URL =
       faqs={faqs}
     />
 
-    <!-- 字体：异步加载，不阻塞 LCP -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href={FONT_URL} media="print" onload="this.media='all'" />
-    <noscript><link rel="stylesheet" href={FONT_URL} /></noscript>
+    <!--
+      字体：2026-09-04 移除 Google Fonts。实测 fonts.googleapis.com 在国内不可达
+      （HTTP 000，约 15 秒才超时），手机浏览器会卡在此请求上导致长时间白屏——
+      这就是「手机打不开」的根因。现全部改用系统字体栈（iOS 苹方/Android 思源/
+      Windows 雅黑），零外部请求、秒开。将来要换字体必须自托管 woff2 到 /public/fonts/。
+    -->
 
     <link rel="alternate" type="application/rss+xml" title="桌面 Agent 实战手册" href="/rss.xml" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />

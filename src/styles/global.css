@@ -23,9 +23,9 @@
   --color-deep-ink-2: #E8E2D6;
   --color-deep-ink-3: #A9A29A;
 
-  /* 字体 */
-  --font-display: "Noto Serif SC", "Source Han Serif SC", "Songti SC", "STSong", Georgia, serif;
-  --font-sans: "Inter", "PingFang SC", "Microsoft YaHei", system-ui, sans-serif;
+  /* 字体：纯系统栈（2026-09-04 移除 Google Fonts —— 国内不可达导致手机白屏） */
+  --font-display: "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", SimSun, STSong, Georgia, serif;
+  --font-sans: system-ui, -apple-system, "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
 
   /* 圆角 */
   --radius-card: 12px;
