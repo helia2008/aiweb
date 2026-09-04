@@ -31,3 +31,6 @@ pnpm-debug.log*
 
 # 不上传到站点、但本地可以留的稿件草稿
 src/content/_drafts/
+
+# WorkBuddy 本地工作数据（记忆/自动化/产物），不入库
+.workbuddy/
