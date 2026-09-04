@@ -8,6 +8,9 @@ const prescriptions = (await getCollection('prescriptions', ({ data }) => !data.
 const featured = prescriptions.slice(0, 3);
 const tools = await getCollection('tools');
 
+// 分类 tab：从全部处方去重得到类目（用于首页「痛点处方」区筛选）
+const categories = ['全部', ...Array.from(new Set(prescriptions.map((p) => p.data.category)))];
+
 // 真实统计：把每篇处方自测的「每周省 X 小时」按每月 4.3 周合计。
 // 口径写在页面上，不编造——这是文章自身声明的加总，不是虚构的读者数据。
 const totalHoursPerMonth = Math.round(
@@ -158,36 +161,73 @@ const totalHoursPerMonth = Math.round(
           <h2 class="text-[40px] leading-[52px] font-bold font-display text-ink">按你烦的那件事找，不按工具找</h2>
           <p class="text-[16px] leading-[29px] text-ink-2">每篇都是同一个结构：这个活烦在哪 → 需要准备什么 → 一步步怎么配 → 直接能抄的指令 → 我踩过的坑。</p>
         </div>
-        <a href="/prescriptions" class="text-[15px] font-medium text-accent hover:underline">查看全部 {prescriptions.length} 篇 →</a>
+        <a href="/start-here" class="text-[15px] font-medium text-accent hover:underline">新手从这里开始 →</a>
       </div>
 
-      <div class="flex flex-col gap-[18px] reveal">
+      <!-- 分类筛选 tab -->
+      <div class="cat-tabs reveal" role="tablist" aria-label="按类目筛选处方">
         {
-          featured.map((p) => (
+          categories.map((c, i) => (
+            <button
+              type="button"
+              class:list={['cat-tab', i === 0 && 'is-active']}
+              data-filter={c}
+              aria-pressed={i === 0 ? 'true' : 'false'}
+            >
+              {c}
+            </button>
+          ))
+        }
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 reveal" id="rx-grid">
+        {
+          prescriptions.map((p) => (
             <a
               href={`/prescriptions/${p.id}`}
-              class="bg-white border border-rule rounded-[12px] ai-card p-[30px] flex items-center gap-7 hover:border-accent transition"
+              data-category={p.data.category}
+              class="bg-white border border-rule rounded-[12px] ai-card p-[24px] flex flex-col gap-[13px] hover:border-accent transition"
             >
-              <div class="w-14 h-14 rounded-[12px] bg-accent-tint flex items-center justify-center">
-                <span class="text-accent text-[22px] font-bold font-display">处</span>
+              <div class="flex gap-2 flex-wrap">
+                <span class="tag bg-paper-2 text-ink-2">{p.data.category}</span>
+                <span class="tag bg-accent-tint text-accent">上手 {p.data.setupMinutes} 分钟</span>
               </div>
-              <div class="flex-1 flex flex-col gap-[11px]">
-                <div class="flex gap-2">
-                  <span class="tag bg-paper-2 text-ink-2">{p.data.category}</span>
-                  <span class="tag bg-accent-tint text-accent">上手 {p.data.setupMinutes} 分钟</span>
-                </div>
-                <h3 class="text-[23px] leading-[33px] font-semibold font-display text-ink">{p.data.title}</h3>
-                <p class="text-[15px] leading-[26px] text-ink-2 line-clamp-2">{p.data.summary}</p>
-                <p class="text-[13px] text-ink-3 font-medium">
-                  每周省 {p.data.saveHoursPerWeek} 小时 · 更新于 {p.data.updatedAt?.toISOString().slice(0, 10) ?? p.data.publishedAt.toISOString().slice(0, 10)}
-                </p>
-              </div>
+              <h3 class="text-[20px] leading-[29px] font-semibold font-display text-ink">{p.data.title}</h3>
+              <p class="text-[14px] leading-[24px] text-ink-2 line-clamp-2">{p.data.summary}</p>
+              <p class="text-[13px] text-ink-3 font-medium mt-auto pt-1">
+                每周省 {p.data.saveHoursPerWeek} 小时
+              </p>
             </a>
           ))
         }
       </div>
     </div>
   </section>
+
+  <script is:inline>
+    // 首页「痛点处方」分类筛选
+    (function () {
+      var tabs = document.querySelectorAll('#rx-grid, .cat-tabs');
+      var tabBar = document.querySelector('.cat-tabs');
+      var grid = document.getElementById('rx-grid');
+      if (!tabBar || !grid) return;
+      var cards = Array.prototype.slice.call(grid.querySelectorAll('[data-category]'));
+      tabBar.addEventListener('click', function (e) {
+        var btn = e.target.closest('.cat-tab');
+        if (!btn) return;
+        var f = btn.getAttribute('data-filter');
+        tabBar.querySelectorAll('.cat-tab').forEach(function (t) {
+          var on = t === btn;
+          t.classList.toggle('is-active', on);
+          t.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        cards.forEach(function (c) {
+          var show = f === '全部' || c.getAttribute('data-category') === f;
+          c.style.display = show ? '' : 'none';
+        });
+      });
+    })();
+  </script>
 
   <!-- ============== 工具罗盘 ============== -->
   <section class="px-5 sm:px-8 lg:px-[120px] py-[92px] bg-paper">

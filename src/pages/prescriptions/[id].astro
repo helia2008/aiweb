@@ -92,7 +92,7 @@ const faqs = entry.data.faqs ?? [];
         </div>
 
         <script is:inline>
-          // 文章目录：从 h2 自动生成锚点胶囊条
+          // 文章目录：从 h2 自动生成锚点胶囊条 + 「直接抄指令」快速定位
           (function () {
             var body = document.getElementById('article-body');
             if (!body) return;
@@ -126,6 +126,23 @@ const faqs = entry.data.faqs ?? [];
               links.push(a);
             });
 
+            // 「⚡ 直接抄指令」：直达可抄指令节（核心卖点）
+            var jumpHead = heads.filter(function (h) { return /指令/.test(h.textContent); })[0] || null;
+            var jump = null;
+            if (jumpHead) {
+              jump = document.createElement('a');
+              jump.className = 'toc-jump';
+              jump.href = '#' + jumpHead.id;
+              jump.textContent = '⚡ 直接抄指令';
+              jump.addEventListener('click', function (e) {
+                e.preventDefault();
+                var top = jumpHead.getBoundingClientRect().top + window.scrollY - 80;
+                window.scrollTo({ top: top, behavior: 'smooth' });
+                history.replaceState(null, '', '#' + jumpHead.id);
+              });
+              bar.appendChild(jump);
+            }
+
             body.insertBefore(bar, body.firstChild);
 
             // 滚动高亮当前章节（克制：仅在滚动时切换，不做多余动画）
@@ -135,6 +152,8 @@ const faqs = entry.data.faqs ?? [];
                   if (en.isIntersecting) {
                     var idx = heads.indexOf(en.target);
                     links.forEach(function (l, i) { l.classList.toggle('is-active', i === idx); });
+                    if (jump && en.target === jumpHead) jump.classList.add('is-active');
+                    else if (jump) jump.classList.remove('is-active');
                   }
                 });
               }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
