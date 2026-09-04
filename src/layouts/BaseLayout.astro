@@ -82,6 +82,7 @@ const {
   </head>
 
   <body class="bg-paper text-ink">
+    <div id="reading-progress" aria-hidden="true"></div>
     <Header pathname={pathname} />
 
     <main>
@@ -92,4 +93,69 @@ const {
 
     <Footer />
   </body>
+
+  <!-- 阅读进度条 + 指令复制按钮（轻量、无依赖、纯 vanilla） -->
+  <script is:inline>
+    (function () {
+      // 阅读进度条
+      var bar = document.getElementById('reading-progress');
+      if (bar) {
+        var ticking = false;
+        function update() {
+          var h = document.documentElement;
+          var max = h.scrollHeight - h.clientHeight;
+          bar.style.width = (max > 0 ? (h.scrollTop / max) * 100 : 0) + '%';
+          ticking = false;
+        }
+        window.addEventListener('scroll', function () {
+          if (!ticking) { ticking = true; requestAnimationFrame(update); }
+        }, { passive: true });
+        update();
+      }
+
+      // 指令代码块：加复制按钮 + 语言小标
+      var langLabel = { plaintext: '指令', bash: 'shell', text: '指令', md: 'markdown', yaml: 'yaml' };
+      document.querySelectorAll('main pre').forEach(function (pre) {
+        if (pre.parentElement && pre.parentElement.classList.contains('code-toolbar')) return;
+        var lang = (pre.getAttribute('data-language') || 'plaintext').toLowerCase();
+        var wrap = document.createElement('div');
+        wrap.className = 'code-toolbar';
+        pre.parentNode.insertBefore(wrap, pre);
+        wrap.appendChild(pre);
+
+        var label = document.createElement('span');
+        label.className = 'code-lang';
+        label.textContent = langLabel[lang] || lang;
+        wrap.appendChild(label);
+
+        var btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'copy-btn';
+        btn.textContent = '复制';
+        btn.setAttribute('aria-label', '复制这段指令');
+        btn.addEventListener('click', function () {
+          var text = pre.innerText || '';
+          function done() {
+            btn.textContent = '已复制 ✓';
+            btn.classList.add('copied');
+            setTimeout(function () { btn.textContent = '复制'; btn.classList.remove('copied'); }, 1800);
+          }
+          if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(done, function () { fallback(); });
+          } else { fallback(); }
+          function fallback() {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); done(); } catch (e) { btn.textContent = '复制失败'; }
+            document.body.removeChild(ta);
+          }
+        });
+        wrap.appendChild(btn);
+      });
+    })();
+  </script>
 </html>

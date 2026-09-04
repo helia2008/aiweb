@@ -305,3 +305,101 @@ h1, h2, h3, h4 {
 /* ---- 平滑滚动 + 锚点偏移（吸顶导航不遮挡） ---- */
 html { scroll-behavior: smooth; }
 [id] { scroll-margin-top: 92px; }
+
+/* ============================================================
+   细节优化层（2026-09-04）
+   ============================================================ */
+
+/* 阅读进度条（页面顶部，AI 产品常见） */
+#reading-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  height: 3px;
+  width: 0%;
+  z-index: 100;
+  background: linear-gradient(90deg, var(--color-ai-1), var(--color-ai-2), var(--color-ai-3));
+  pointer-events: none;
+  transition: width 0.05s linear;
+}
+
+/* 指令代码块：右上角悬浮复制按钮 */
+.code-toolbar {
+  position: relative;
+}
+.code-toolbar pre {
+  margin-top: 0.5rem;
+}
+.copy-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+  font-size: 11px;
+  font-weight: 500;
+  font-family: var(--font-sans);
+  color: var(--color-deep-ink-2);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-radius: 6px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.18s ease, background 0.18s ease;
+}
+.code-toolbar:hover .copy-btn,
+.copy-btn:focus-visible {
+  opacity: 1;
+}
+.copy-btn:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+.copy-btn.copied {
+  color: #A7F3D0;
+  border-color: rgba(167, 243, 208, 0.4);
+}
+
+/* 代码块内语言小标（右上，在复制按钮左侧） */
+.code-lang {
+  position: absolute;
+  top: 9px;
+  right: 74px;
+  font-size: 10px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.4);
+  font-family: var(--font-mono);
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* 表格在移动端可横滑 */
+.article-prose table {
+  display: block;
+  overflow-x: auto;
+  white-space: nowrap;
+  border-collapse: collapse;
+  margin: 1.25rem 0;
+}
+.article-prose th, .article-prose td {
+  border: 1px solid var(--color-rule);
+  padding: 8px 12px;
+  font-size: 0.9rem;
+}
+.article-prose th {
+  background: var(--color-paper-2);
+  font-weight: 600;
+}
+
+/* 尊重系统「减弱动态效果」偏好 */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
