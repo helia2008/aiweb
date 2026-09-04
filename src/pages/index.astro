@@ -55,15 +55,27 @@ const totalHoursPerMonth = Math.round(
         </p>
       </div>
 
-      <div class="w-full lg:flex-1 flex justify-center">
-        <img
-          src="/hero-desk.png"
-          alt="桌面工作场景：木桌上的笔记本与手写便签"
-          class="w-full max-w-[468px] h-auto lg:h-[452px] object-cover rounded-[14px] shadow-[0_24px_60px_-20px_rgba(0,0,0,0.5)] border border-white/10"
-          loading="eager"
-          width="468"
-          height="452"
-        />
+      <div class="w-full lg:flex-1 flex justify-center relative">
+        <!-- Agent 终端窗口演示（替代实景照片，AI 感核心视觉） -->
+        <span class="agent-window-glow" aria-hidden="true"></span>
+        <div class="agent-window" role="img" aria-label="桌面 Agent 正在自动合并门店销售表的演示窗口">
+          <div class="aw-titlebar">
+            <span class="aw-dot" style="background:#FF5F57"></span>
+            <span class="aw-dot" style="background:#FEBC2E"></span>
+            <span class="aw-dot" style="background:#28C840"></span>
+            <span class="aw-title">Agent · 合并 12 家门店销售表</span>
+          </div>
+          <div class="aw-body">
+            <div class="aw-line aw-ok l1"><b>读取</b> 12 家门店的销售表（Excel）</div>
+            <div class="aw-line aw-ok l2"><b>对齐</b> 表头与日期格式，去重 3 处重复行</div>
+            <div class="aw-line aw-ok l3"><b>合并</b> 384 行 → 一张总表</div>
+            <div class="aw-line aw-pending l4"><b>校验</b> 金额合计，2 处差异已标黄</div>
+            <div class="aw-line aw-pending l5"><b>导出</b> 汇总表.xlsx 到桌面<span class="aw-cursor"></span></div>
+            <div class="aw-result">
+              原耗时 <b class="g">3 小时</b> → 现在 <b class="g">8 分钟</b> · 你只负责抽查
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -76,7 +88,7 @@ const totalHoursPerMonth = Math.round(
         <h2 class="text-[38px] leading-[50px] font-bold font-display text-deep-ink">三个月前，和三个月后</h2>
       </div>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-7">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-7 reveal">
         <div class="bg-deep-2 rounded-[12px] p-[34px] flex flex-col gap-[22px]">
           <p class="text-[12px] font-medium tracking-[2px] text-deep-ink-3">BEFORE</p>
           <h3 class="text-[23px] leading-[34px] font-semibold font-display text-deep-ink">每周三下午，你还在手工对 400 行表格</h3>
@@ -111,7 +123,7 @@ const totalHoursPerMonth = Math.round(
         </p>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 reveal">
         <a href="/start-here#p1" class="bg-white border border-rule rounded-[12px] ai-card p-8 flex flex-col gap-4 hover:border-accent transition">
           <span class="text-[42px] font-bold font-display text-rule">01</span>
           <h3 class="text-[21px] leading-[31px] font-semibold font-display text-ink">我连提示词都写不明白</h3>
@@ -149,7 +161,7 @@ const totalHoursPerMonth = Math.round(
         <a href="/prescriptions" class="text-[15px] font-medium text-accent hover:underline">查看全部 {prescriptions.length} 篇 →</a>
       </div>
 
-      <div class="flex flex-col gap-[18px]">
+      <div class="flex flex-col gap-[18px] reveal">
         {
           featured.map((p) => (
             <a

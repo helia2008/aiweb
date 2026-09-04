@@ -403,3 +403,142 @@ html { scroll-behavior: smooth; }
     scroll-behavior: auto !important;
   }
 }
+
+/* ============================================================
+   Hero「Agent 终端窗口」演示（2026-09-04，AI 感核心视觉）
+   模拟一个桌面 Agent 正在跑任务的窗口，替代实景照片
+   ============================================================ */
+
+.agent-window {
+  width: 100%;
+  max-width: 520px;
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(15, 15, 18, 0.9);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.04),
+    0 30px 80px -24px rgba(0, 0, 0, 0.7),
+    0 0 90px -30px rgba(79, 70, 229, 0.45);
+  backdrop-filter: blur(8px);
+  font-family: var(--font-mono);
+}
+
+/* 标题栏 */
+.agent-window .aw-titlebar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+.agent-window .aw-dot {
+  width: 11px;
+  height: 11px;
+  border-radius: 999px;
+  display: inline-block;
+}
+.agent-window .aw-title {
+  margin-left: 8px;
+  font-size: 11.5px;
+  color: rgba(255, 255, 255, 0.5);
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 正文区：模拟任务日志 */
+.agent-window .aw-body {
+  padding: 18px 18px 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  font-size: 13px;
+  line-height: 1.6;
+}
+.agent-window .aw-line {
+  color: rgba(255, 255, 255, 0.72);
+  opacity: 0;
+  animation: aw-in 0.5s ease forwards;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.agent-window .aw-line b { color: #E8E2D6; font-weight: 600; }
+.agent-window .aw-ok::before {
+  content: "✓ ";
+  color: #34D399;
+}
+.agent-window .aw-pending::before {
+  content: "… ";
+  color: #FBBF24;
+}
+
+/* 逐条延迟出现 */
+.agent-window .l1 { animation-delay: 0.3s; }
+.agent-window .l2 { animation-delay: 0.9s; }
+.agent-window .l3 { animation-delay: 1.5s; }
+.agent-window .l4 { animation-delay: 2.1s; }
+.agent-window .l5 { animation-delay: 2.7s; }
+.agent-window .l6 { animation-delay: 3.3s; }
+
+@keyframes aw-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* 闪烁光标（等待态） */
+.agent-window .aw-cursor {
+  display: inline-block;
+  width: 8px;
+  height: 15px;
+  background: #A5B4FC;
+  vertical-align: -2px;
+  animation: aw-blink 1s steps(1) infinite;
+  margin-left: 2px;
+}
+@keyframes aw-blink { 50% { opacity: 0; } }
+
+/* 底部结果条：渐变发光 */
+.agent-window .aw-result {
+  margin-top: 8px;
+  padding: 12px 14px;
+  border-radius: 9px;
+  background: linear-gradient(100deg, rgba(79, 70, 229, 0.22), rgba(124, 58, 237, 0.18));
+  border: 1px solid rgba(165, 180, 252, 0.3);
+  color: #E8E2D6;
+  font-size: 13px;
+  opacity: 0;
+  animation: aw-in 0.6s ease 3.9s forwards;
+}
+.agent-window .aw-result .g { color: #A5B4FC; font-weight: 700; }
+
+/* 终端窗口的旋转光晕装饰 */
+.agent-window-glow {
+  position: absolute;
+  inset: -12%;
+  border-radius: 50%;
+  background: conic-gradient(from 90deg, rgba(79,70,229,.25), rgba(124,58,237,0), rgba(8,145,178,.2), rgba(79,70,229,.25));
+  filter: blur(60px);
+  opacity: 0.5;
+  z-index: -1;
+}
+
+/* 入场滚动显现（AI 产品通用，尊重 reduced-motion）
+   注意：默认可见；仅当 html.js（JS 可用）时才初始隐藏，
+   避免无 JS 环境内容永远不可见。 */
+.reveal { opacity: 1; transform: none; }
+html.js .reveal {
+  opacity: 0;
+  transform: translateY(22px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+html.js .reveal.in {
+  opacity: 1;
+  transform: translateY(0);
+}
+@media (prefers-reduced-motion: reduce) {
+  html.js .reveal { opacity: 1; transform: none; transition: none; }
+}

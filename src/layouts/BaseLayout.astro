@@ -97,6 +97,9 @@ const {
   <!-- 阅读进度条 + 指令复制按钮（轻量、无依赖、纯 vanilla） -->
   <script is:inline>
     (function () {
+      // JS 可用标记（reveal 动画依赖，避免无 JS 时内容不可见）
+      document.documentElement.classList.add('js');
+
       // 阅读进度条
       var bar = document.getElementById('reading-progress');
       if (bar) {
@@ -111,6 +114,19 @@ const {
           if (!ticking) { ticking = true; requestAnimationFrame(update); }
         }, { passive: true });
         update();
+      }
+
+      // 入场滚动显现：进入视口才淡入上移
+      var revealEls = document.querySelectorAll('.reveal');
+      if (revealEls.length && 'IntersectionObserver' in window) {
+        var ro = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) {
+            if (e.isIntersecting) { e.target.classList.add('in'); ro.unobserve(e.target); }
+          });
+        }, { threshold: 0.12, rootMargin: '0px 0px -40px 0px' });
+        revealEls.forEach(function (el) { ro.observe(el); });
+      } else {
+        revealEls.forEach(function (el) { el.classList.add('in'); });
       }
 
       // 指令代码块：加复制按钮 + 语言小标
