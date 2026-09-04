@@ -87,9 +87,61 @@ const faqs = entry.data.faqs ?? [];
 
         <hr class="border-t border-rule" />
 
-        <div class="article-prose">
+        <div class="article-prose" id="article-body">
           <Content />
         </div>
+
+        <script is:inline>
+          // 文章目录：从 h2 自动生成锚点胶囊条
+          (function () {
+            var body = document.getElementById('article-body');
+            if (!body) return;
+            var heads = Array.prototype.slice.call(body.querySelectorAll('h2'));
+            if (heads.length < 2) return;
+
+            heads.forEach(function (h, i) {
+              if (!h.id) h.id = 'sec-' + (i + 1);
+            });
+
+            var bar = document.createElement('nav');
+            bar.className = 'toc-bar';
+            bar.setAttribute('aria-label', '本页目录');
+            var label = document.createElement('span');
+            label.className = 'toc-bar-label';
+            label.textContent = '目录';
+            bar.appendChild(label);
+
+            var links = [];
+            heads.forEach(function (h) {
+              var a = document.createElement('a');
+              a.href = '#' + h.id;
+              a.textContent = h.textContent.replace(/^\s*[0-9]+[.、．]\s*/, '');
+              a.addEventListener('click', function (e) {
+                e.preventDefault();
+                var top = h.getBoundingClientRect().top + window.scrollY - 80;
+                window.scrollTo({ top: top, behavior: 'smooth' });
+                history.replaceState(null, '', '#' + h.id);
+              });
+              bar.appendChild(a);
+              links.push(a);
+            });
+
+            body.insertBefore(bar, body.firstChild);
+
+            // 滚动高亮当前章节（克制：仅在滚动时切换，不做多余动画）
+            if ('IntersectionObserver' in window) {
+              var io = new IntersectionObserver(function (entries) {
+                entries.forEach(function (en) {
+                  if (en.isIntersecting) {
+                    var idx = heads.indexOf(en.target);
+                    links.forEach(function (l, i) { l.classList.toggle('is-active', i === idx); });
+                  }
+                });
+              }, { rootMargin: '-80px 0px -70% 0px', threshold: 0 });
+              heads.forEach(function (h) { io.observe(h); });
+            }
+          })();
+        </script>
 
         <hr class="border-t border-rule mt-12" />
 

@@ -29,13 +29,35 @@ import BaseLayout from '../layouts/BaseLayout.astro';
         这个站只写后者。
       </p>
 
-      <h2 id="pkm">内容从哪来：PKM 自动供血</h2>
+      <h2 id="pkm">内容从哪来：一条自动供血管线</h2>
       <p>
-        我有一个 <strong>WorkBuddy + Obsidian + ima</strong> 的自动化知识库（也叫 PKM）。日常遇到能写进站里的事，我会先丢进 Obsidian 的 <code>Publish/</code> 目录，并打上
-        <code>publish: true</code> 的 frontmatter。
+        这个站不是手动维护的博客，而是跑在一条自动化管线上——日常遇到能写进站里的事，丢进 Obsidian 并打上
+        <code>publish: true</code>，之后全自动走到上线。管线长这样：
       </p>
+
+      <!-- 管线可视化（AI 感：深色终端氛围 + 渐变箭头） -->
+      <div class="pipeline" role="img" aria-label="内容管线：ima 收藏 → Obsidian 写作 → sync 同步 → Git 推送 → Cloudflare 自动部署上线">
+        {
+          [
+            { step: '01', name: 'ima 收藏', desc: '手机随手收藏素材', icon: '收' },
+            { step: '02', name: 'Obsidian 写作', desc: 'vault 打 publish: true', icon: '写' },
+            { step: '03', name: 'sync 脚本', desc: '转 Markdown + 改链接', icon: '转' },
+            { step: '04', name: 'Git 推送', desc: 'push 触发部署', icon: '推' },
+            { step: '05', name: 'CF 自动上线', desc: '60-90 秒生效', icon: '发' },
+          ].map((s) => (
+            <div class="pipe-node">
+              <span class="pipe-icon" aria-hidden="true">{s.icon}</span>
+              <div class="pipe-text">
+                <span class="pipe-name">{s.name}</span>
+                <span class="pipe-desc">{s.desc}</span>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+
       <p>
-        仓库里有一个 <code>scripts/sync-from-obsidian.mjs</code>，跑一次会做三件事：
+        核心脚本是 <code>scripts/sync-from-obsidian.mjs</code>，跑一次做三件事：
       </p>
       <ol>
         <li>扫 <code>vault/Publish/</code> 下所有 <code>publish: true</code> 的笔记；</li>
@@ -47,13 +69,27 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       </p>
 
       <h2>我用的工具链（开诚布公）</h2>
-      <ul>
-        <li>写作与 PKM：<strong>Obsidian</strong>（Markdown 本地优先）+ <strong>WorkBuddy</strong>（桌面 Agent 工作台）+ <strong>ima</strong>（腾讯系知识库）</li>
-        <li>站点：<strong>Astro 5</strong> + <strong>Tailwind 4</strong>（静态站、零运行时）</li>
-        <li>托管：<strong>Cloudflare Pages</strong>（免费、全球 CDN、Git 直连）</li>
-        <li>设计：设计稿在 Ardot 里画，导出 token 落到 Tailwind 主题里</li>
-        <li>图片生成：<strong>Mureka / NanoBanana</strong>（站内配图我尽量用自己拍的，AI 图只用在首页 Hero）</li>
-      </ul>
+      <!-- 工具链卡片（专家轮：标签化呈现，替代纯列表） -->
+      <div class="tool-grid">
+        {
+          [
+            { cat: '知识管理', name: 'Obsidian', role: '本地 Markdown 写作 + 发布源' },
+            { cat: '桌面 Agent', name: 'WorkBuddy', role: '自动化加工 + 调度日常任务' },
+            { cat: '知识库', name: 'ima', role: '腾讯系云端知识库，移动端捕获' },
+            { cat: '框架', name: 'Astro 5', role: '静态站生成，零运行时' },
+            { cat: '样式', name: 'Tailwind 4', role: '设计 token 驱动的原子 CSS' },
+            { cat: '托管', name: 'CF Pages', role: '免费 CDN + Git 自动部署' },
+            { cat: '设计', name: 'Ardot', role: '画布画稿，token 落入 Tailwind' },
+            { cat: '配图', name: '自拍优先', role: 'AI 图仅用于首页 Hero' },
+          ].map((t) => (
+            <div class="tool-card">
+              <span class="tool-cat mono-badge">{t.cat}</span>
+              <strong>{t.name}</strong>
+              <span class="tool-role">{t.role}</span>
+            </div>
+          ))
+        }
+      </div>
 
       <h2>什么不写</h2>
       <ul>
