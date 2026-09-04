@@ -91,6 +91,57 @@ const faqs = entry.data.faqs ?? [];
           <Content />
         </div>
 
+        <!-- 一键复制整篇指令（核心卖点导出） -->
+        <div class="rx-export-card">
+          <div class="flex flex-col gap-1">
+            <p class="text-[15px] font-semibold font-display text-ink">📋 一键复制本文全部可抄指令</p>
+            <p class="text-[13px] text-ink-3">共 <span id="rx-cmd-count" class="font-mono text-ai-1">0</span> 段，已带章节标题，粘进 Agent 直接能用</p>
+          </div>
+          <button id="rx-copy-all" type="button" class="btn-ai h-[44px] px-[22px] text-[14px]">
+            复制全部指令
+          </button>
+        </div>
+
+        <script is:inline>
+          // 一键复制整篇指令：聚合正文全部代码块，附章节标题
+          (function () {
+            var body = document.getElementById('article-body');
+            var btn = document.getElementById('rx-copy-all');
+            var cnt = document.getElementById('rx-cmd-count');
+            if (!body || !btn) return;
+            var pres = Array.prototype.slice.call(body.querySelectorAll('pre'));
+            if (cnt) cnt.textContent = pres.length;
+            if (!pres.length) { btn.disabled = true; btn.textContent = '本文暂无指令块'; return; }
+            btn.addEventListener('click', function () {
+              var parts = pres.map(function (pre) {
+                var h = null, n = pre;
+                while (n && n !== body) {
+                  n = n.previousElementSibling;
+                  if (n && (n.tagName === 'H2' || n.tagName === 'H3')) { h = n; break; }
+                }
+                var label = h ? h.textContent.replace(/^\s*[0-9]+[.、．]\s*/, '').trim() : '指令';
+                return '## ' + label + '\n' + (pre.innerText || '').trim();
+              });
+              var text = parts.join('\n\n');
+              function done() {
+                var o = btn.textContent;
+                btn.textContent = '已复制 ' + pres.length + ' 段 ✓';
+                setTimeout(function () { btn.textContent = o; }, 1800);
+              }
+              if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(text).then(done, fallback);
+              } else { fallback(); }
+              function fallback() {
+                var ta = document.createElement('textarea');
+                ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+                document.body.appendChild(ta); ta.select();
+                try { document.execCommand('copy'); done(); } catch (e) { btn.textContent = '复制失败'; }
+                document.body.removeChild(ta);
+              }
+            });
+          })();
+        </script>
+
         <script is:inline>
           // 文章目录：从 h2 自动生成锚点胶囊条 + 「直接抄指令」快速定位
           (function () {
