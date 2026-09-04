@@ -10,6 +10,8 @@ const tools = await getCollection('tools');
 
 // 分类 tab：从全部处方去重得到类目（用于首页「痛点处方」区筛选）
 const categories = ['全部', ...Array.from(new Set(prescriptions.map((p) => p.data.category)))];
+// 微数据条比例：以最大「每周省 X 小时」为满格基准
+const maxSave = Math.max(...prescriptions.map((p) => p.data.saveHoursPerWeek || 0), 1);
 
 // 真实统计：把每篇处方自测的「每周省 X 小时」按每月 4.3 周合计。
 // 口径写在页面上，不编造——这是文章自身声明的加总，不是虚构的读者数据。
@@ -197,6 +199,9 @@ const totalHoursPerMonth = Math.round(
               <p class="text-[13px] text-ink-3 font-medium mt-auto pt-1">
                 每周省 {p.data.saveHoursPerWeek} 小时
               </p>
+              <div class="rx-savebar" aria-hidden="true" title={`每周省 ${p.data.saveHoursPerWeek} 小时`}>
+                <span class="rx-savebar-fill" style={`--save:${Math.round((p.data.saveHoursPerWeek / maxSave) * 100)}%`}></span>
+              </div>
             </a>
           ))
         }

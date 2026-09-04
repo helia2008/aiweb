@@ -15,6 +15,11 @@
   --color-rule: #E5DFD2;
   --color-accent: #B23A2B;
   --color-accent-tint: #FBEEEB;
+  /* 卡片/芯片表面（浅色态为 #fff，深色态重写为深色面板） */
+  --color-surface: #FFFFFF;
+  --color-surface-2: #F3EFE6;
+  /* AI 强调色浅底（目录胶囊 hover 等） */
+  --color-ai-glow-tint: #EEF0FF;
   --color-deep: #1A1917;
   --color-deep-2: #23211D;
   --color-deep-3: #2A2722;
@@ -339,7 +344,7 @@ html { scroll-behavior: smooth; }
   align-items: center;
   margin: 0 0 1.75rem;
   padding: 12px 14px;
-  background: #fff;
+  background: var(--color-surface);
   border: 1px solid var(--color-rule);
   border-radius: 12px;
 }
@@ -365,7 +370,7 @@ html { scroll-behavior: smooth; }
 .toc-bar a:hover {
   color: var(--color-ai-1);
   border-color: rgba(79, 70, 229, 0.45);
-  background: var(--color-ai-glow-tint, #EEF0FF);
+  background: var(--color-ai-glow-tint);
 }
 .toc-bar a.is-active {
   color: #fff;
@@ -682,7 +687,7 @@ html.js .reveal.in {
   flex-direction: column;
   gap: 6px;
   padding: 14px 16px;
-  background: #fff;
+  background: var(--color-surface);
   border: 1px solid var(--color-rule);
   border-radius: 10px;
   transition: border-color 0.18s ease, box-shadow 0.18s ease;
@@ -709,7 +714,7 @@ html.js .reveal.in {
   font-weight: 500;
   font-family: var(--font-sans);
   color: var(--color-ink-2);
-  background: #fff;
+  background: var(--color-surface);
   border: 1px solid var(--color-rule);
   border-radius: 999px;
   cursor: pointer;
@@ -756,3 +761,84 @@ html.js .reveal.in {
 @media (prefers-reduced-motion: reduce) {
   .toc-jump { transition: none; }
 }
+
+/* ============================================================
+   处方卡 hover 微数据条「已省 X 小时」（2026-09-04 续轮·专家规范）
+   规范：仅动 opacity/transform(scaleX)，0.24-0.45s，GPU 友好
+   ============================================================ */
+.rx-savebar {
+  height: 4px;
+  border-radius: 999px;
+  background: var(--color-paper-2);
+  overflow: hidden;
+  margin-top: 2px;
+  opacity: 0;
+  transform: translateY(2px);
+  transition: opacity 0.24s ease, transform 0.24s ease;
+}
+.ai-card:hover .rx-savebar { opacity: 1; transform: none; }
+.rx-savebar-fill {
+  display: block;
+  height: 100%;
+  width: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--color-ai-1), var(--color-ai-2));
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.ai-card:hover .rx-savebar-fill { transform: scaleX(var(--save, 0.5)); }
+@media (prefers-reduced-motion: reduce) {
+  .rx-savebar { transition: none; opacity: 1; transform: none; }
+  .rx-savebar-fill { transition: none; transform: scaleX(var(--save, 0.5)); }
+}
+
+/* ============================================================
+   深色模式（2026-09-04 续轮·专家轮）
+   策略：设计 token 重写（纸感浅色 ↔ 深色面板）。
+   - 系统偏好自动：@media (prefers-color-scheme: dark) 且未显式选浅色
+   - 手动覆盖：html[data-theme="dark"|"light"]（Header 切换按钮 + localStorage）
+   - 对比度按 WCAG 2.2 AA：正文 ink 在 #0E0E11 上约 15:1
+   ============================================================ */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --color-paper: #0E0E11;
+    --color-paper-2: #17171B;
+    --color-ink: #ECEAE3;
+    --color-ink-2: #B6B0A6;
+    --color-ink-3: #8A857D;
+    --color-rule: #26262C;
+    --color-accent: #E5705F;
+    --color-accent-tint: rgba(229, 112, 95, 0.14);
+    --color-surface: #17171B;
+    --color-surface-2: #1F1F25;
+    --color-ai-glow-tint: rgba(165, 180, 252, 0.12);
+  }
+  :root:not([data-theme="light"]) .bg-white { background-color: var(--color-surface); }
+}
+html[data-theme="dark"] {
+  --color-paper: #0E0E11;
+  --color-paper-2: #17171B;
+  --color-ink: #ECEAE3;
+  --color-ink-2: #B6B0A6;
+  --color-ink-3: #8A857D;
+  --color-rule: #26262C;
+  --color-accent: #E5705F;
+  --color-accent-tint: rgba(229, 112, 95, 0.14);
+  --color-surface: #17171B;
+  --color-surface-2: #1F1F25;
+  --color-ai-glow-tint: rgba(165, 180, 252, 0.12);
+}
+html[data-theme="dark"] .bg-white { background-color: var(--color-surface); }
+
+/* 主题切换按钮：浅色显月亮，深色显太阳 */
+#theme-toggle .i-sun { display: none; }
+#theme-toggle .i-moon { display: inline-flex; }
+html[data-theme="dark"] #theme-toggle .i-sun { display: inline-flex; }
+html[data-theme="dark"] #theme-toggle .i-moon { display: none; }
+
+/* 主题切换按钮（class 版，桌面+移动共用） */
+.theme-toggle .i-sun { display: none; }
+.theme-toggle .i-moon { display: inline-flex; }
+html[data-theme="dark"] .theme-toggle .i-sun { display: inline-flex; }
+html[data-theme="dark"] .theme-toggle .i-moon { display: none; }

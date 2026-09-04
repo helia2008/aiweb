@@ -53,6 +53,15 @@ const isActive = (href: string) => {
     </nav>
 
     <div class="hidden lg:flex items-center gap-[18px]">
+      <button
+        type="button"
+        class="theme-toggle w-[42px] h-[42px] inline-flex items-center justify-center rounded-[8px] border border-rule text-ink-2 hover:text-ink hover:border-accent transition"
+        aria-label="切换深色 / 浅色模式"
+        aria-pressed="false"
+      >
+        <svg class="i-moon w-[20px] h-[20px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="i-sun w-[20px] h-[20px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
       <a href="/rss.xml" class="text-[15px] font-medium text-ink-3 hover:text-ink transition">RSS</a>
       <a
         href="/#subscribe"
@@ -101,6 +110,15 @@ const isActive = (href: string) => {
         href="/rss.xml"
         class="h-[44px] px-5 inline-flex items-center justify-center border border-rule rounded-[10px] text-[15px] font-medium text-ink-2"
       >RSS</a>
+      <button
+        type="button"
+        class="theme-toggle h-[44px] w-[44px] inline-flex items-center justify-center border border-rule rounded-[10px] text-ink-2"
+        aria-label="切换深色 / 浅色模式"
+        aria-pressed="false"
+      >
+        <svg class="i-moon w-[20px] h-[20px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <svg class="i-sun w-[20px] h-[20px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+      </button>
     </div>
   </nav>
 </header>
@@ -131,5 +149,24 @@ const isActive = (href: string) => {
         btn.setAttribute('aria-expanded', 'false');
       });
     });
+
+    // 深色 / 浅色切换（桌面 + 移动按钮共用 .theme-toggle）
+    var themeBtns = document.querySelectorAll('.theme-toggle');
+    if (themeBtns.length) {
+      function syncTheme() {
+        var dark = document.documentElement.getAttribute('data-theme') === 'dark';
+        themeBtns.forEach(function (b) { b.setAttribute('aria-pressed', dark ? 'true' : 'false'); });
+      }
+      syncTheme();
+      themeBtns.forEach(function (b) {
+        b.addEventListener('click', function () {
+          var cur = document.documentElement.getAttribute('data-theme');
+          var next = cur === 'dark' ? 'light' : 'dark';
+          document.documentElement.setAttribute('data-theme', next);
+          try { localStorage.setItem('theme', next); } catch (e) {}
+          syncTheme();
+        });
+      });
+    }
   })();
 </script>

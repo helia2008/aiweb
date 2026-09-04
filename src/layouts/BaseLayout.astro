@@ -46,7 +46,20 @@ const {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="theme-color" content="#FBF9F4" />
+    <!-- 自适应主题色（浏览器地址栏/状态栏） -->
+    <meta name="theme-color" content="#FBF9F4" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0E0E11" media="(prefers-color-scheme: dark)" />
+
+    <!-- 防 FOUC：绘制前确定主题（localStorage 优先，否则跟随系统） -->
+    <script is:inline>
+      (function () {
+        try {
+          var t = localStorage.getItem('theme');
+          if (!t) t = window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+          document.documentElement.setAttribute('data-theme', t);
+        } catch (e) {}
+      })();
+    </script>
 
     <SEO
       title={title}
