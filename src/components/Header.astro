@@ -128,9 +128,8 @@ const isActive = (href: string) => {
     var btn = document.getElementById('menu-toggle');
     var menu = document.getElementById('mobile-menu');
     if (!btn || !menu) return;
-    btn.addEventListener('click', function () {
-      var open = menu.classList.toggle('hidden') === false;
-      btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+    // 汉堡图标动画（展开/收起共用）
+    function setBars(open) {
       var bars = btn.querySelectorAll('span');
       if (open) {
         bars[0].style.transform = 'translateY(6.5px) rotate(45deg)';
@@ -141,13 +140,51 @@ const isActive = (href: string) => {
         bars[1].style.opacity = '1';
         bars[2].style.transform = '';
       }
+    }
+    function openMenu() {
+      menu.classList.remove('hidden');
+      btn.setAttribute('aria-expanded', 'true');
+      setBars(true);
+      var first = menu.querySelector('a, button');
+      if (first) first.focus();
+    }
+    function closeMenu(returnFocus) {
+      menu.classList.add('hidden');
+      btn.setAttribute('aria-expanded', 'false');
+      setBars(false);
+      if (returnFocus) btn.focus();
+    }
+    btn.addEventListener('click', function () {
+      if (menu.classList.contains('hidden')) openMenu();
+      else closeMenu(false);
     });
-    // 点击菜单项后自动收起
+    // Esc 关闭并归还焦点（WCAG 2.1.2 无键盘陷阱 / 2.4.3 焦点顺序）
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape' && !menu.classList.contains('hidden')) closeMenu(true);
+    });
+    // 焦点陷阱：菜单展开时 Tab / Shift+Tab 在菜单内循环，不漏到页面正文
+    menu.addEventListener('keydown', function (e) {
+      if (menu.classList.contains('hidden') || e.key !== 'Tab') return;
+      var f = menu.querySelectorAll('a[href], button:not([disabled])');
+      if (!f.length) return;
+      var first = f[0], last = f[f.length - 1];
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault(); last.focus();
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault(); first.focus();
+      }
+    });
+    // 点击菜单项后自动收起并归还焦点（避免焦点落在已隐藏元素上）
     menu.querySelectorAll('a').forEach(function (a) {
-      a.addEventListener('click', function () {
-        menu.classList.add('hidden');
-        btn.setAttribute('aria-expanded', 'false');
-      });
+      a.addEventListener('click', function () { closeMenu(true); });
+    });
+    // 点击菜单/按钮之外时收起
+    // 菜单已具备焦点陷阱（行为等同模态），点外部关闭是用户对这类组件的稳定预期。
+    // 守卫：点击按钮自身由上面的 toggle 处理，避免刚展开就被这里收起。
+    document.addEventListener('click', function (e) {
+      if (menu.classList.contains('hidden')) return;
+      if (menu.contains(e.target) || btn.contains(e.target)) return;
+      closeMenu(false);
     });
 
     // 深色 / 浅色切换（桌面 + 移动按钮共用 .theme-toggle）

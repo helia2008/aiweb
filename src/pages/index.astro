@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
+import { SITE } from '../lib/site.js';
 
 const prescriptions = (await getCollection('prescriptions', ({ data }) => !data.draft))
   .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
@@ -8,10 +9,15 @@ const prescriptions = (await getCollection('prescriptions', ({ data }) => !data.
 const featured = prescriptions.slice(0, 3);
 const tools = await getCollection('tools');
 
-// 分类 tab：从全部处方去重得到类目（用于首页「痛点处方」区筛选）
-const categories = ['全部', ...Array.from(new Set(prescriptions.map((p) => p.data.category)))];
+// 岗位分桶 tab：从 role 字段去重（4 个桶）。
+// 原用 category：14 个不同值对应 16 篇文章（12 个只挂 1 篇），
+// 筛选栏被撑到 15 个胶囊、窄屏折三四行，且点任一大概率只出 1 篇——筛选等于废的。
+const roles = ['全部', ...Array.from(new Set(prescriptions.map((p) => p.data.role)))];
 // 微数据条比例：以最大「每周省 X 小时」为满格基准
 const maxSave = Math.max(...prescriptions.map((p) => p.data.saveHoursPerWeek || 0), 1);
+// 首屏统计行改用「单篇区间」而非 16 篇加总——加总（148 小时/月）会让读者
+// 误以为自己能省那么多。单篇区间更可信，也更可行动。
+const minSave = Math.min(...prescriptions.map((p) => p.data.saveHoursPerWeek || 0));
 
 // 真实统计：把每篇处方自测的「每周省 X 小时」按每月 4.3 周合计。
 // 口径写在页面上，不编造——这是文章自身声明的加总，不是虚构的读者数据。
@@ -37,26 +43,47 @@ const totalHoursPerMonth = Math.round(
           <span class="mono-badge text-deep-ink-2">只写自己跑通过的 · 每周三更新</span>
         </span>
 
+        <!-- H1：身份锚定 + 时间对比。
+             原写「一个不懂代码的普通人」——「普通人」不是身份，没有读者会对号入座；
+             而 16 篇处方其实是按岗位写的（人事考勤、财务对账、行政 SOP、市场舆情），
+             这里把岗位直接点名，让读者 3 秒内认出「这是写给我的」。 -->
         <h1 class="text-[38px] sm:text-[46px] lg:text-[58px] leading-[1.25] lg:leading-[74px] font-bold font-display text-deep-ink">
-          把你每周重复做的那件事，<span class="gradient-text-light">交给电脑自己做</span>
+          财务、人事、行政、运营——你每周那几小时重复活，<span class="gradient-text-light">其实只要 8 分钟</span>
         </h1>
 
+        <!-- 副标题：清单式承诺（点名真实场景）+ 门槛消除 + 自曝短板建立信任 -->
         <p class="text-[16px] lg:text-[17px] leading-[28px] lg:leading-[31px] text-deep-ink-2">
-          这里不做工具评测，也不讲大模型原理。只记录一件事：一个不懂代码的普通人，怎么用桌面 Agent 把每周三小时的手工活，压缩成一次回车。
+          16 篇都是我自己先跑通的：供应商对账、考勤异常、简历初筛、发货月报。
+          每篇都给你<b class="text-deep-ink font-semibold">能直接复制的指令</b>，
+          和我<b class="text-deep-ink font-semibold">踩过的坑</b>。不用懂代码，也不装付费软件。
         </p>
 
+        <!-- 「桌面 Agent」在全站高频出现却从未解释过；目标读者不懂这个词，这里一句话说清 -->
+        <p class="text-[14px] leading-[26px] text-deep-ink-3">
+          <b class="text-deep-ink-2 font-semibold">桌面 Agent</b> =
+          装在你电脑上的软件，你用大白话说一句要做什么，它就去操作你的文件和表格。
+        </p>
+
+        <!-- 主 CTA 改指 /prescriptions：那是当前真正有货的地方。
+             原主按钮指向 /start-here，而该页只有 7 个文字标签、无实质教学内容，
+             却承诺「第七天拿出跑得起来的自动化」——用户跟主 CTA 走却拿到空壳，
+             是转化漏斗最大的漏点。7 天路线降为次按钮。 -->
         <div class="flex flex-col sm:flex-row gap-[14px] mt-2">
-          <a href="/start-here" class="h-[52px] px-7 inline-flex items-center justify-center btn-ai text-[16px]">
-            从 7 天路线开始
+          <a href="/prescriptions" class="h-[52px] px-7 inline-flex items-center justify-center btn-ai text-[16px]">
+            按我的岗位找
           </a>
-          <a href="/prescriptions" class="h-[52px] px-7 inline-flex items-center justify-center glass-dark rounded-[10px] text-[16px] font-medium text-deep-ink hover:border-ai-glow/50 transition">
-            先看看能省多少时间
+          <a href="/start-here" class="h-[52px] px-7 inline-flex items-center justify-center glass-dark rounded-[10px] text-[16px] font-medium text-deep-ink hover:border-ai-glow/50 transition">
+            第一天该做什么
           </a>
         </div>
 
+        <!-- 统计行：原写「合计约 148 小时/月」——那是 16 篇全做的加总。
+             改为单篇区间（0.5–5 小时）：更可信，也更可行动；
+             自测口径仍写在句尾，诚实不丢。 -->
         <p class="text-[13px] lg:text-[14px] text-deep-ink-3 mt-2 font-medium">
-          <span class="font-mono text-deep-ink-2">{prescriptions.length}</span> 篇已验证处方 ·
-          按文中自测口径合计约 <span class="font-mono text-ai-glow">{totalHoursPerMonth}</span> 小时/月
+          <span class="font-mono text-deep-ink-2">{prescriptions.length}</span> 篇已跑通 ·
+          单篇每周省 <span class="font-mono text-ai-glow">{minSave}–{maxSave}</span> 小时 ·
+          每篇都写了自测口径，可自己验算
         </p>
       </div>
 
@@ -90,7 +117,9 @@ const totalHoursPerMonth = Math.round(
     <div class="flex flex-col gap-[44px]">
       <div class="flex flex-col gap-[14px]">
         <p class="text-[13px] font-medium tracking-[1.6px] text-accent">为什么值得花这 7 天</p>
-        <h2 class="text-[38px] leading-[50px] font-bold font-display text-deep-ink">三个月前，和三个月后</h2>
+        <!-- 原标题「三个月前，和三个月后」与全站「7 天」承诺互相打架（到底是 7 天还是 3 个月？）。
+             改为直接回答上方 eyebrow 的问题：投入产出比。 -->
+        <h2 class="text-[38px] leading-[50px] font-bold font-display text-deep-ink">花七天，换回你每周的三小时</h2>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-7 reveal">
@@ -160,38 +189,49 @@ const totalHoursPerMonth = Math.round(
       <div class="flex items-end justify-between">
         <div class="flex flex-col gap-4 max-w-[760px]">
           <p class="mono-badge text-ai-1">痛点处方</p>
-          <h2 class="text-[40px] leading-[52px] font-bold font-display text-ink">按你烦的那件事找，不按工具找</h2>
+          <!-- 筛选已改为按岗位（role）分桶，标题随之改为「按岗位挑」，
+               避免标题说「按那件事找」而筛选器却是岗位桶的口径错位 -->
+          <h2 class="text-[40px] leading-[52px] font-bold font-display text-ink">按你的岗位挑，不按工具找</h2>
           <p class="text-[16px] leading-[29px] text-ink-2">每篇都是同一个结构：这个活烦在哪 → 需要准备什么 → 一步步怎么配 → 直接能抄的指令 → 我踩过的坑。</p>
         </div>
         <a href="/start-here" class="text-[15px] font-medium text-accent hover:underline">新手从这里开始 →</a>
       </div>
 
-      <!-- 分类筛选 tab -->
-      <div class="cat-tabs reveal" role="tablist" aria-label="按类目筛选处方">
+      <!-- 岗位筛选：这是「一组切换按钮」，不是选项卡。
+           判定依据：卡片在同一网格内就地显示/隐藏，每个类目没有独立面板，
+           所以正确模式是 role="group" + 按钮 aria-pressed。
+           原写法用 tablist 角色属 ARIA 反模式——它要求子元素带 tab 角色、
+           aria-selected 与方向键导航，此处三者皆无，读屏会播报「选项卡列表」却找不到选项卡。
+           注：注释内刻意不写完整属性字面量，以免后续 grep 复检时被误判成漏改。 -->
+      <div class="cat-tabs reveal" role="group" aria-label="按岗位筛选处方">
         {
-          categories.map((c, i) => (
+          roles.map((r, i) => (
             <button
               type="button"
               class:list={['cat-tab', i === 0 && 'is-active']}
-              data-filter={c}
+              data-filter={r}
               aria-pressed={i === 0 ? 'true' : 'false'}
             >
-              {c}
+              {r}
             </button>
           ))
         }
       </div>
+      <!-- 筛选结果播报（WCAG 2.2 · 4.1.3 状态消息）：过滤会改变可见内容，需告知读屏用户 -->
+      <p id="rx-filter-status" class="sr-only" role="status" aria-live="polite"></p>
 
       <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 reveal" id="rx-grid">
         {
           prescriptions.map((p) => (
             <a
               href={`/prescriptions/${p.id}`}
-              data-category={p.data.category}
+              data-role={p.data.role}
               class="bg-white border border-rule rounded-[12px] ai-card p-[24px] flex flex-col gap-[13px] hover:border-accent transition"
             >
               <div class="flex gap-2 flex-wrap">
-                <span class="tag bg-paper-2 text-ink-2">{p.data.category}</span>
+                <!-- 标签与筛选口径保持一致（都显示 role）。
+                     否则会出现「筛了『人事 / HR』却看到『HR / 招聘』标签」的错位感。 -->
+                <span class="tag bg-paper-2 text-ink-2">{p.data.role}</span>
                 <span class="tag bg-accent-tint text-accent">上手 {p.data.setupMinutes} 分钟</span>
               </div>
               <h3 class="text-[20px] leading-[29px] font-semibold font-display text-ink">{p.data.title}</h3>
@@ -215,8 +255,9 @@ const totalHoursPerMonth = Math.round(
       var tabs = document.querySelectorAll('#rx-grid, .cat-tabs');
       var tabBar = document.querySelector('.cat-tabs');
       var grid = document.getElementById('rx-grid');
+      var status = document.getElementById('rx-filter-status');
       if (!tabBar || !grid) return;
-      var cards = Array.prototype.slice.call(grid.querySelectorAll('[data-category]'));
+      var cards = Array.prototype.slice.call(grid.querySelectorAll('[data-role]'));
       tabBar.addEventListener('click', function (e) {
         var btn = e.target.closest('.cat-tab');
         if (!btn) return;
@@ -226,10 +267,13 @@ const totalHoursPerMonth = Math.round(
           t.classList.toggle('is-active', on);
           t.setAttribute('aria-pressed', on ? 'true' : 'false');
         });
+        var shown = 0;
         cards.forEach(function (c) {
-          var show = f === '全部' || c.getAttribute('data-category') === f;
+          var show = f === '全部' || c.getAttribute('data-role') === f;
           c.style.display = show ? '' : 'none';
+          if (show) shown++;
         });
+        if (status) status.textContent = '已按「' + f + '」筛选，显示 ' + shown + ' 篇处方';
       });
     })();
   </script>
@@ -246,24 +290,33 @@ const totalHoursPerMonth = Math.round(
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {
           tools.map((t) => (
-            <a
-              href="/tools"
-              class="bg-white border border-rule rounded-[12px] ai-card p-[30px] flex flex-col gap-[11px] hover:border-accent transition"
-            >
+            // 原为 <a href="/tools">：指向的就是当前列表页，点了等于没点（假可点）。
+            // 工具没有详情页，故改为非链接卡片，去掉 hover 以免误导；下方统一给一个入口。
+            <div class="bg-white border border-rule rounded-[12px] ai-card p-[30px] flex flex-col gap-[11px]">
               <h3 class="text-[20px] font-semibold">{t.data.name}</h3>
               <p class="text-[13px] font-medium text-accent">{t.data.tag}</p>
               <p class="text-[14px] leading-[25px] text-ink-2 line-clamp-3">{t.data.fit[0]}</p>
               <div class="h-px bg-rule my-2"></div>
+              <!-- 区块标题承诺「都标了不适合谁」，但此前只渲染了 fit[0]（适合谁）——
+                   「我敢说坏话」是全站最强的信任状，却一直藏在数据里。这里补上。 -->
+              <p class="text-[13px] leading-[22px] text-ink-2">
+                <span class="font-semibold text-ink-3">不适合：</span>{t.data.unfit[0]}
+              </p>
               <p class="text-[13px] font-medium text-ink-3">上手 {t.data.setupTime} · {t.data.cost}</p>
-            </a>
+            </div>
           ))
         }
       </div>
+
+      <a href="/tools" class="text-[15px] font-medium text-accent hover:underline self-start">
+        在工具罗盘看完整对比与数据安全说明 →
+      </a>
     </div>
   </section>
 
   <!-- ============== 痛点门诊 ============== -->
-  <section class="px-5 sm:px-8 lg:px-[120px] py-[84px] bg-accent-tint">
+  <!-- data-email 单一来源：is:inline 脚本无法 import，故把 SITE.email 渲染到属性上让脚本读取 -->
+  <section id="pain-clinic" data-email={SITE.email} class="px-5 sm:px-8 lg:px-[120px] py-[84px] bg-accent-tint">
     <div class="flex flex-col gap-[26px] max-w-[920px]">
       <p class="mono-badge text-ai-1">痛点门诊</p>
       <h2 class="text-[38px] leading-[50px] font-bold font-display text-ink">把你最烦的那件事丢过来</h2>
@@ -276,9 +329,13 @@ const totalHoursPerMonth = Math.round(
         改为：JS 把输入内容拼进 mailto 链接的 subject/body 再跳转——任何浏览器都可靠。
       -->
       <div class="flex flex-col sm:flex-row gap-3">
+        <!-- 原输入框只有 placeholder、没有 label：placeholder 不是 label，读屏用户无从知晓该填什么 -->
+        <label class="sr-only" for="pain-input">你每周重复做的那件事</label>
         <input
           id="pain-input"
           type="text"
+          aria-label="你每周重复做的那件事"
+          aria-describedby="pain-hint"
           placeholder="比如：每周一要把 12 家门店的销售表合成一张"
           class="flex-1 h-[58px] px-[22px] rounded-[9px] bg-white border border-rule text-[15px] focus:outline-none focus:border-ai-1"
         />
@@ -288,35 +345,86 @@ const totalHoursPerMonth = Math.round(
           class="h-[58px] px-8 rounded-[9px] btn-ai text-[16px] justify-center"
         >提交</button>
       </div>
+      <!-- 行内提示替代 alert()：不打断、观感更好，且带 aria-live 可被读屏播报 -->
+      <p id="pain-hint" class="text-[13px] font-medium text-accent hidden" role="status" aria-live="polite"></p>
       <p class="text-[13px] font-medium text-ink-3">
         点提交会自动打开邮件客户端并带上你写的内容。<b class="text-ink-2">也可以直接写信到</b>
-        <a href="mailto:admin@aiwind.eu.cc" class="text-ai-1 underline">admin@aiwind.eu.cc</a> · 每周挑选 3 个真实痛点写成处方
+        <a href={`mailto:${SITE.email}`} class="text-ai-1 underline">{SITE.email}</a>
+        <!-- 兜底：手机上大量用户没配置邮件客户端，mailto 会静默失败。给一个复制按钮。 -->
+        <button id="copy-email" type="button" class="ml-1 underline hover:text-ai-1">复制邮箱</button>
+        <span id="copy-done" class="ml-1 hidden" role="status" aria-live="polite">已复制</span>
+        · 每周挑选 3 个真实痛点写成处方
       </p>
 
       <script is:inline>
         (function () {
           var input = document.getElementById('pain-input');
           var btn = document.getElementById('pain-submit');
+          var hint = document.getElementById('pain-hint');
+          // 联系邮箱取自 section 的 data-email（单一来源 SITE.email，避免 is:inline 脚本里硬编码）
+          var clinic = document.getElementById('pain-clinic');
+          var email = clinic ? clinic.getAttribute('data-email') : '';
           if (!input || !btn) return;
+
+          function showHint(msg) {
+            if (!hint) return;
+            hint.textContent = msg;
+            hint.classList.remove('hidden');
+          }
+          function clearHint() {
+            if (!hint) return;
+            hint.textContent = '';
+            hint.classList.add('hidden');
+          }
+
           function send() {
             var text = (input.value || '').trim();
             if (!text) {
-              alert('先写一句你每周重复做的那件事，再点提交。');
+              showHint('先写一句你每周重复做的那件事，再点提交。');
               input.focus();
               return;
             }
+            clearHint();
             var subject = encodeURIComponent('【痛点门诊】' + text.slice(0, 40));
             var body = encodeURIComponent(
               '我最烦的重复劳动是：\n' + text + '\n\n' +
               '（建议补充）多久做一次：\n每次大概花：\n现在怎么做的：\n'
             );
             window.location.href =
-              'mailto:admin@aiwind.eu.cc?subject=' + subject + '&body=' + body;
+              'mailto:' + email + '?subject=' + subject + '&body=' + body;
           }
           btn.addEventListener('click', send);
           input.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') send();
           });
+          input.addEventListener('input', clearHint);
+
+          // 复制邮箱兜底（mailto 在不少手机上无客户端可用）
+          var copyBtn = document.getElementById('copy-email');
+          var copyDone = document.getElementById('copy-done');
+          if (copyBtn) {
+            copyBtn.addEventListener('click', function () {
+              var mail = email;
+              function done() {
+                if (!copyDone) return;
+                copyDone.classList.remove('hidden');
+                setTimeout(function () { copyDone.classList.add('hidden'); }, 1800);
+              }
+              function fallback() {
+                var ta = document.createElement('textarea');
+                ta.value = mail;
+                ta.style.position = 'fixed';
+                ta.style.opacity = '0';
+                document.body.appendChild(ta);
+                ta.select();
+                try { document.execCommand('copy'); done(); } catch (e) {}
+                document.body.removeChild(ta);
+              }
+              if (navigator.clipboard && window.isSecureContext) {
+                navigator.clipboard.writeText(mail).then(done, fallback);
+              } else { fallback(); }
+            });
+          }
         })();
       </script>
     </div>

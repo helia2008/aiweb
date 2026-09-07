@@ -2,6 +2,7 @@
 title: 简历筛选流水线：HR 一晚看完 800 份
 summary: 校招季每天收 100 多份简历，HR 一份份看看到半夜。让 Agent 做"初筛"，你只负责"复核名单 + 终面"。这一条讲怎么把筛选标准写清楚、Agent 才能筛得准。
 category: HR / 招聘
+role: "人事 / HR"
 difficulty: 进阶
 setupMinutes: 60
 saveHoursPerWeek: 5

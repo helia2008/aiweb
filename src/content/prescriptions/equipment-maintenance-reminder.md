@@ -2,6 +2,7 @@
 title: "设备该保养了没人记得，让它按运行小时自动排提醒"
 summary: "有的设备按日历保养，有的按运行小时，还有的按产量，混在一起根本记不住。让它把三种周期统一算成\"剩余天数\"，每周给你一张到期清单，逾期的一个都不漏。"
 category: "运营 / 生产"
+role: "市场 / 运营"
 difficulty: "进阶"
 setupMinutes: 45
 saveHoursPerWeek: 2

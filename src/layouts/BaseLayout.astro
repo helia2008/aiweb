@@ -95,10 +95,11 @@ const {
   </head>
 
   <body class="bg-paper text-ink">
+    <a href="#main" class="skip-link">跳到主内容</a>
     <div id="reading-progress" aria-hidden="true"></div>
     <Header pathname={pathname} />
 
-    <main>
+    <main id="main" tabindex="-1">
       <slot />
     </main>
 

@@ -2,6 +2,7 @@
 title: 舆情日报：让 Agent 把 20 个信源压成一页纸
 summary: 每天 20 个公众号、3 个垂类网站、1 个微博话题，9 点前合成一页 PDF 推给老板。Agent 做收集与摘要，老板只看一页。
 category: 市场 / 公关
+role: "市场 / 运营"
 difficulty: 进阶
 setupMinutes: 50
 saveHoursPerWeek: 3

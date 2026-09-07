@@ -2,6 +2,7 @@
 title: 200 份合同里的关键条款，抽成一张表
 summary: 法务和采购每年经手上百份合同，最怕月底盘点时"这份合同到哪天了"。这篇讲怎么让 Agent 把合同批量读、关键信息抓、汇总成一张能直接筛选的表。
 category: 法务 / 采购
+role: "财务 / 采购"
 difficulty: 进阶
 setupMinutes: 90
 saveHoursPerWeek: 1.5

@@ -1,4 +1,5 @@
 ---
+import { SITE } from '../lib/site.js';
 /**
  * 订阅区（原在 BaseLayout 内，抽出以便文章页复用/隐藏）
  * 2026-09-04 修复：① 补 id="subscribe" 锚点（Header 按钮指向这里）
@@ -22,7 +23,7 @@ const BODY = encodeURIComponent('我想订阅《桌面 Agent 实战手册》的�
 
     <div class="flex flex-col sm:flex-row gap-3 justify-center mt-2">
       <a
-        href={`mailto:admin@aiwind.eu.cc?subject=${SUBJECT}&body=${BODY}`}
+        href={`mailto:${SITE.email}?subject=${SUBJECT}&body=${BODY}`}
         class="h-[52px] px-8 inline-flex items-center justify-center btn-ai text-[16px]"
       >写信订阅</a>
       <a

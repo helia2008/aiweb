@@ -9,7 +9,14 @@ const prescriptions = defineCollection({
   schema: z.object({
     title: z.string(),
     summary: z.string(), // 卡片上的一行话
-    category: z.string(), // "财务 / 行政" 这类
+    category: z.string(), // 细类目（保留作标签，如「财务 / 行政」）
+    /**
+     * 岗位分桶：首页筛选只用它。
+     * 2026-09-07：原 category 有 14 个不同值对应 16 篇文章（其中 12 个只挂 1 篇），
+     * 筛选栏被撑到 15 个胶囊、窄屏折三四行，且点任一大概率只出 1 篇——筛选等于废的。
+     * 现收敛为 4 个岗位桶，并用 enum 锁死，防止日后再次碎片化。
+     */
+    role: z.enum(['人事 / HR', '财务 / 采购', '行政 / 通用', '市场 / 运营']),
     difficulty: z.enum(['入门', '进阶', '高阶']),
     setupMinutes: z.number(), // 上手耗时（分钟）
     saveHoursPerWeek: z.number(), // 每周省下的小时数

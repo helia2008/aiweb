@@ -2,6 +2,7 @@
 title: 让它替你盯竞品官网，有变化才来叫你
 summary: 竞品官网、招标公告页、政府采购网——你关心的十几个 URL，设好之后只在真有更新时给你发一条摘要。再不用人工每天点开 8 个标签页。
 category: 市场 / 运营
+role: "市场 / 运营"
 difficulty: 入门
 setupMinutes: 25
 saveHoursPerWeek: 1

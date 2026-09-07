@@ -2,6 +2,7 @@
 title: "散落在微信群和邮件里的文件，让它自动归集成一份台账"
 summary: "二十几个部门把文件丢在群里、邮件里和网盘里，月底你一个个翻聊天记录找。让它按你定的命名规则统一改名、归类、登记进台账，你只负责抽查。"
 category: "行政 / 运营"
+role: "行政 / 通用"
 difficulty: "入门"
 setupMinutes: 35
 saveHoursPerWeek: 2

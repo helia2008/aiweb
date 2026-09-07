@@ -2,6 +2,7 @@
 title: "一个月几百张运单，让它汇总成能交差的月度报表"
 summary: "同一票货被拆成多行、客户名三种写法、退货混在正常单里，月底汇总总差那么几票。让它先报告数据状况，再清洗归一，最后异常件单列——你拿到的表能直接交上去。"
 category: "运营 / 物流"
+role: "市场 / 运营"
 difficulty: "进阶"
 setupMinutes: 40
 saveHoursPerWeek: 3

@@ -2,6 +2,7 @@
 title: "每月几百条考勤异常，让它先把该解释的挑出来"
 summary: "迟到、缺卡、外勤、请假混在一张表里，逐条问当事人要一周。让它先把有审批记录的剔除，再按严重度分档，需要你处理的通常只剩十几条。"
 category: "人事"
+role: "人事 / HR"
 difficulty: "入门"
 setupMinutes: 30
 saveHoursPerWeek: 2

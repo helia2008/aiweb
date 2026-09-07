@@ -2,6 +2,7 @@
 title: 让 Agent 帮你核对两份名单的差异
 summary: 上周名单和这周名单相比，谁新增、谁流失、谁改了字段——用 Excel 公式也能做，但每次新名单格式一变公式就崩。让 Agent 做这件事，稳。
 category: 通用
+role: "行政 / 通用"
 difficulty: 入门
 setupMinutes: 20
 saveHoursPerWeek: 0.5

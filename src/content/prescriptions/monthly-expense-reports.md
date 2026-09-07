@@ -2,6 +2,7 @@
 title: 每月 5 号的报销单整理，交给它
 summary: 十二家门店的发票散落在邮件、微信和网盘三个地方，每月第一个工作日花三小时合并去重。这篇讲怎么把这件事压到八分钟，以及我踩过的三个坑。
 category: 财务 / 行政
+role: "财务 / 采购"
 difficulty: 入门
 setupMinutes: 40
 saveHoursPerWeek: 2.5

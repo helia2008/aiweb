@@ -5,18 +5,19 @@ import { getCollection } from 'astro:content';
 const prescriptions = (await getCollection('prescriptions', ({ data }) => !data.draft))
   .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
 
-// 按 category 分组
+// 按 role（岗位桶）分组。
+// 原按 category 分组会产生 14 个组、其中 12 组只有 1 篇，页面被切得极碎、也看不出结构。
 const grouped = prescriptions.reduce<Record<string, typeof prescriptions>>((acc, p) => {
-  (acc[p.data.category] ??= []).push(p);
+  (acc[p.data.role] ??= []).push(p);
   return acc;
 }, {});
 
-const categories = Object.keys(grouped);
+const roles = Object.keys(grouped);
 ---
 
 <BaseLayout
   title="办公自动化处方 · 按岗位找"
-  description="按你烦的那件事找，不按工具找。每篇都是同一个结构：烦在哪 → 准备什么 → 一步步怎么配 → 直接能抄的指令 → 我踩过的坑。全部自己跑过一遍。"
+  description="按岗位挑，不按工具找。每篇都是同一个结构：烦在哪 → 准备什么 → 一步步怎么配 → 直接能抄的指令 → 我踩过的坑。全部自己跑过一遍。"
   breadcrumbs={[
     { name: '首页', url: '/' },
     { name: '痛点处方', url: '/prescriptions' },
@@ -25,23 +26,24 @@ const categories = Object.keys(grouped);
   <section class="px-5 sm:px-8 lg:px-[120px] py-[80px] bg-paper">
     <div class="flex flex-col gap-3 max-w-[820px]">
       <p class="mono-badge text-ai-1">痛点处方</p>
-      <h1 class="text-[48px] leading-[60px] font-bold font-display">按你烦的那件事找，不按工具找</h1>
+      <!-- 标题与分组口径对齐：分组已改为按岗位桶（原来是「按那件事找」但按场景分组，口径错位） -->
+      <h1 class="text-[48px] leading-[60px] font-bold font-display">按你的岗位挑，不按工具找</h1>
       <p class="text-[17px] leading-[31px] text-ink-2 mt-2">
-        共 {prescriptions.length} 篇，按使用场景分组。点进去，每篇都是同一个结构——你照着做就能用。
+        共 {prescriptions.length} 篇，按岗位分组。点进去，每篇都是同一个结构——你照着做就能用。
       </p>
     </div>
   </section>
 
   {
-    categories.map((cat) => (
+    roles.map((r) => (
       <section class="px-5 sm:px-8 lg:px-[120px] py-[60px] bg-paper">
         <div class="flex flex-col gap-7">
           <h2 class="text-[24px] font-semibold font-display text-ink-2 flex items-baseline gap-3">
-            {cat}
-            <span class="text-[14px] text-ink-3 font-medium">{grouped[cat].length} 篇</span>
+            {r}
+            <span class="text-[14px] text-ink-3 font-medium">{grouped[r].length} 篇</span>
           </h2>
           <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {grouped[cat].map((p) => (
+            {grouped[r].map((p) => (
               <a
                 href={`/prescriptions/${p.id}`}
                 class="bg-white border border-rule rounded-[12px] ai-card p-7 flex flex-col gap-3 hover:border-accent transition"

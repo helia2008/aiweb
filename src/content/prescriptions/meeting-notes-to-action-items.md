@@ -2,6 +2,7 @@
 title: "开完会那堆笔记，让它变成待办清单和责任人"
 summary: "一小时会议记了三页笔记，散会没人知道谁该干什么。让它把口水话压成三块：定了什么、谁在什么时间前做完、哪些还没定。你只负责确认责任人名字有没有写错。"
 category: "通用"
+role: "行政 / 通用"
 difficulty: "入门"
 setupMinutes: 40
 saveHoursPerWeek: 1

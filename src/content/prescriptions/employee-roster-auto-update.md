@@ -2,6 +2,7 @@
 title: "入职离职一圈人，让花名册自己更新不用手改"
 summary: "每月入离职十几个人，信息散在 offer、离职单、社保增减里，改花名册时总怕漏掉谁。让它先输出变动清单给你确认，再更新，最后校验人数对不对得上。"
 category: "人事"
+role: "人事 / HR"
 difficulty: "入门"
 setupMinutes: 30
 saveHoursPerWeek: 1.5

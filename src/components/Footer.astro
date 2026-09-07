@@ -1,19 +1,25 @@
 ---
+import { SITE } from '../lib/site.js';
 const year = new Date().getFullYear();
 ---
 
 <footer class="bg-deep text-deep-ink px-5 sm:px-8 lg:px-[120px] pt-[70px] pb-[40px] flex flex-col gap-11">
-  <div class="flex justify-between gap-12">
+  <!-- 窄屏纵向堆叠：320px 下左品牌块(~193px)+间距(48px)+右双栏(~288px)≈529px，
+       而容器可用宽仅 280px，不堆叠会被严重挤压、文字乱折。md 起恢复左右分栏。 -->
+  <div class="flex flex-col md:flex-row md:justify-between gap-8 md:gap-12">
     <div class="max-w-[420px] flex flex-col gap-4">
       <div class="flex items-center gap-[11px]">
         <span class="block w-4 h-4 rounded-[4px] bg-accent" aria-hidden="true"></span>
         <span class="text-[18px] font-bold font-display text-deep-ink">桌面 Agent 实战手册</span>
       </div>
       <p class="text-[14px] leading-6 text-deep-ink-3">写给不想学编程、但想把重复劳动交出去的人。</p>
-      <p class="text-[13px] leading-[22px] text-ink-3">内容源自我个人的 Obsidian 知识库，经人工复核后发布。</p>
+      <!-- 用 deep-ink-3 而非 ink-3：页脚恒为深底(bg-deep #1A1917)，与主题无关。
+           ink-3 是「浅色态」变量，在深底上仅 3.52:1（不合格）；deep-ink-3 为 6.96:1，
+           且不被深色模式覆盖，两个主题下都稳定。 -->
+      <p class="text-[13px] leading-[22px] text-deep-ink-3">内容源自我个人的 Obsidian 知识库，经人工复核后发布。</p>
     </div>
 
-    <div class="flex gap-20">
+    <div class="flex gap-10 md:gap-20">
       <div class="flex flex-col gap-[14px]">
         <h4 class="text-[13px] font-medium tracking-[1.2px] text-deep-ink-3">内容</h4>
         <a href="/start-here" class="text-[14px] text-deep-ink-2 hover:text-deep-ink">Start Here 路线</a>
@@ -25,14 +31,15 @@ const year = new Date().getFullYear();
         <h4 class="text-[13px] font-medium tracking-[1.2px] text-deep-ink-3">关于</h4>
         <a href="/about" class="text-[14px] text-deep-ink-2 hover:text-deep-ink">这个站怎么更新</a>
         <a href="/about#pkm" class="text-[14px] text-deep-ink-2 hover:text-deep-ink">我的工具链</a>
-        <a href="mailto:admin@aiwind.eu.cc" class="text-[14px] text-deep-ink-2 hover:text-deep-ink">联系与投稿</a>
+        <a href={`mailto:${SITE.email}`} class="text-[14px] text-deep-ink-2 hover:text-deep-ink">联系与投稿</a>
       </div>
     </div>
   </div>
 
   <hr class="border-t border-deep-rule" />
 
-  <div class="flex justify-between items-center">
+  <!-- 版权行：窄屏两行堆叠，避免两段文字并排被压成多行 -->
+  <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
     <p class="text-[13px] text-deep-ink-3">Copyright {year} · 桌面 Agent 实战手册</p>
     <p class="text-[13px] text-deep-ink-3">Astro + Cloudflare Pages · 内容经 Obsidian 萃取后人工复核</p>
   </div>

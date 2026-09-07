@@ -2,6 +2,7 @@
 title: "新人天天问系统怎么操作，让它把你演示一遍的过程变成 SOP"
 summary: "报销怎么提、OA 怎么走、门禁怎么开，每来一个新人你都要手把手教一遍，写在文档里的操作手册系统一改版就废。演示一遍给它看，它把你点过的每一步收成一份能直接发给新人的操作说明。"
 category: "行政"
+role: "行政 / 通用"
 difficulty: "进阶"
 setupMinutes: 15
 saveHoursPerWeek: 1

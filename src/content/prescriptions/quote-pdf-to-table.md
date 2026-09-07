@@ -2,6 +2,7 @@
 title: "二十家供应商的报价单 PDF，让它拆成一张可比的表"
 summary: "每家格式都不一样，单位有吨有公斤，含税不含税混着报，比价要花一整天。让它按你定的统一表头从 PDF 里抽字段，缺失的留空并标记，你只负责把待确认的几条问清楚。"
 category: "销售 / 采购"
+role: "财务 / 采购"
 difficulty: "进阶"
 setupMinutes: 45
 saveHoursPerWeek: 4

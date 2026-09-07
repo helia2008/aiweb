@@ -34,7 +34,8 @@ const prescriptions = (await getCollection('prescriptions'))
         ))}
       </ul>
 
-      <div class="flex gap-4 mt-4">
+      <!-- flex-wrap：320px 窄屏上三枚链接合计宽度会超出容器，不加 wrap 会被挤压致文字中途折行 -->
+      <div class="flex flex-wrap gap-x-4 gap-y-2 mt-4">
         <a href="/prescriptions" class="text-accent underline underline-offset-4">全部痛点处方</a>
         <a href="/start-here" class="text-accent underline underline-offset-4">Start Here 路线</a>
         <a href="/" class="text-accent underline underline-offset-4">回首页</a>

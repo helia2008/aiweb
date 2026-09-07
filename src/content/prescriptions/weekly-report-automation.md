@@ -2,6 +2,7 @@
 title: 周报怎么从两小时压到二十分钟
 summary: 写周报不难，难的是"翻这周做过的所有事"。把零散的聊天记录、工单、邮件、文档喂给 Agent，它给你拼成草稿，你只负责润色和取舍。
 category: 运营 / 项目
+role: "市场 / 运营"
 difficulty: 入门
 setupMinutes: 30
 saveHoursPerWeek: 1.5
