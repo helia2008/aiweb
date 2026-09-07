@@ -218,6 +218,13 @@ h1, h2, h3, h4 {
   --color-ai-2: #7C3AED;
   --color-ai-3: #0891B2;
   --color-ai-glow: #A5B4FC;
+  /* 赛博朋克霓虹（仅用于深色模式皮肤，浅色态不使用）：青/品红电光主色 +
+     柔光底，供深色态 hero/终端/卡片引用。浅色态不引用这些变量，保持纸感基底。 */
+  --color-neon-cyan: #22D3EE;
+  --color-neon-magenta: #FF2E97;
+  --color-neon-violet: #B26BFF;
+  --color-neon-cyan-soft: rgba(34, 211, 238, 0.16);
+  --color-neon-magenta-soft: rgba(255, 46, 151, 0.14);
   /* 等宽字体：技术感点缀（数字、指令、标签） */
   --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 }
@@ -233,14 +240,14 @@ h1, h2, h3, h4 {
   overflow: hidden;
 }
 
-/* Hero 上的细网格纹理（科技感底纹） */
+/* Hero 上的细网格纹理（科技感底纹 → 赛博朋克霓虹网格，共享于浅深主题） */
 .hero-ai::before {
   content: "";
   position: absolute;
   inset: 0;
   background-image:
-    linear-gradient(rgba(255, 255, 255, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.035) 1px, transparent 1px);
+    linear-gradient(rgba(34, 211, 238, 0.06) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(34, 211, 238, 0.06) 1px, transparent 1px);
   background-size: 56px 56px;
   mask-image: radial-gradient(ellipse 70% 70% at 50% 30%, #000 40%, transparent 100%);
   pointer-events: none;
@@ -539,18 +546,36 @@ html { scroll-behavior: smooth; }
    ============================================================ */
 
 .agent-window {
+  position: relative;
   width: 100%;
   max-width: 520px;
   border-radius: 14px;
   overflow: hidden;
   background: rgba(15, 15, 18, 0.9);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(34, 211, 238, 0.28);
   box-shadow:
     0 0 0 1px rgba(255, 255, 255, 0.04),
     0 30px 80px -24px rgba(0, 0, 0, 0.7),
-    0 0 90px -30px rgba(79, 70, 229, 0.45);
+    0 0 70px -18px rgba(34, 211, 238, 0.42),
+    0 0 90px -30px rgba(255, 46, 151, 0.28);
   backdrop-filter: blur(8px);
   font-family: var(--font-mono);
+}
+/* CRT 扫描线：共享于浅深主题（终端窗自身为深色半透明）。
+   极低透明（5%）+ z-index 在文字之上模拟 CRT 像素扫描，不伤可读。 */
+.agent-window::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(34, 211, 238, 0.05) 0px,
+    rgba(34, 211, 238, 0.05) 1px,
+    transparent 1px,
+    transparent 3px
+  );
 }
 
 /* 标题栏 */
@@ -560,7 +585,7 @@ html { scroll-behavior: smooth; }
   gap: 8px;
   padding: 12px 16px;
   background: rgba(255, 255, 255, 0.05);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  border-bottom: 1px solid rgba(34, 211, 238, 0.18);
 }
 .agent-window .aw-dot {
   width: 11px;
@@ -623,7 +648,7 @@ html { scroll-behavior: smooth; }
   display: inline-block;
   width: 8px;
   height: 15px;
-  background: #A5B4FC;
+  background: var(--color-ai-glow);
   vertical-align: -2px;
   animation: aw-blink 1s steps(1) infinite;
   margin-left: 2px;
@@ -635,14 +660,14 @@ html { scroll-behavior: smooth; }
   margin-top: 8px;
   padding: 12px 14px;
   border-radius: 9px;
-  background: linear-gradient(100deg, rgba(79, 70, 229, 0.22), rgba(124, 58, 237, 0.18));
-  border: 1px solid rgba(165, 180, 252, 0.3);
-  color: #E8E2D6;
+  background: linear-gradient(100deg, rgba(34, 211, 238, 0.22), rgba(255, 46, 151, 0.18));
+  border: 1px solid rgba(103, 232, 249, 0.32);
+  color: #ECEAF6;
   font-size: 13px;
   opacity: 0;
   animation: aw-in 0.6s ease 3.9s forwards;
 }
-.agent-window .aw-result .g { color: #A5B4FC; font-weight: 700; }
+.agent-window .aw-result .g { color: var(--color-ai-glow); font-weight: 700; }
 
 /* 终端窗口的旋转光晕装饰 */
 .agent-window-glow {
@@ -857,32 +882,55 @@ html.js .reveal.in {
    ============================================================ */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --color-paper: #0E0E11;
-    --color-paper-2: #17171B;
-    --color-ink: #ECEAE3;
-    --color-ink-2: #B6B0A6;
-    --color-ink-3: #8A857D;
-    --color-rule: #26262C;
-    --color-accent: #E5705F;
-    --color-accent-tint: rgba(229, 112, 95, 0.14);
-    --color-surface: #17171B;
-    --color-surface-2: #1F1F25;
-    --color-ai-glow-tint: rgba(165, 180, 252, 0.12);
+    /* 赛博朋克深色皮肤：冷黑紫底 + 电光霓虹强调。浅色态(paper/ink/accent 暖米白/朱砂)完全不动。
+       对比度已核：accent #FF2E97 在 #0A0A0F 上 5.15:1，neon-cyan #22D3EE 10.7:1，均过 WCAG 2.2 AA。 */
+    --color-paper: #0A0A0F;
+    --color-paper-2: #121019;
+    --color-ink: #ECEAF6;
+    --color-ink-2: #B7B2C4;
+    --color-ink-3: #8E879B;
+    --color-rule: #23222E;
+    --color-accent: #FF2E97;
+    --color-accent-tint: rgba(255, 46, 151, 0.14);
+    --color-surface: #121019;
+    --color-surface-2: #1A1822;
+    --color-ai-glow-tint: rgba(34, 211, 238, 0.12);
+    --color-deep: #0A0A0F;
+    --color-deep-2: #101019;
+    --color-deep-3: #15151F;
+    --color-deep-rule: #1E2A33;
+    --color-ai-1: #22D3EE;
+    --color-ai-2: #FF2E97;
+    --color-ai-3: #B26BFF;
+    --color-ai-glow: #67E8F9;
+    --color-neon-cyan: #22D3EE;
+    --color-neon-magenta: #FF2E97;
   }
   :root:not([data-theme="light"]) .bg-white { background-color: var(--color-surface); }
 }
 html[data-theme="dark"] {
-  --color-paper: #0E0E11;
-  --color-paper-2: #17171B;
-  --color-ink: #ECEAE3;
-  --color-ink-2: #B6B0A6;
-  --color-ink-3: #8A857D;
-  --color-rule: #26262C;
-  --color-accent: #E5705F;
-  --color-accent-tint: rgba(229, 112, 95, 0.14);
-  --color-surface: #17171B;
-  --color-surface-2: #1F1F25;
-  --color-ai-glow-tint: rgba(165, 180, 252, 0.12);
+  /* 赛博朋克深色皮肤（手动切换态）：与系统深色偏好同一套霓虹变量 */
+  --color-paper: #0A0A0F;
+  --color-paper-2: #121019;
+  --color-ink: #ECEAF6;
+  --color-ink-2: #B7B2C4;
+  --color-ink-3: #8E879B;
+  --color-rule: #23222E;
+  --color-accent: #FF2E97;
+  --color-accent-tint: rgba(255, 46, 151, 0.14);
+  --color-surface: #121019;
+  --color-surface-2: #1A1822;
+  --color-ai-glow-tint: rgba(34, 211, 238, 0.12);
+  --color-deep: #0A0A0F;
+  --color-deep-2: #101019;
+  --color-deep-3: #15151F;
+  --color-deep-rule: #1E2A33;
+  --color-ai-1: #22D3EE;
+  --color-ai-2: #FF2E97;
+  --color-ai-3: #B26BFF;
+  --color-ai-glow: #67E8F9;
+  --color-neon-cyan: #22D3EE;
+  --color-neon-magenta: #FF2E97;
 }
 html[data-theme="dark"] .bg-white { background-color: var(--color-surface); }
 
@@ -900,6 +948,12 @@ html[data-theme="dark"] .bg-white { background-color: var(--color-surface); }
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  /* glitch 标题：减弱动效时彻底关闭错位，避免前庭不适与可读干扰 */
+  .glitch::before, .glitch::after {
+    animation: none !important;
+    opacity: 0 !important;
+    transform: none !important;
   }
 }
 
@@ -1008,12 +1062,93 @@ html[data-theme="dark"] .theme-toggle .i-moon { display: none; }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) .about-hero {
     background-image:
-      radial-gradient(62% 82% at 12% 0%, rgba(79, 70, 229, 0.18), transparent 60%),
-      radial-gradient(52% 70% at 88% 8%, rgba(124, 58, 237, 0.15), transparent 60%);
+      radial-gradient(62% 82% at 12% 0%, rgba(34, 211, 238, 0.16), transparent 60%),
+      radial-gradient(52% 70% at 88% 8%, rgba(255, 46, 151, 0.13), transparent 60%);
+  }
+  /* 深色模式：AI 卡 hover 霓虹描边覆盖（浅色态保持原靛紫柔光，不改动） */
+  :root:not([data-theme="light"]) .ai-card:hover {
+    border-color: rgba(34, 211, 238, 0.55);
+    box-shadow:
+      0 1px 2px rgba(0, 0, 0, 0.25),
+      0 22px 44px -20px rgba(34, 211, 238, 0.5),
+      0 0 26px -8px rgba(255, 46, 151, 0.35);
+  }
+  :root:not([data-theme="light"]) .ai-card:hover::after {
+    background: radial-gradient(120% 90% at 50% -20%, rgba(34, 211, 238, 0.14), transparent 55%);
   }
 }
 html[data-theme="dark"] .about-hero {
   background-image:
-    radial-gradient(62% 82% at 12% 0%, rgba(79, 70, 229, 0.18), transparent 60%),
-    radial-gradient(52% 70% at 88% 8%, rgba(124, 58, 237, 0.15), transparent 60%);
+    radial-gradient(62% 82% at 12% 0%, rgba(34, 211, 238, 0.16), transparent 60%),
+    radial-gradient(52% 70% at 88% 8%, rgba(255, 46, 151, 0.13), transparent 60%);
+}
+
+/* 深色模式（手动态）：AI 卡 hover 霓虹描边覆盖 */
+html[data-theme="dark"] .ai-card:hover {
+  border-color: rgba(34, 211, 238, 0.55);
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.25),
+    0 22px 44px -20px rgba(34, 211, 238, 0.5),
+    0 0 26px -8px rgba(255, 46, 151, 0.35);
+}
+html[data-theme="dark"] .ai-card:hover::after {
+  background: radial-gradient(120% 90% at 50% -20%, rgba(34, 211, 238, 0.14), transparent 55%);
+}
+
+/* ============================================================
+   赛博朋克 glitch 标题（2026-09-07 方案 A）
+   原则：克制。仅深色态显现，浅色态 opacity:0 完全无影响（保持职场纸感纯净）；
+   动画大部分时间静止、仅极短几帧错位，不闪红绿、不刺眼；开启减弱动效时全关。
+   用法：<h1 class="glitch" data-text="完整标题文本">...</h1>
+   ============================================================ */
+.glitch {
+  position: relative;
+  display: inline-block;
+}
+.glitch::before,
+.glitch::after {
+  content: attr(data-text);
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  z-index: 1;
+}
+.glitch::before {
+  color: var(--color-neon-cyan);
+  transform: translate(-2px, 0);
+}
+.glitch::after {
+  color: var(--color-neon-magenta);
+  transform: translate(2px, 0);
+}
+/* 仅深色态播放轻微 glitch：青/品红错位，92% 时间静止 */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) .glitch::before {
+    opacity: 0.8;
+    animation: glitch-x 2.6s infinite linear alternate;
+  }
+  :root:not([data-theme="light"]) .glitch::after {
+    opacity: 0.8;
+    animation: glitch-y 3.1s infinite linear alternate;
+  }
+}
+html[data-theme="dark"] .glitch::before {
+  opacity: 0.8;
+  animation: glitch-x 2.6s infinite linear alternate;
+}
+html[data-theme="dark"] .glitch::after {
+  opacity: 0.8;
+  animation: glitch-y 3.1s infinite linear alternate;
+}
+@keyframes glitch-x {
+  0%, 92%, 100% { transform: translate(-2px, 0); clip-path: inset(0 0 0 0); }
+  94% { transform: translate(-4px, -1px); clip-path: inset(20% 0 50% 0); }
+  96% { transform: translate(2px, 1px); clip-path: inset(60% 0 10% 0); }
+  98% { transform: translate(-3px, 0); clip-path: inset(10% 0 70% 0); }
+}
+@keyframes glitch-y {
+  0%, 90%, 100% { transform: translate(2px, 0); clip-path: inset(0 0 0 0); }
+  93% { transform: translate(4px, 1px); clip-path: inset(40% 0 30% 0); }
+  97% { transform: translate(-2px, -1px); clip-path: inset(15% 0 60% 0); }
 }
