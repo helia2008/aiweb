@@ -33,8 +33,10 @@
   --color-deep-ink-2: #E8E2D6;
   --color-deep-ink-3: #A9A29A;
 
-  /* 字体：纯系统栈（2026-09-04 移除 Google Fonts —— 国内不可达导致手机白屏） */
-  --font-display: "Songti SC", "Noto Serif CJK SC", "Source Han Serif SC", SimSun, STSong, Georgia, serif;
+  /* 字体：纯系统栈（2026-09-04 移除 Google Fonts —— 国内不可达导致手机白屏）
+     标题衬线栈：Songti SC(macOS) → Source Han/Noto 系列 → SimSun(Windows 兜底) → Georgia(西文)。
+     Windows 无 Songti 时回落 SimSun，属跨平台已知漂移，接受为品牌锚；不引外部字体规避白屏。 */
+  --font-display: "Songti SC", "Source Han Serif SC", "Noto Serif CJK SC", "Noto Serif SC", STSong, SimSun, Georgia, serif;
   --font-sans: system-ui, -apple-system, "PingFang SC", "HarmonyOS Sans SC", "Microsoft YaHei", "Noto Sans CJK SC", sans-serif;
 
   /* 圆角 */
@@ -218,8 +220,10 @@ h1, h2, h3, h4 {
   --color-ai-2: #7C3AED;
   --color-ai-3: #0891B2;
   --color-ai-glow: #A5B4FC;
-  /* 等宽字体：技术感点缀（数字、指令、标签） */
-  --font-mono: "JetBrains Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  /* 等宽字体：技术感点缀（数字、指令、标签）
+     不写 JetBrains Mono 等未自托管字体名（避免「假装有」却回落系统栈）；
+     直接 ui-monospace 优先，逐级兜底 Cascadia Code / Menlo / Consolas / Liberation Mono。 */
+  --font-mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, "Liberation Mono", monospace;
 }
 
 /* ---- 深色渐变 Hero（AI 感主视觉） ---- */
@@ -661,8 +665,8 @@ html { scroll-behavior: smooth; }
 .reveal { opacity: 1; transform: none; }
 html.js .reveal {
   opacity: 0;
-  transform: translateY(22px);
-  transition: opacity 0.65s ease, transform 0.65s ease;
+  transform: translateY(12px);
+  transition: opacity 0.5s ease, transform 0.5s ease;
 }
 html.js .reveal.in {
   opacity: 1;
@@ -827,8 +831,9 @@ html.js .reveal.in {
   background: var(--color-paper-2);
   overflow: hidden;
   margin-top: 2px;
-  opacity: 0;
-  transform: translateY(2px);
+  /* 默认常显：移动端无 hover，「每周省 X 小时」的视觉进度条也要可见（此前仅 hover 显现，手机用户永远看不到） */
+  opacity: 1;
+  transform: none;
   transition: opacity 0.24s ease, transform 0.24s ease;
 }
 .ai-card:hover .rx-savebar { opacity: 1; transform: none; }
@@ -885,6 +890,11 @@ html[data-theme="dark"] {
   --color-ai-glow-tint: rgba(165, 180, 252, 0.12);
 }
 html[data-theme="dark"] .bg-white { background-color: var(--color-surface); }
+
+/* 主题切换（深浅）平滑过渡，避免瞬切闪烁；尊重系统「减少动态效果」偏好（WCAG 2.3.3） */
+@media (prefers-reduced-motion: no-preference) {
+  html, body { transition: background-color 0.2s ease, color 0.2s ease; }
+}
 
 /* 主题切换按钮：浅色显月亮，深色显太阳 */
 #theme-toggle .i-sun { display: none; }
