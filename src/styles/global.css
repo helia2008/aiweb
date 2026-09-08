@@ -1179,3 +1179,23 @@ html[data-theme="dark"] .about-hero {
   color: var(--color-ink-2);
   padding-top: 3px;
 }
+
+/* ============================================================
+   工具卡「不适合谁」判断条（2026-09-08 加）
+   全站最强信任状是「我敢说坏话」。此前首页只是普通文字行，
+   被埋在卡片底部、视觉权重与「适合谁」相同——信任信号被稀释。
+   改为左侧朱砂竖条 + 浅朱砂底的判断条，让「坏话」比「好话」更醒目。
+   ============================================================ */
+.tool-unfit {
+  border-left: 3px solid var(--color-accent);
+  background: var(--color-accent-tint);
+  padding: 10px 13px;
+  border-radius: 0 8px 8px 0;
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--color-ink-2);
+}
+.tool-unfit b {
+  color: var(--color-accent);
+  font-weight: 600;
+}

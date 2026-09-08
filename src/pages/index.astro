@@ -26,11 +26,69 @@ const minSave = Math.min(...prescriptions.map((p) => p.data.saveHoursPerWeek || 
 function countCommands(body) {
   return Math.floor(((body || '').match(/```/g) || []).length / 2);
 }
-function countPitfalls(body) {
+/**
+ * 坑章节统一提取（2026-09-08 修正）
+ *
+ * 站内「我踩过的坑」至少有三种写法，只认一种会让其余文章的坑**静默消失**
+ * （页面不报错、构建照过，只能靠产物计数发现）：
+ *   A. 1. **小标题**。—— 说明…        （例：monthly-expense-reports）
+ *   B. **坑一：小标题** —— 整段，无序号  （例：sop-from-screen-recording）
+ *   C. - 小标题                      （无序列表）
+ * 按 A → B → C 依次尝试，取第一种命中的形态。
+ * 注：A 取整行而非只取加粗部分——加粗里是「错在哪」，后面的正文才是「怎么翻的车」。
+ */
+function extractPitfalls(body) {
   const sec = (body || '').match(/##[^\n]*我踩过的[\s\S]*?(?=\n##\s|\n---|$)/);
-  if (!sec) return 0;
-  return (sec[0].match(/^\s*\d+\.\s+\*\*/gm) || []).length;
+  if (!sec) return [];
+  const s = sec[0];
+  const clean = (x) => x.replace(/\*\*/g, '').trim();
+
+  let items = s.match(/^\s*\d+\.\s+(.+)$/gm) || [];
+  if (items.length) return items.map((x) => clean(x.replace(/^\s*\d+\.\s+/, '')));
+
+  items = s.match(/^\*\*坑[一二三四五六七八九十\d]+[：:](.+?)\*\*/gm) || [];
+  if (items.length) {
+    return items.map((x) => clean(x.replace(/^\*\*坑[一二三四五六七八九十\d]+[：:]/, '')));
+  }
+
+  items = s.match(/^\s*[-*]\s+(.+)$/gm) || [];
+  return items.map((x) => clean(x.replace(/^\s*[-*]\s+/, '')));
 }
+
+function countPitfalls(body) {
+  return extractPitfalls(body).length;
+}
+
+/**
+ * 首页自曝翻车：取第一条坑的前两句。
+ * 取「两句」而非一句：第一句通常是「错在哪」，第二句才是「我当时怎么翻的车」——
+ * 后者才是爆款文案里最有画面感的部分（例："我第一次直接交上去，被财务退回"）。
+ */
+function firstPitfall(body) {
+  const p = extractPitfalls(body)[0];
+  if (!p) return '';
+  const two = p.match(/^(.+?[。！？!?][^。！？!?]*[。！？!?])/);
+  const one = p.match(/^(.+?[。！？!?])/);
+  const t = (two ? two[1] : one ? one[1] : p).trim();
+  return t.length > 56 ? t.slice(0, 56) + '…' : t;
+}
+
+// 每个岗位桶各取最新一篇：让财务/人事/行政/运营四类读者都能对号入座，
+// 而不是只展示某一类岗位的坑。
+const roleKeys = Array.from(new Set(prescriptions.map((p) => p.data.role)));
+const pitfallPicks = roleKeys
+  .map((r) => prescriptions.find((p) => p.data.role === r))
+  .filter(Boolean)
+  .map((p) => ({ p, pit: firstPitfall(p.body) }))
+  .filter((x) => x.pit);
+
+// 最近更新：按 updatedAt（无则 publishedAt）倒序。
+// 「每周三更新」此前只是口头承诺，页面上没有任何落地点——读者关掉就没理由回来。
+const recentlyUpdated = prescriptions
+  .map((p) => ({ p, t: (p.data.updatedAt ?? p.data.publishedAt).getTime() }))
+  .sort((a, b) => b.t - a.t)
+  .slice(0, 3);
+const fmtDate = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
 // 真实统计：把每篇处方自测的「每周省 X 小时」按每月 4.3 周合计。
 // 口径写在页面上，不编造——这是文章自身声明的加总，不是虚构的读者数据。
@@ -295,6 +353,36 @@ const totalHoursPerMonth = Math.round(
     })();
   </script>
 
+  <!-- ============== 我踩过的坑（自曝翻车提到外层） ==============
+       全站最有力的信任信号（真实翻车）此前只藏在每篇正文结尾，首页完全看不到。
+       这里按岗位桶各取一条提到首页：读者不用点进去，就能判断「这人是真干过」。
+       内容从正文自动提取，随正文更新，零维护成本。 -->
+  <section class="px-5 sm:px-8 lg:px-[120px] py-[92px] bg-paper-2">
+    <div class="flex flex-col gap-[42px]">
+      <div class="flex flex-col gap-4 max-w-[820px]">
+        <p class="mono-badge text-ai-1">我踩过的坑</p>
+        <h2 class="text-[40px] leading-[52px] font-bold font-display text-ink">这些坑，我先替你踩过了</h2>
+        <p class="text-[16px] leading-[29px] text-ink-2">
+          每篇处方结尾我都写了自己真出过的错——不是「注意事项」，是我当时怎么翻的车。
+          这儿按岗位各挑一条：你照着做大概率也会撞上，提前知道比事后返工强。
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+        {pitfallPicks.map(({ p, pit }) => (
+          <a
+            href={`/prescriptions/${p.id}`}
+            class="bg-white border border-rule rounded-[12px] ai-card p-[26px] flex flex-col gap-3"
+          >
+            <span class="tag bg-paper-2 text-ink-2 w-fit">{p.data.role}</span>
+            <p class="text-[16px] leading-[28px] text-ink">「{pit}」</p>
+            <p class="text-[13px] text-accent font-medium mt-auto">看完整处方 →</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
   <!-- ============== 工具罗盘 ============== -->
   <section class="px-5 sm:px-8 lg:px-[120px] py-[92px] bg-paper">
     <div class="flex flex-col gap-[42px]">
@@ -316,8 +404,8 @@ const totalHoursPerMonth = Math.round(
               <div class="h-px bg-rule my-2"></div>
               <!-- 区块标题承诺「都标了不适合谁」，但此前只渲染了 fit[0]（适合谁）——
                    「我敢说坏话」是全站最强的信任状，却一直藏在数据里。这里补上。 -->
-              <p class="text-[13px] leading-[22px] text-ink-2">
-                <span class="font-semibold text-ink-3">不适合：</span>{t.data.unfit[0]}
+              <p class="tool-unfit">
+                <b>不适合：</b>{t.data.unfit[0]}
               </p>
               <p class="text-[13px] font-medium text-ink-3">上手 {t.data.setupTime} · {t.data.cost}</p>
             </div>
@@ -444,6 +532,43 @@ const totalHoursPerMonth = Math.round(
           }
         })();
       </script>
+    </div>
+  </section>
+
+  <!-- ============== 最近在改什么（复访钩子） ==============
+       「每周三更新」此前只是口头承诺，页面上没有任何落地点——
+       读者关掉就再没理由回来。这里给出：① 按 updatedAt 的最近更新列表
+       ② RSS 可见入口（此前 rss.xml 已生成但首页无任何入口）。 -->
+  <section class="px-5 sm:px-8 lg:px-[120px] py-[80px] bg-paper">
+    <div class="flex flex-col gap-[26px]">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div class="flex flex-col gap-3">
+          <p class="mono-badge text-ai-1">最近在改什么</p>
+          <h2 class="text-[32px] leading-[44px] font-bold font-display text-ink">这站还在长，不是写完就扔</h2>
+        </div>
+        <a href="/rss.xml" class="text-[15px] font-medium text-accent hover:underline">用 RSS 追更 →</a>
+      </div>
+
+      <div class="flex flex-col border-b border-rule">
+        {recentlyUpdated.map(({ p, t }) => (
+          <a
+            href={`/prescriptions/${p.id}`}
+            class="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 py-4 border-t border-rule hover:text-accent transition"
+          >
+            <p class="text-[13px] font-mono text-ink-3 sm:w-[110px] shrink-0">{fmtDate(new Date(t))}</p>
+            <p class="text-[16px] leading-[26px] font-medium text-ink">{p.data.title}</p>
+            <p class="text-[13px] text-ink-3 sm:ml-auto shrink-0">
+              {p.data.updatedAt ? '有更新' : '首发'}
+            </p>
+          </a>
+        ))}
+      </div>
+
+      <p class="text-[13px] leading-[22px] text-ink-3">
+        每周三更新一篇。不想错过就把
+        <a href="/rss.xml" class="text-ai-1 underline">RSS</a>
+        加进阅读器，或者用下面的订阅——不用留手机号，也不发广告。
+      </p>
     </div>
   </section>
 </BaseLayout>
