@@ -10,7 +10,9 @@ export async function getStaticPaths() {
   );
 
   return sorted.map((entry, i) => {
-    // 相关处方：同类目优先（主题集群内链），不足则用最新的补齐
+    // 相关处方：同类目优先（主题集群内链），不足则用最新的补齐。
+    // 注：排序仍按 category（更细粒度，主题集群内链质量更高），
+    // 但卡片与面包屑「显示」给用户的一律用 role（岗位桶），与首页/列表页口径一致。
     const sameCategory = sorted.filter(
       (p) => p.id !== entry.id && p.data.category === entry.data.category,
     );
@@ -39,6 +41,43 @@ const dateStr = (d: Date) => d.toISOString().slice(0, 10);
 // FAQ：文章可在 frontmatter 里写 faqs（数组），写了才输出 FAQPage schema。
 // 没有真实 Q&A 就不要硬造——PAA 富摘要要靠真问题，不是模板。
 const faqs = entry.data.faqs ?? [];
+
+/**
+ * 步骤概览（2026-09-08 加·纯 CSS 视觉直观）
+ * 从正文「一步步怎么配」章节自动提取有序列表的步骤标题，渲染成步骤条。
+ * 好处：16 篇立即生效、零内容改动、零维护成本；且步骤来自正文真实内容，不是编造的。
+ * 桌面 Agent 是「操作软件」，读者最需要「看清一共几步、每步干什么」——此前全靠文字想象。
+ */
+function extractSteps(body: string) {
+  const sec = body.match(/##[^\n]*一步步怎么配[\s\S]*?(?=\n##\s|\n---|$)/);
+  if (!sec) return [];
+  const text = sec[0];
+
+  // 形态 A：有序列表 + 加粗小标题 —— 1. **先跑一次手动流程**。说明…
+  let items = text.match(/^\s*\d+\.\s+\*\*(.+?)\*\*/gm) || [];
+  if (items.length) {
+    return items
+      .map((s) => s.replace(/^\s*\d+\.\s+/, '').replace(/\*\*/g, '').trim());
+  }
+
+  // 形态 B：加粗段落 —— **第一步：先让它复述，别急着要结论**
+  // （16 篇里两种写法都有，只认其中一种会让另一批文章的步骤条整体消失）
+  items = text.match(/^\*\*第[一二三四五六七八九十\d]+步[：:](.+?)\*\*/gm) || [];
+  if (items.length) {
+    return items
+      .map((s) =>
+        s.replace(/^\*\*第[一二三四五六七八九十\d]+步[：:]/, '').replace(/\*\*/g, '').trim(),
+      );
+  }
+
+  // 形态 C：普通有序列表（无加粗）—— 取第一句，避免把整段说明塞进步骤条
+  return (text.match(/^\s*\d+\.\s+(.+)$/gm) || []).map((s) => {
+    const t = s.replace(/^\s*\d+\.\s+/, '').replace(/\*\*/g, '').trim();
+    const first = t.match(/^(.+?[。！？!?])/);
+    return (first ? first[1] : t).trim();
+  });
+}
+const steps = extractSteps(entry.body ?? '');
 ---
 
 <BaseLayout
@@ -53,7 +92,7 @@ const faqs = entry.data.faqs ?? [];
   breadcrumbs={[
     { name: '首页', url: '/' },
     { name: '痛点处方', url: '/prescriptions' },
-    { name: entry.data.category, url: '/prescriptions' },
+    { name: entry.data.role, url: '/prescriptions' },
   ]}
 >
   <article class="pt-0 pb-[110px] bg-paper">
@@ -61,13 +100,13 @@ const faqs = entry.data.faqs ?? [];
     <nav aria-label="面包屑" class="px-5 sm:px-8 lg:px-[120px] pt-[30px] pb-2 flex items-center gap-[9px]">
       <a href="/prescriptions" class="text-[13px] font-medium text-ink-3 hover:text-accent">痛点处方</a>
       <span class="text-ink-3" aria-hidden="true">/</span>
-      <span class="text-[13px] font-medium text-ink-3">{entry.data.category}</span>
+      <span class="text-[13px] font-medium text-ink-3">{entry.data.role}</span>
     </nav>
 
     <div class="px-5 sm:px-8 lg:px-[120px] flex justify-center">
       <div class="w-full max-w-[800px] flex flex-col gap-[26px]">
         <div class="flex gap-2">
-          <a href="/prescriptions" class="tag bg-paper-2 text-ink-2 hover:text-accent">{entry.data.category}</a>
+          <a href="/prescriptions" class="tag bg-paper-2 text-ink-2 hover:text-accent">{entry.data.role}</a>
           <span class="tag bg-accent-tint text-accent">
             已验证 · 每周省 {entry.data.saveHoursPerWeek} 小时
           </span>
@@ -85,7 +124,36 @@ const faqs = entry.data.faqs ?? [];
           · 读完约 {Math.max(4, Math.round(entry.data.setupMinutes / 3))} 分钟
         </p>
 
+        <!-- 投入 / 回报对比条：数值全部取自 frontmatter 真实字段，不编造、不夸大 -->
+        <div class="rx-compare">
+          <div class="rx-compare-cell">
+            <p class="rx-compare-k">一次上手</p>
+            <p class="rx-compare-v">{entry.data.setupMinutes}<span class="rx-compare-u">分钟</span></p>
+          </div>
+          <span class="rx-compare-arrow" aria-hidden="true">→</span>
+          <div class="rx-compare-cell">
+            <p class="rx-compare-k">之后每周省</p>
+            <p class="rx-compare-v rx-compare-v-accent">{entry.data.saveHoursPerWeek}<span class="rx-compare-u">小时</span></p>
+          </div>
+        </div>
+
         <hr class="border-t border-rule" />
+
+        <!-- 步骤概览：从正文「一步步怎么配」自动提取（真实内容，非编造），
+             解决「桌面 Agent 是操作软件，但全靠文字想象看不懂步骤」的问题 -->
+        {steps.length > 0 && (
+          <nav class="rx-steps" aria-label="配置步骤概览">
+            <p class="rx-steps-label">先看全局 · 一共 {steps.length} 步</p>
+            <ol class="rx-steps-list">
+              {steps.map((s, i) => (
+                <li class="rx-step">
+                  <span class="rx-step-no" aria-hidden="true">{i + 1}</span>
+                  <span class="rx-step-text">{s}</span>
+                </li>
+              ))}
+            </ol>
+          </nav>
+        )}
 
         <div class="article-prose" id="article-body">
           <Content />
@@ -225,7 +293,7 @@ const faqs = entry.data.faqs ?? [];
                   href={`/prescriptions/${r.id}`}
                   class="bg-white border border-rule rounded-[10px] ai-card p-5 flex flex-col gap-2 hover:border-accent transition"
                 >
-                  <p class="text-[12px] text-ink-3">{r.data.category}</p>
+                  <p class="text-[12px] text-ink-3">{r.data.role}</p>
                   <p class="text-[16px] leading-[24px] font-semibold font-display text-ink">{r.data.title}</p>
                   <p class="text-[12px] text-accent mt-auto">每周省 {r.data.saveHoursPerWeek} 小时</p>
                 </a>

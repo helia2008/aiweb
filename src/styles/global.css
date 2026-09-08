@@ -1027,3 +1027,155 @@ html[data-theme="dark"] .about-hero {
     radial-gradient(62% 82% at 12% 0%, rgba(79, 70, 229, 0.18), transparent 60%),
     radial-gradient(52% 70% at 88% 8%, rgba(124, 58, 237, 0.15), transparent 60%);
 }
+
+/* ============================================================
+   7 天路线 · 纵向日程（2026-09-08 填实）
+   原为 7 列窄网格，每格只能塞 4-6 字标签（"装好 Agent"），
+   与首页「第七天验收」的承诺严重不符——读者按路线点进来却拿到空气。
+   改为纵向日程：每天给出「做什么（可执行动作）+ 产出什么 + 相关处方」。
+   ============================================================ */
+.route-days {
+  display: flex;
+  flex-direction: column;
+}
+.route-day {
+  display: grid;
+  grid-template-columns: 84px 1fr;
+  gap: 18px;
+  padding: 18px 0;
+  border-top: 1px solid var(--color-rule);
+}
+.route-day:first-child { border-top: none; padding-top: 4px; }
+.route-day-no {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ai-1);
+  padding-top: 4px;
+}
+.route-day-body { display: flex; flex-direction: column; gap: 7px; min-width: 0; }
+.route-day-title {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.55;
+  color: var(--color-ink);
+}
+.route-day-do {
+  font-size: 14px;
+  line-height: 1.75;
+  color: var(--color-ink-2);
+}
+.route-day-out {
+  font-size: 13px;
+  line-height: 1.65;
+  color: var(--color-ink-3);
+}
+.route-day-out b { color: var(--color-accent); font-weight: 600; }
+.route-day-link {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--color-accent);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  align-self: flex-start;
+}
+.route-day-link:hover { text-decoration-thickness: 2px; }
+@media (max-width: 640px) {
+  .route-day { grid-template-columns: 1fr; gap: 8px; }
+  .route-day-no { padding-top: 0; }
+}
+
+/* ============================================================
+   详情页视觉直观组件（2026-09-08 加 · 纯 CSS，零图片零加载成本）
+   ① 投入/回报对比条 ② 步骤概览条
+   桌面 Agent 是「操作软件」，读者最需要看清「几步、每步干什么」；
+   用结构化组件替代截图：信息密度更高，且不消耗图片资源与加载时间。
+   ============================================================ */
+.rx-compare {
+  display: flex;
+  align-items: center;
+  gap: 22px;
+  flex-wrap: wrap;
+  padding: 16px 20px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-rule);
+  border-radius: 12px;
+}
+.rx-compare-cell { display: flex; flex-direction: column; gap: 2px; }
+.rx-compare-k { font-size: 12px; font-weight: 500; color: var(--color-ink-3); }
+.rx-compare-v {
+  font-family: var(--font-mono);
+  font-size: 26px;
+  font-weight: 700;
+  line-height: 1.2;
+  color: var(--color-ink);
+}
+.rx-compare-v-accent { color: var(--color-accent); }
+.rx-compare-u {
+  font-family: var(--font-sans);
+  font-size: 13px;
+  font-weight: 500;
+  margin-left: 3px;
+  color: var(--color-ink-3);
+}
+.rx-compare-arrow { color: var(--color-ink-3); font-size: 18px; }
+
+.rx-steps {
+  padding: 18px 20px;
+  background: var(--color-paper-2);
+  border: 1px solid var(--color-rule);
+  border-radius: 12px;
+}
+.rx-steps-label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--color-ai-1);
+  margin-bottom: 12px;
+}
+.rx-steps-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.rx-step {
+  display: grid;
+  grid-template-columns: 26px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 9px 0;
+  position: relative;
+}
+/* 步骤间的连接竖线：左侧对齐圆心（26px 圆 → 圆心 13px） */
+.rx-step:not(:last-child)::after {
+  content: "";
+  position: absolute;
+  left: 12.5px;
+  top: 36px;
+  bottom: -4px;
+  width: 1px;
+  background: var(--color-rule);
+}
+.rx-step-no {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-accent);
+  color: #fff;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  font-weight: 700;
+}
+.rx-step-text {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--color-ink-2);
+  padding-top: 3px;
+}

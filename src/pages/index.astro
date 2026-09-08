@@ -19,6 +19,19 @@ const maxSave = Math.max(...prescriptions.map((p) => p.data.saveHoursPerWeek || 
 // 误以为自己能省那么多。单篇区间更可信，也更可行动。
 const minSave = Math.min(...prescriptions.map((p) => p.data.saveHoursPerWeek || 0));
 
+// 内容硬货统计（2026-09-08 加）：从正文解析「可抄指令段数」与「已踩坑数」。
+// 全站最强的信任状（真实踩坑、能直接抄的指令）此前只藏在正文里，
+// 读者在列表页无从判断「这篇真有用」还是「又一篇 AI 水文」。
+// 这里把它提到卡片层：零维护成本（跟着正文自动变），且全部来自真实内容。
+function countCommands(body) {
+  return Math.floor(((body || '').match(/```/g) || []).length / 2);
+}
+function countPitfalls(body) {
+  const sec = (body || '').match(/##[^\n]*我踩过的[\s\S]*?(?=\n##\s|\n---|$)/);
+  if (!sec) return 0;
+  return (sec[0].match(/^\s*\d+\.\s+\*\*/gm) || []).length;
+}
+
 // 真实统计：把每篇处方自测的「每周省 X 小时」按每月 4.3 周合计。
 // 口径写在页面上，不编造——这是文章自身声明的加总，不是虚构的读者数据。
 const totalHoursPerMonth = Math.round(
@@ -236,6 +249,10 @@ const totalHoursPerMonth = Math.round(
               </div>
               <h3 class="text-[20px] leading-[29px] font-semibold font-display text-ink">{p.data.title}</h3>
               <p class="text-[14px] leading-[24px] text-ink-2 line-clamp-2">{p.data.summary}</p>
+              <p class="text-[12px] text-ink-3 font-medium">
+                <span class="font-mono text-ink-2">{countCommands(p.body)}</span> 段可抄指令 ·
+                <span class="font-mono text-ink-2">{countPitfalls(p.body)}</span> 个已踩坑
+              </p>
               <p class="rx-savetext text-[13px] text-ink-3 font-medium mt-auto pt-1">
                 每周省 {p.data.saveHoursPerWeek} 小时
               </p>

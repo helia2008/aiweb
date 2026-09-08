@@ -1,10 +1,170 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+
+/**
+ * 7 天路线（2026-09-08 填实）
+ *
+ * 原实现：3 条路线各 7 个格子，每格只有 4-6 个字（"装好 Agent""读 5 页 PDF"），
+ * 再没有任何可执行内容。而首页 START HERE 区块、次按钮、处方页顶部入口
+ * 全部指向这里，并承诺"第七天手上会有一个真跑得起来的自动化"。
+ * 读者按路线点进来却拿到空气 → 判定标题党，是全站信任崩塌的头号来源。
+ *
+ * 现在：每天给「做什么（一个可执行的动作）+ 产出什么（可验收的东西）」，
+ * 能链到站里已有真实处方的那一天都链过去，让路线有落脚点。
+ */
+const routes = [
+  {
+    no: '01',
+    title: '我连提示词都写不明白',
+    meta: '7 天 · 每天 20 分钟 · 零基础',
+    goal: '从装好第一个桌面 Agent，到让它读完一份 40 页 PDF 并写出三段摘要。全程图形界面，不碰命令行。',
+    days: [
+      {
+        t: '装好 Agent，确认它能读你的文件',
+        do: '装一个能读本地文件夹的桌面 Agent，新建一个测试文件夹，让它列出里面有什么。',
+        out: '确认「它真的能看到我的电脑」，而不只是会陪你聊天。',
+      },
+      {
+        t: '让它读 5 页 PDF，只问事实',
+        do: '丢一份 5 页的 PDF 进去，只问「这份文件讲了哪三件事」，不要问观点。',
+        out: '第一次感受到「它读得比我快」，也看清它会不会瞎编。',
+        link: '/prescriptions/quote-pdf-to-table',
+      },
+      {
+        t: '让它总结全文，但把格式限死',
+        do: '同一份文件改问「用三段话总结，每段不超过 60 字，只许用文件里出现过的词」。',
+        out: '明白「限死格式」比「说人话」更管用。',
+        link: '/prescriptions/meeting-notes-to-action-items',
+      },
+      {
+        t: '给它看样板，而不是下命令',
+        do: '先手动做一份你想要的结果（哪怕只有三行），把样板丢给它，说「照这个样子做」。',
+        out: '从「命令它」转到「给它看样板」，成功率能翻倍。',
+        link: '/prescriptions/sop-from-screen-recording',
+      },
+      {
+        t: '让它盯一个网页，只报变化',
+        do: '挑一个你每周都会去看的网页，让它比对昨天和今天有什么不同。',
+        out: '第一次体会「它主动告诉我」，而不是「我去查」。',
+        link: '/prescriptions/competitor-website-watcher',
+      },
+      {
+        t: '让它比对两份名单',
+        do: '给它两份名单（比如上月和本月），让它标出「新增了谁、少了谁」。',
+        out: '第一份真正省下时间的产出物。',
+        link: '/prescriptions/list-diff-pipeline',
+      },
+      {
+        t: '挑一件你每周做的事，完整跑一遍',
+        do: '把 Day 1–6 学到的串起来，挑一件你每周必做的事，走一遍完整流程。',
+        out: '一个能拿给同事看的东西——这就是你的「第七天验收」。',
+        link: '/prescriptions/weekly-report-automation',
+      },
+    ],
+  },
+  {
+    no: '02',
+    title: '我想让它替我干掉一份周报',
+    meta: '7 天 · 每天 30 分钟 · 会用 Excel',
+    goal: '挑一件你每周必做、最厌烦的事，把它拆成 Agent 能执行的步骤，最后得到一份可复用的指令模板。',
+    days: [
+      {
+        t: '选一件事，要小而确定',
+        do: '列出你每周必做的三件事，挑「步骤最固定、最不用动脑」的那件。别挑需要判断的。',
+        out: '一个明确的靶子，后面六天都围着它转。',
+      },
+      {
+        t: '手动做一遍，并把过程记下来',
+        do: '像往常一样人肉做一次，顺手录屏或记下每一步花了多久、哪一步最烦。',
+        out: '一张「现状耗时表」——也是最后验证到底省没省时间的基准。',
+        link: '/prescriptions/sop-from-screen-recording',
+      },
+      {
+        t: '拆成步骤，写到傻子都能照做',
+        do: '把流程拆成 5–8 步，每步只写一个动作，写到不用问你也能执行。',
+        out: '一份可执行清单，后面只是把它翻译成指令。',
+      },
+      {
+        t: '写第一版指令，先只让它「只读」',
+        do: '把步骤清单改写成一段指令，但先让它只输出「我看到了什么」，先别让它动手改文件。',
+        out: '确认它读懂了，而且没碰你的原文件。',
+        link: '/prescriptions/monthly-expense-reports',
+      },
+      {
+        t: '跑一次，盯死最容易翻车的两处',
+        do: '让它真跑一次，重点盯「名字归一」和「单位统一」——九成的错都出在这两处。',
+        out: '第一版结果，外加一张错误清单。',
+        link: '/prescriptions/supplier-statement-reconciliation',
+      },
+      {
+        t: '改两版，把例外写进去',
+        do: '把 Day 5 的错误逐条变成指令里的例外规则（比如「店名带『分』字的不归一」）。',
+        out: '第二版指令，基本稳定可用。',
+        link: '/prescriptions/shipment-monthly-summary',
+      },
+      {
+        t: '本周上线，并留一份说明书',
+        do: '把它接进你每周的流程，同时把指令和例外写成一页纸，谁接手都能照着跑。',
+        out: '一个真跑起来的自动化，加一份交接文档。',
+        link: '/prescriptions/weekly-report-automation',
+      },
+    ],
+  },
+  {
+    no: '03',
+    title: '我们部门都想用起来',
+    meta: '7 天 · 每天 40 分钟 · 带团队',
+    goal: '从个人提效跨到团队落地：怎么选场景、怎么定红线、怎么让同事愿意跟着用，而不是偷偷抵触。',
+    days: [
+      {
+        t: '画现状流程，找出最脏的那一段',
+        do: '把部门里那件事的现状画出来（谁做什么、在哪交接），标出最耗时的一段。',
+        out: '一张现状流程图，加一个明确的改造点。',
+      },
+      {
+        t: '挑 3 个场景，只留高频、低风险、易验证的',
+        do: '列出候选场景，按「每周都做、错了也不致命、结果一眼能看出来」筛，只留 3 个。',
+        out: '3 个候选场景，排好优先级。',
+        link: '/prescriptions/attendance-exception-triage',
+      },
+      {
+        t: '定数据红线，先想清楚什么绝不能给它',
+        do: '明确哪些数据不能出本地、哪些结果必须人工复核、最后谁来签字。',
+        out: '一份一页纸的红线清单——也是拿给 IT 和法务看的东西。',
+        link: '/prescriptions/contract-terms-extraction',
+      },
+      {
+        t: '找一位同事试，只找最嫌麻烦的那个',
+        do: '别全员推广。先找一位本身就嫌这事麻烦的同事，用他的真实数据跑一天。',
+        out: '第一份真实反馈，加一个内部支持者。',
+        link: '/prescriptions/resume-screening-pipeline',
+      },
+      {
+        t: '做一份手册，把「坑」写进去',
+        do: '把指令、例外、红线写成一页纸手册，重点写「哪些情况会出错、出了怎么办」。',
+        out: '可交接的手册，不是培训 PPT。',
+        link: '/prescriptions/sop-from-screen-recording',
+      },
+      {
+        t: '开一次 30 分钟分享，只演示真实数据',
+        do: '用同事的真实数据现场跑一遍，包括它出错的那次——自曝翻车比讲成功更让人信。',
+        out: '从「你要他们用」变成「他们问你要」。',
+        link: '/prescriptions/meeting-notes-to-action-items',
+      },
+      {
+        t: '收集反馈，定下一轮',
+        do: '收集「哪一步还是会卡住」，挑下一件事，进入第二轮。',
+        out: '下一轮的场景清单。',
+        link: '/prescriptions/social-listening-summary',
+      },
+    ],
+  },
+];
 ---
 
 <BaseLayout
   title="7 天入门路线 · 从零用上 AI Agent"
-  description="三条 7 天路线：完全零基础、想干掉一份周报、带团队落地。每天 20-40 分钟，第七天手上会有一个真跑得起来的自动化。"
+  description="三条 7 天路线：完全零基础、想干掉一份周报、带团队落地。每天 20-40 分钟，第七天你能拿出一个真跑得起来的自动化。"
   breadcrumbs={[
     { name: '首页', url: '/' },
     { name: 'Start Here', url: '/start-here' },
@@ -15,67 +175,44 @@ import BaseLayout from '../layouts/BaseLayout.astro';
       <p class="mono-badge text-ai-1">START HERE</p>
       <h1 class="text-[48px] leading-[60px] font-bold font-display">挑一条路，七天后来验收</h1>
       <p class="text-[17px] leading-[31px] text-ink-2 mt-2">
-        每条路线都按"周一到周日"分好了。每天 20-40 分钟，第七天你能拿出一个真跑得起来的自动化给你同事看。
+        每条路线都按「周一到周日」分好了，每天只给一个动作和一个产出。每天 20-40 分钟，
+        第七天你能拿出一个真跑得起来的自动化给你同事看。
       </p>
     </div>
   </section>
 
   <section class="px-5 sm:px-8 lg:px-[120px] pb-[80px] bg-paper flex flex-col gap-6">
-    <article id="p1" class="bg-white border border-rule rounded-[12px] p-10">
-      <div class="flex items-baseline gap-4 mb-4">
-        <span class="text-[42px] font-bold font-display text-accent">01</span>
-        <h2 class="text-[28px] font-bold font-display">我连提示词都写不明白</h2>
-      </div>
-      <p class="text-[15px] text-ink-3 mb-6">7 天 · 每天 20 分钟 · 零基础</p>
-      <p class="text-[16px] leading-[29px] text-ink-2 mb-6">从装好第一个桌面 Agent 开始，到让它帮你读完一份 40 页 PDF 并写出三段摘要。这一条只走图形界面，不碰命令行。</p>
-      <div class="grid grid-cols-7 gap-2 text-center">
-        {Array.from({ length: 7 }).map((_, i) => (
-          <div class="border border-rule rounded-[8px] p-3">
-            <p class="text-[11px] font-medium text-ink-3">DAY {i + 1}</p>
-            <p class="text-[12px] text-ink-2 mt-1">
-              {['装好 Agent', '读 5 页 PDF', '让它总结', '改你的写法', '试一篇新闻', '贴一段代码', '周六自由练'][i]}
-            </p>
+    {
+      routes.map((r) => (
+        <article id={`p${Number(r.no)}`} class="bg-white border border-rule rounded-[12px] p-8 sm:p-10">
+          <div class="flex items-baseline gap-4 mb-3">
+            <span class="text-[42px] font-bold font-display text-accent">{r.no}</span>
+            <h2 class="text-[26px] sm:text-[28px] font-bold font-display">{r.title}</h2>
           </div>
-        ))}
-      </div>
-    </article>
+          <p class="text-[15px] text-ink-3 mb-4">{r.meta}</p>
+          <p class="text-[16px] leading-[29px] text-ink-2 mb-7">{r.goal}</p>
 
-    <article id="p2" class="bg-white border border-rule rounded-[12px] p-10">
-      <div class="flex items-baseline gap-4 mb-4">
-        <span class="text-[42px] font-bold font-display text-accent">02</span>
-        <h2 class="text-[28px] font-bold font-display">我想让它替我干掉一份周报</h2>
-      </div>
-      <p class="text-[15px] text-ink-3 mb-6">7 天 · 每天 30 分钟 · 会用 Excel</p>
-      <p class="text-[16px] leading-[29px] text-ink-2 mb-6">挑一件你每周必做、最厌烦的事，照着这一条的"拆解模板"把它拆成 Agent 能执行的步骤，最后得到一份可复用的指令模板。</p>
-      <div class="grid grid-cols-7 gap-2 text-center">
-        {Array.from({ length: 7 }).map((_, i) => (
-          <div class="border border-rule rounded-[8px] p-3">
-            <p class="text-[11px] font-medium text-ink-3">DAY {i + 1}</p>
-            <p class="text-[12px] text-ink-2 mt-1">
-              {['选一件事', '手动做一遍', '拆成步骤', '写第一版指令', '跑一次', '改两版', '本周上线'][i]}
-            </p>
+          <div class="route-days">
+            {r.days.map((d, i) => (
+              <div class="route-day">
+                <p class="route-day-no">DAY {i + 1}</p>
+                <div class="route-day-body">
+                  <p class="route-day-title">{d.t}</p>
+                  <p class="route-day-do">
+                    <b class="text-ink-2 font-semibold">做什么：</b>{d.do}
+                  </p>
+                  <p class="route-day-out">
+                    <b>产出：</b>{d.out}
+                  </p>
+                  {d.link && (
+                    <a href={d.link} class="route-day-link">看一篇真实做法 →</a>
+                  )}
+                </div>
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
-    </article>
-
-    <article id="p3" class="bg-white border border-rule rounded-[12px] p-10">
-      <div class="flex items-baseline gap-4 mb-4">
-        <span class="text-[42px] font-bold font-display text-accent">03</span>
-        <h2 class="text-[28px] font-bold font-display">我们部门都想用起来</h2>
-      </div>
-      <p class="text-[15px] text-ink-3 mb-6">7 天 · 每天 40 分钟 · 带团队</p>
-      <p class="text-[16px] leading-[29px] text-ink-2 mb-6">从个人提效跨到团队落地。讲怎么选场景、怎么定红线、怎么让同事愿意跟着用、怎么在不被 IT 拦下的前提下接外部服务。</p>
-      <div class="grid grid-cols-7 gap-2 text-center">
-        {Array.from({ length: 7 }).map((_, i) => (
-          <div class="border border-rule rounded-[8px] p-3">
-            <p class="text-[11px] font-medium text-ink-3">DAY {i + 1}</p>
-            <p class="text-[12px] text-ink-2 mt-1">
-              {['画现状流程', '挑 3 个场景', '定数据红线', '找一位同事试', '做一份手册', '开一次分享', '收集反馈'][i]}
-            </p>
-          </div>
-        ))}
-      </div>
-    </article>
+        </article>
+      ))
+    }
   </section>
 </BaseLayout>
