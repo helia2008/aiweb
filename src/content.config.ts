@@ -98,19 +98,20 @@ const prompts = defineCollection({
 });
 
 // ============================================================
-// Agent 技能 · 能力清单（2026-09-08 新增）
-// 面向新手，每条只回答三个问题：能做什么 / 一句话怎么用 / 不能做什么。
-// 「不能做什么」是必填项——它是全站「我敢说坏话」信任风格的延续。
+// Agent 技能 · 真实 skill 目录（2026-09-09 重构）
+// 不是泛化的"能力清单"，而是 WorkBuddy 技能生态里真实可装的 agent skill。
+// 每条对应一个真实技能（skillId），教读者怎么调用、能做什么、边界在哪。
 // ============================================================
 const skills = defineCollection({
   loader: glob({ pattern: '**/*.md', base: './src/content/skills' }),
   schema: z.object({
-    name: z.string(), // 技能名（如「读取本地文件」）
+    name: z.string(), // 显示名（如「find-skills · 技能发现器」）
+    skillId: z.string(), // 真实技能 id（如 find-skills），用于调用
     summary: z.string(), // 一句话定位
-    level: z.enum(['基础', '进阶']),
-    can: z.array(z.string()), // 能做什么
-    howto: z.string(), // 一句话怎么用（可直接复制）
-    cannot: z.array(z.string()), // 不能做什么 / 边界
+    category: z.enum(['文档协作', '知识笔记', '会议音视频', '信息获取', '元技能']),
+    what: z.array(z.string()), // 能做什么
+    invoke: z.string(), // 怎么调用（@skill:xxx / 面板搜索）
+    cannot: z.array(z.string()).default([]), // 边界与注意
     relatedPrescriptions: z.array(z.string()).default([]),
     order: z.number().default(0),
   }),

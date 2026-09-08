@@ -4,14 +4,17 @@ import { getCollection } from 'astro:content';
 
 const skills = (await getCollection('skills')).sort((a, b) => a.data.order - b.data.order);
 const groups = [
-  { label: '基础能力', desc: '装好就能用，不需要任何配置。', items: skills.filter((s) => s.data.level === '基础') },
-  { label: '进阶能力', desc: '需要多配一步，但能替你长期盯着一件事。', items: skills.filter((s) => s.data.level === '进阶') },
+  { label: '文档协作', desc: '建文档、出 PPT、排 Word——把重复性的文档活交给它。', items: skills.filter((s) => s.data.category === '文档协作') },
+  { label: '知识笔记', desc: '搭个人知识库，并让它随你收藏的文章持续进化。', items: skills.filter((s) => s.data.category === '知识笔记') },
+  { label: '会议 / 音视频', desc: '录音转写、纪要整理、图片成片，会议与素材不再堆积。', items: skills.filter((s) => s.data.category === '会议音视频') },
+  { label: '信息获取', desc: '联网搜索、智能摘要、浏览器自动化——替你盯着网上的事。', items: skills.filter((s) => s.data.category === '信息获取') },
+  { label: '元技能', desc: '发现更多技能、让 AI 记住你的风格——越用越懂你。', items: skills.filter((s) => s.data.category === '元技能') },
 ];
 ---
 
 <BaseLayout
-  title="Agent 到底能做什么"
-  description="不谈原理，只回答三个问题：能做什么、一句话怎么用、不能做什么。每条都标了边界——知道它干不了什么，比知道它能干什么更重要。"
+  title="Agent 技能 · 真实 skill 目录"
+  description="不是泛化的能力清单，而是 WorkBuddy 技能生态里真实可装的 agent skill。每条都告诉你怎么调用、能做什么、边界在哪。"
   breadcrumbs={[
     { name: '首页', url: '/' },
     { name: 'Agent 技能', url: '/skills' },
@@ -21,12 +24,13 @@ const groups = [
     <div class="flex flex-col gap-4 max-w-[860px]">
       <p class="mono-badge text-ai-1">AGENT 技能</p>
       <h1 class="text-[48px] leading-[60px] font-bold font-display">
-        它到底能替你做什么
+        真实能装的 skill，都在这里
       </h1>
       <p class="text-[17px] leading-[31px] text-ink-2 mt-2">
-        共 {skills.length} 项能力，每一项只回答三个问题：<b class="text-ink">能做什么</b>、
-        <b class="text-ink">一句话怎么用</b>、<b class="text-ink">不能做什么</b>。
-        最后一条我们写得最认真——知道它干不了什么，比知道它能干什么更重要。
+        共 {skills.length} 个。不是"AI 能做什么"的空话，而是 WorkBuddy 技能生态里
+        <b class="text-ink">真实存在、搜得到、装得上</b>的 agent skill。
+        每张卡都写了三件事：<b class="text-ink">怎么调用</b>、<b class="text-ink">能做什么</b>、
+        <b class="text-ink">边界在哪</b>——最后一条我们写得最认真，因为它决定你敢不敢真用。
       </p>
     </div>
   </section>
@@ -44,15 +48,18 @@ const groups = [
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
               {g.items.map((s) => (
                 <div class="bg-white border border-rule rounded-[12px] ai-card p-[28px] flex flex-col gap-4">
-                  <div class="flex flex-col gap-1">
-                    <h3 class="text-[21px] font-bold font-display text-ink">{s.data.name}</h3>
+                  <div class="flex flex-col gap-2">
+                    <div class="flex items-center gap-2 flex-wrap">
+                      <h3 class="text-[21px] font-bold font-display text-ink">{s.data.name}</h3>
+                      <span class="mono-badge !text-[11px] !py-[2px] !px-[8px] text-ai-1 bg-accent-tint">@{s.data.skillId}</span>
+                    </div>
                     <p class="text-[14px] leading-[24px] text-ink-2">{s.data.summary}</p>
                   </div>
 
                   <div class="flex flex-col gap-2">
                     <p class="text-[12px] font-medium tracking-[1.2px] text-ink-3">能做什么</p>
                     <ul class="flex flex-col gap-1.5">
-                      {s.data.can.map((c) => (
+                      {s.data.what.map((c) => (
                         <li class="text-[14px] leading-[23px] text-ink-2 flex gap-2">
                           <span class="text-accent shrink-0">＋</span>{c}
                         </li>
@@ -61,20 +68,20 @@ const groups = [
                   </div>
 
                   <div class="flex flex-col gap-2">
-                    <p class="text-[12px] font-medium tracking-[1.2px] text-ink-3">一句话怎么用</p>
-                    <div class="instruction-block !my-0 !text-[13px]">{s.data.howto}</div>
+                    <p class="text-[12px] font-medium tracking-[1.2px] text-ink-3">怎么调用</p>
+                    <div class="instruction-block !my-0 !text-[13px]">{s.data.invoke}</div>
                     <button
                       type="button"
                       class="copy-prompt text-[13px] font-medium text-accent hover:underline self-start"
-                      data-prompt={s.data.howto}
+                      data-prompt={s.data.invoke}
                     >
                       复制这句
                     </button>
                   </div>
 
-                  <!-- 「不能做什么」用判断条样式：让坏话比好话更醒目（全站信任风格） -->
+                  <!-- 「边界在哪」用判断条样式：让坏话比好话更醒目（全站信任风格） -->
                   <div class="tool-unfit flex flex-col gap-1.5">
-                    <p class="text-[12px] font-medium tracking-[1.2px]">不能做什么</p>
+                    <p class="text-[12px] font-medium tracking-[1.2px]">边界在哪</p>
                     <ul class="flex flex-col gap-1">
                       {s.data.cannot.map((c) => (
                         <li class="text-[13px] leading-[21px] flex gap-2">
@@ -108,7 +115,7 @@ const groups = [
   </section>
 
   <script is:inline>
-    // 复制「一句话怎么用」（与提示词库同一套逻辑：带降级与反馈）
+    // 复制「怎么调用」（与提示词库同一套逻辑：带降级与反馈）
     (function () {
       var btns = document.querySelectorAll('.copy-prompt');
       btns.forEach(function (btn) {
