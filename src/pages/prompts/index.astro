@@ -1,0 +1,152 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const prompts = (await getCollection('prompts')).sort(
+  (a, b) => a.data.order - b.data.order,
+);
+
+// 岗位筛选：与处方页同一套 role 口径，另加「通用」（不属于某个岗位的通用模板）
+const roles = ['全部', ...Array.from(new Set(prompts.map((p) => p.data.role)))];
+const tested = prompts.filter((p) => p.data.source === '处方实测').length;
+---
+
+<BaseLayout
+  title="提示词库 · 拿来就能用"
+  description="从实战处方里拆出来的提示词，外加通用高频场景模板。每条都标了哪些地方要改成你自己的——复制过去不会跑不通。"
+  breadcrumbs={[
+    { name: '首页', url: '/' },
+    { name: '提示词库', url: '/prompts' },
+  ]}
+>
+  <section class="px-5 sm:px-8 lg:px-[120px] py-[80px] bg-paper">
+    <div class="flex flex-col gap-4 max-w-[860px]">
+      <p class="mono-badge text-ai-1">提示词库</p>
+      <h1 class="text-[48px] leading-[60px] font-bold font-display">
+        这些提示词，都是从真跑过的活里拆出来的
+      </h1>
+      <p class="text-[17px] leading-[31px] text-ink-2 mt-2">
+        共 {prompts.length} 条，其中 <b class="text-ink">{tested}</b> 条来自站内处方的实测指令。
+        每条都标了<b class="text-ink">哪些地方要改成你自己的</b>——提示词最常见的坑就是复制过去跑不通，
+        因为占位符没解释。
+      </p>
+    </div>
+  </section>
+
+  <section class="px-5 sm:px-8 lg:px-[120px] pb-[100px] bg-paper">
+    <div class="flex flex-col gap-[34px]">
+      <!-- 筛选：一组切换按钮（同处方页口径），不是 tablist -->
+      <div class="cat-tabs" role="group" aria-label="按岗位筛选提示词">
+        {
+          roles.map((r, i) => (
+            <button
+              type="button"
+              class:list={['cat-tab', i === 0 && 'is-active']}
+              data-filter={r}
+              aria-pressed={i === 0 ? 'true' : 'false'}
+            >
+              {r}
+            </button>
+          ))
+        }
+      </div>
+      <p id="prompt-filter-status" class="sr-only" role="status" aria-live="polite"></p>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" id="prompt-grid">
+        {
+          prompts.map((p) => (
+            <div
+              data-role={p.data.role}
+              class="bg-white border border-rule rounded-[12px] ai-card p-[24px] flex flex-col gap-[13px]"
+            >
+              <div class="flex gap-2 flex-wrap">
+                <span class="tag bg-paper-2 text-ink-2">{p.data.role}</span>
+                <span class="tag bg-accent-tint text-accent">{p.data.source}</span>
+              </div>
+              <a href={`/prompts/${p.id}`} class="flex flex-col gap-2 group">
+                <h3 class="text-[19px] leading-[28px] font-semibold font-display text-ink group-hover:text-accent transition">
+                  {p.data.title}
+                </h3>
+                <p class="text-[14px] leading-[24px] text-ink-2 line-clamp-3">{p.data.summary}</p>
+              </a>
+              {p.data.variables.length > 0 && (
+                <p class="text-[12px] text-ink-3">
+                  要改 {p.data.variables.length} 处：
+                  {p.data.variables.map((v) => v.name).join(' / ')}
+                </p>
+              )}
+              <div class="flex items-center gap-3 mt-auto pt-2">
+                <button
+                  type="button"
+                  class="copy-prompt text-[13px] font-medium text-accent hover:underline"
+                  data-prompt={p.data.prompt}
+                >
+                  复制提示词
+                </button>
+                <a href={`/prompts/${p.id}`} class="text-[13px] font-medium text-ink-3 hover:text-ink">
+                  看说明 →
+                </a>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <script is:inline>
+    // 岗位筛选（与首页处方筛选同口径：role=group + aria-pressed + 状态播报）
+    (function () {
+      var bar = document.querySelector('.cat-tabs');
+      var grid = document.getElementById('prompt-grid');
+      var status = document.getElementById('prompt-filter-status');
+      if (!bar || !grid) return;
+      var cards = Array.prototype.slice.call(grid.querySelectorAll('[data-role]'));
+      bar.addEventListener('click', function (e) {
+        var btn = e.target.closest('.cat-tab');
+        if (!btn) return;
+        var f = btn.getAttribute('data-filter');
+        bar.querySelectorAll('.cat-tab').forEach(function (t) {
+          var on = t === btn;
+          t.classList.toggle('is-active', on);
+          t.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        var shown = 0;
+        cards.forEach(function (c) {
+          var show = f === '全部' || c.getAttribute('data-role') === f;
+          c.style.display = show ? '' : 'none';
+          if (show) shown++;
+        });
+        if (status) status.textContent = '已按「' + f + '」筛选，显示 ' + shown + ' 条提示词';
+      });
+    })();
+
+    // 一键复制提示词（带降级与反馈）
+    (function () {
+      var btns = document.querySelectorAll('.copy-prompt');
+      btns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var text = btn.getAttribute('data-prompt') || '';
+          var origin = btn.textContent;
+          function done() {
+            btn.textContent = '已复制 ✓';
+            setTimeout(function () { btn.textContent = origin; }, 1800);
+          }
+          function fallback() {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); done(); } catch (e) { btn.textContent = '复制失败'; }
+            document.body.removeChild(ta);
+          }
+          if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(done, fallback);
+          } else { fallback(); }
+        });
+      });
+    })();
+  </script>
+</BaseLayout>

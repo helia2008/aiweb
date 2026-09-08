@@ -6,7 +6,19 @@ import { SITE } from '../lib/site.js';
 const prescriptions = (await getCollection('prescriptions', ({ data }) => !data.draft))
   .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
 
-const featured = prescriptions.slice(0, 3);
+// 编辑精选（热门文章排序）：静态站没有浏览量，硬做「热门」会名不副实，
+// 所以热门 = 编辑人工精选（featured=true，order 小排前）。
+// 没标精选时回退到最新 3 篇，避免区块空着。
+const featured = (() => {
+  const picks = prescriptions
+    .filter((p) => p.data.featured)
+    .sort(
+      (a, b) =>
+        (a.data.order ?? 0) - (b.data.order ?? 0) ||
+        b.data.publishedAt.getTime() - a.data.publishedAt.getTime(),
+    );
+  return picks.length ? picks : prescriptions.slice(0, 3);
+})();
 const tools = await getCollection('tools');
 
 // 岗位分桶 tab：从 role 字段去重（4 个桶）。
@@ -258,8 +270,53 @@ const totalHoursPerMonth = Math.round(
     </div>
   </section>
 
-  <!-- ============== 痛点处方 ============== -->
+  <!-- ============== 编辑精选（热门文章排序） ==============
+       静态站没有浏览量，「热门」若按假数据排会名不副实。
+       这里用编辑人工精选（featured=true，order 小排前）——
+       保证首页永远有几篇「最该先读」的，不随时间漂移。 -->
   <section class="px-5 sm:px-8 lg:px-[120px] py-[92px] bg-paper-2">
+    <div class="flex flex-col gap-[42px]">
+      <div class="flex items-end justify-between">
+        <div class="flex flex-col gap-4 max-w-[760px]">
+          <p class="mono-badge text-ai-1">编辑精选</p>
+          <h2 class="text-[40px] leading-[52px] font-bold font-display text-ink">先看这几篇，性价比最高</h2>
+          <p class="text-[16px] leading-[29px] text-ink-2">没有浏览量可以刷，这几篇是我亲手挑的——踩坑最实在、最该先读。</p>
+        </div>
+        <a href="/prescriptions" class="text-[15px] font-medium text-accent hover:underline">看全部处方 →</a>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 reveal">
+        {
+          featured.map((p) => (
+            <a
+              href={`/prescriptions/${p.id}`}
+              class="bg-white border border-rule rounded-[12px] ai-card p-[24px] flex flex-col gap-[13px] hover:border-accent transition"
+            >
+              <div class="flex gap-2 flex-wrap">
+                <span class="tag bg-paper-2 text-ink-2">{p.data.role}</span>
+                <span class="tag bg-accent-tint text-accent">上手 {p.data.setupMinutes} 分钟</span>
+              </div>
+              <h3 class="text-[20px] leading-[29px] font-semibold font-display text-ink">{p.data.title}</h3>
+              <p class="text-[14px] leading-[24px] text-ink-2 line-clamp-2">{p.data.summary}</p>
+              <p class="text-[12px] text-ink-3 font-medium">
+                <span class="font-mono text-ink-2">{countCommands(p.body)}</span> 段可抄指令 ·
+                <span class="font-mono text-ink-2">{countPitfalls(p.body)}</span> 个已踩坑
+              </p>
+              <p class="rx-savetext text-[13px] text-ink-3 font-medium mt-auto pt-1">
+                每周省 {p.data.saveHoursPerWeek} 小时
+              </p>
+              <div class="rx-savebar" aria-hidden="true" title={`每周省 ${p.data.saveHoursPerWeek} 小时`}>
+                <span class="rx-savebar-fill" style={`--save:${Math.round((p.data.saveHoursPerWeek / maxSave) * 100)}%`}></span>
+              </div>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- ============== 痛点处方 ============== -->
+  <section class="px-5 sm:px-8 lg:px-[120px] py-[92px] bg-paper">
     <div class="flex flex-col gap-[42px]">
       <div class="flex items-end justify-between">
         <div class="flex flex-col gap-4 max-w-[760px]">

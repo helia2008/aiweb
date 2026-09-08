@@ -1,0 +1,55 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const prescriptions = await getCollection('prescriptions', ({ data }) => !data.draft);
+
+// 统计每个标签下有几篇。标签已在 2026-09-08 收敛为 10 个受控标签——
+// 此前 45+ 个碎片标签、多数只挂 1 篇，做出来就是「点进去只有一篇」的废筛选。
+const tagMap = new Map();
+for (const p of prescriptions) {
+  for (const t of p.data.tags || []) {
+    if (!tagMap.has(t)) tagMap.set(t, []);
+    tagMap.get(t).push(p);
+  }
+}
+const tags = [...tagMap.entries()].sort(
+  (a, b) => b[1].length - a[1].length || a[0].localeCompare(b[0], 'zh'),
+);
+---
+
+<BaseLayout
+  title="按标签找"
+  description="全部处方标签。每个标签都标了篇数，不会出现点进去只有一篇的空标签。"
+  breadcrumbs={[
+    { name: '首页', url: '/' },
+    { name: '标签', url: '/tags' },
+  ]}
+>
+  <section class="px-5 sm:px-8 lg:px-[120px] py-[80px] bg-paper">
+    <div class="flex flex-col gap-4 max-w-[820px]">
+      <p class="mono-badge text-ai-1">标签</p>
+      <h1 class="text-[48px] leading-[60px] font-bold font-display">按标签找</h1>
+      <p class="text-[17px] leading-[31px] text-ink-2 mt-2">
+        共 {tags.length} 个标签。我们不追求标签多——每个标签至少要有几篇，
+        否则点了也是白点。
+      </p>
+    </div>
+  </section>
+
+  <section class="px-5 sm:px-8 lg:px-[120px] pb-[100px] bg-paper">
+    <div class="flex flex-wrap gap-3">
+      {
+        tags.map(([t, list]) => (
+          <a
+            href={`/tags/${encodeURIComponent(t)}`}
+            class="inline-flex items-center gap-2 px-5 py-3 bg-white border border-rule rounded-[999px] hover:border-accent hover:text-accent transition"
+          >
+            <span class="text-[15px] font-medium text-ink">{t}</span>
+            <span class="text-[13px] font-mono text-ink-3">{list.length}</span>
+          </a>
+        ))
+      }
+    </div>
+  </section>
+</BaseLayout>

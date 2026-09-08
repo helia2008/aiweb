@@ -7,7 +7,7 @@ difficulty: 进阶
 setupMinutes: 90
 saveHoursPerWeek: 1.5
 publishedAt: 2026-08-19
-tags: [合同, 采购, PDF]
+tags: ["PDF 文档", "对账财务"]
 ---
 
 ## 这个活烦在哪

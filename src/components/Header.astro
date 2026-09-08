@@ -4,10 +4,15 @@ export interface Props {
 }
 const { pathname = '/' } = Astro.props;
 
+// 2026-09-08：新增「提示词库」「Agent 技能」两个板块，导航会到 7 项——
+// 加上 Logo、RSS 与订阅按钮，1280px 以下就会挤压。
+// 处理：「Start Here」移出主导航（首页有 START HERE 大区块，Footer 也保留入口），
+// 主导航保持 6 项。
 const navItems = [
   { label: '首页', href: '/' },
-  { label: 'Start Here', href: '/start-here' },
   { label: '痛点处方', href: '/prescriptions' },
+  { label: '提示词库', href: '/prompts' },
+  { label: 'Agent 技能', href: '/skills' },
   { label: '工具罗盘', href: '/tools' },
   { label: '关于', href: '/about' },
 ];

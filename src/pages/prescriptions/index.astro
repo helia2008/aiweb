@@ -54,6 +54,11 @@ const roles = Object.keys(grouped);
                 </div>
                 <h3 class="text-[20px] leading-[30px] font-semibold font-display text-ink">{p.data.title}</h3>
                 <p class="text-[15px] leading-[26px] text-ink-2 line-clamp-2">{p.data.summary}</p>
+                <div class="flex gap-2 flex-wrap">
+                  {p.data.tags.slice(0, 3).map((t) => (
+                    <span class="tag bg-paper-2 text-ink-2">{t}</span>
+                  ))}
+                </div>
                 <p class="text-[13px] text-ink-3 font-medium">
                   {p.data.publishedAt.toISOString().slice(0, 10)} · 读完约 {Math.max(4, Math.round(p.data.setupMinutes / 3))} 分钟
                 </p>

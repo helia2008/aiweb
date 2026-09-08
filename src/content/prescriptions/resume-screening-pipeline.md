@@ -7,7 +7,9 @@ difficulty: 进阶
 setupMinutes: 60
 saveHoursPerWeek: 5
 publishedAt: 2026-08-05
-tags: [HR, 招聘, 筛选]
+tags: ["招聘人事"]
+featured: true
+order: 1
 # 首页「我踩过的坑」固定展示这一条（必须来自正文真实内容）
 showcase: "我把「计算机科学与技术」设成硬性条件，结果「计算机科学与技术（大数据方向）」被整批漏掉"
 ---

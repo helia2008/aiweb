@@ -9,7 +9,9 @@ saveHoursPerWeek: 3
 publishedAt: "2026-09-03"
 updatedAt: "2026-09-03"
 draft: false
-tags: ["运单", "月度报表", "物流", "数据汇总"]
+tags: ["数据汇总", "Excel 表格"]
+featured: true
+order: 6
 faqs:
   - q: "同一票货被拆成多行，它会重复计算吗？"
     a: "会，除非你告诉它去重规则。关键是要说清\"同一运单号出现多次时以哪一条为准\"——通常是取状态最新的一条，或者按你的业务规则合并数量。"

@@ -7,7 +7,9 @@ difficulty: 进阶
 setupMinutes: 50
 saveHoursPerWeek: 3
 publishedAt: 2026-07-28
-tags: [舆情, 公关, 摘要]
+tags: ["竞品调研", "周报汇报"]
+featured: true
+order: 5
 # 首页「我踩过的坑」固定展示这一条（必须来自正文真实内容）
 showcase: "周日早上 7 点被它叫醒——一个不太重要的信源命中了信号词"
 ---

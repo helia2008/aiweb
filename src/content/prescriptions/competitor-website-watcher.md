@@ -7,7 +7,7 @@ difficulty: 入门
 setupMinutes: 25
 saveHoursPerWeek: 1
 publishedAt: 2026-09-01
-tags: [监控, 竞品, 自动化]
+tags: ["竞品调研", "监控提醒"]
 ---
 
 ## 这个活烦在哪

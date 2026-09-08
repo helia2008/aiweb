@@ -1,0 +1,139 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+
+const skills = (await getCollection('skills')).sort((a, b) => a.data.order - b.data.order);
+const groups = [
+  { label: '基础能力', desc: '装好就能用，不需要任何配置。', items: skills.filter((s) => s.data.level === '基础') },
+  { label: '进阶能力', desc: '需要多配一步，但能替你长期盯着一件事。', items: skills.filter((s) => s.data.level === '进阶') },
+];
+---
+
+<BaseLayout
+  title="Agent 到底能做什么"
+  description="不谈原理，只回答三个问题：能做什么、一句话怎么用、不能做什么。每条都标了边界——知道它干不了什么，比知道它能干什么更重要。"
+  breadcrumbs={[
+    { name: '首页', url: '/' },
+    { name: 'Agent 技能', url: '/skills' },
+  ]}
+>
+  <section class="px-5 sm:px-8 lg:px-[120px] py-[80px] bg-paper">
+    <div class="flex flex-col gap-4 max-w-[860px]">
+      <p class="mono-badge text-ai-1">AGENT 技能</p>
+      <h1 class="text-[48px] leading-[60px] font-bold font-display">
+        它到底能替你做什么
+      </h1>
+      <p class="text-[17px] leading-[31px] text-ink-2 mt-2">
+        共 {skills.length} 项能力，每一项只回答三个问题：<b class="text-ink">能做什么</b>、
+        <b class="text-ink">一句话怎么用</b>、<b class="text-ink">不能做什么</b>。
+        最后一条我们写得最认真——知道它干不了什么，比知道它能干什么更重要。
+      </p>
+    </div>
+  </section>
+
+  <section class="px-5 sm:px-8 lg:px-[120px] pb-[100px] bg-paper">
+    <div class="flex flex-col gap-[54px]">
+      {
+        groups.map((g) => (
+          <div class="flex flex-col gap-6">
+            <div class="flex flex-col gap-2">
+              <h2 class="text-[28px] font-bold font-display text-ink">{g.label}</h2>
+              <p class="text-[15px] text-ink-3">{g.desc}</p>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              {g.items.map((s) => (
+                <div class="bg-white border border-rule rounded-[12px] ai-card p-[28px] flex flex-col gap-4">
+                  <div class="flex flex-col gap-1">
+                    <h3 class="text-[21px] font-bold font-display text-ink">{s.data.name}</h3>
+                    <p class="text-[14px] leading-[24px] text-ink-2">{s.data.summary}</p>
+                  </div>
+
+                  <div class="flex flex-col gap-2">
+                    <p class="text-[12px] font-medium tracking-[1.2px] text-ink-3">能做什么</p>
+                    <ul class="flex flex-col gap-1.5">
+                      {s.data.can.map((c) => (
+                        <li class="text-[14px] leading-[23px] text-ink-2 flex gap-2">
+                          <span class="text-accent shrink-0">＋</span>{c}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  <div class="flex flex-col gap-2">
+                    <p class="text-[12px] font-medium tracking-[1.2px] text-ink-3">一句话怎么用</p>
+                    <div class="instruction-block !my-0 !text-[13px]">{s.data.howto}</div>
+                    <button
+                      type="button"
+                      class="copy-prompt text-[13px] font-medium text-accent hover:underline self-start"
+                      data-prompt={s.data.howto}
+                    >
+                      复制这句
+                    </button>
+                  </div>
+
+                  <!-- 「不能做什么」用判断条样式：让坏话比好话更醒目（全站信任风格） -->
+                  <div class="tool-unfit flex flex-col gap-1.5">
+                    <p class="text-[12px] font-medium tracking-[1.2px]">不能做什么</p>
+                    <ul class="flex flex-col gap-1">
+                      {s.data.cannot.map((c) => (
+                        <li class="text-[13px] leading-[21px] flex gap-2">
+                          <span class="shrink-0">－</span>{c}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {
+                    s.data.relatedPrescriptions.length > 0 && (
+                      <div class="flex flex-wrap gap-x-4 gap-y-1 pt-1 border-t border-rule">
+                        {s.data.relatedPrescriptions.map((rid) => (
+                          <a
+                            href={`/prescriptions/${rid}`}
+                            class="text-[13px] text-accent hover:underline"
+                          >
+                            相关处方 →
+                          </a>
+                        ))}
+                      </div>
+                    )
+                  }
+                </div>
+              ))}
+            </div>
+          </div>
+        ))
+      }
+    </div>
+  </section>
+
+  <script is:inline>
+    // 复制「一句话怎么用」（与提示词库同一套逻辑：带降级与反馈）
+    (function () {
+      var btns = document.querySelectorAll('.copy-prompt');
+      btns.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var text = btn.getAttribute('data-prompt') || '';
+          var origin = btn.textContent;
+          function done() {
+            btn.textContent = '已复制 ✓';
+            setTimeout(function () { btn.textContent = origin; }, 1800);
+          }
+          function fallback() {
+            var ta = document.createElement('textarea');
+            ta.value = text;
+            ta.style.position = 'fixed';
+            ta.style.opacity = '0';
+            document.body.appendChild(ta);
+            ta.select();
+            try { document.execCommand('copy'); done(); } catch (e) { btn.textContent = '复制失败'; }
+            document.body.removeChild(ta);
+          }
+          if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(text).then(done, fallback);
+          } else { fallback(); }
+        });
+      });
+    })();
+  </script>
+</BaseLayout>

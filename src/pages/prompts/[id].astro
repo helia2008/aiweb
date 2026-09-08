@@ -1,0 +1,144 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const prompts = await getCollection('prompts');
+  return prompts.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const isTested = entry.data.source === '处方实测';
+---
+
+<BaseLayout
+  title={`${entry.data.title} · 提示词`}
+  description={entry.data.summary}
+  showSubscribe={false}
+  breadcrumbs={[
+    { name: '首页', url: '/' },
+    { name: '提示词库', url: '/prompts' },
+    { name: entry.data.title, url: `/prompts/${entry.id}` },
+  ]}
+>
+  <article class="pt-0 pb-[110px] bg-paper">
+    <nav aria-label="面包屑" class="px-5 sm:px-8 lg:px-[120px] pt-[30px] pb-2 flex items-center gap-[9px]">
+      <a href="/prompts" class="text-[13px] font-medium text-ink-3 hover:text-accent">提示词库</a>
+      <span class="text-ink-3" aria-hidden="true">/</span>
+      <span class="text-[13px] font-medium text-ink-3">{entry.data.role}</span>
+    </nav>
+
+    <div class="px-5 sm:px-8 lg:px-[120px] flex justify-center">
+      <div class="w-full max-w-[800px] flex flex-col gap-[26px]">
+        <div class="flex gap-2 flex-wrap">
+          <span class="tag bg-paper-2 text-ink-2">{entry.data.role}</span>
+          <span class="tag bg-accent-tint text-accent">{entry.data.source}</span>
+          <span class="tag bg-paper-2 text-ink-2">{entry.data.scene}</span>
+        </div>
+
+        <h1 class="text-[40px] leading-[54px] font-bold font-display text-ink">
+          {entry.data.title}
+        </h1>
+
+        <p class="text-[18px] leading-[32px] text-ink-2">{entry.data.summary}</p>
+
+        {
+          !isTested && (
+            <p class="text-[13px] leading-[22px] text-ink-3 bg-paper-2 border border-rule rounded-[10px] px-4 py-3">
+              这条是<b class="text-ink-2">通用模板</b>，不是某一篇处方的实测指令。
+              建议先在你不那么重要的事情上试一遍，确认输出符合预期再进正式流程。
+            </p>
+          )
+        }
+
+        <!-- 提示词全文：一整块，带一键复制 -->
+        <div class="flex flex-col gap-3">
+          <p class="mono-badge text-ai-1">提示词全文</p>
+          <div class="instruction-block" id="prompt-body">{entry.data.prompt}</div>
+          <button
+            id="copy-prompt"
+            type="button"
+            class="btn-ai h-[46px] px-[24px] text-[15px] self-start"
+          >
+            复制这段提示词
+          </button>
+          <p id="copy-hint" class="text-[13px] font-medium text-accent hidden" role="status" aria-live="polite"></p>
+        </div>
+
+        {
+          entry.data.variables.length > 0 && (
+            <div class="flex flex-col gap-3">
+              <p class="mono-badge text-ai-1">要改成你自己的（{entry.data.variables.length} 处）</p>
+              <div class="bg-white border border-rule rounded-[12px] overflow-hidden">
+                {entry.data.variables.map((v) => (
+                  <div class="px-5 py-4 border-t border-rule first:border-t-0 flex flex-col gap-1">
+                    <p class="text-[15px] font-semibold text-ink">{v.name}</p>
+                    <p class="text-[14px] leading-[24px] text-ink-2">{v.desc}</p>
+                    {v.example && (
+                      <p class="text-[13px] text-ink-3 font-mono">例：{v.example}</p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          )
+        }
+
+        <hr class="border-t border-rule" />
+
+        <div class="article-prose">
+          <Content />
+        </div>
+
+        {
+          entry.data.fromPrescription && (
+            <a
+              href={`/prescriptions/${entry.data.fromPrescription}`}
+              class="bg-paper-2 border border-rule rounded-[12px] p-5 flex flex-col gap-1 hover:border-accent transition"
+            >
+              <p class="text-[12px] text-ink-3">这条提示词出自</p>
+              <p class="text-[16px] font-semibold font-display text-ink">
+                看完整处方：怎么配、坑在哪 →
+              </p>
+            </a>
+          )
+        }
+      </div>
+    </div>
+  </article>
+
+  <script is:inline>
+    (function () {
+      var btn = document.getElementById('copy-prompt');
+      var body = document.getElementById('prompt-body');
+      var hint = document.getElementById('copy-hint');
+      if (!btn || !body) return;
+      var origin = btn.textContent;
+      function done() {
+        if (hint) { hint.textContent = '已复制到剪贴板'; hint.classList.remove('hidden'); }
+        btn.textContent = '已复制 ✓';
+        setTimeout(function () {
+          btn.textContent = origin;
+          if (hint) hint.classList.add('hidden');
+        }, 1800);
+      }
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = body.innerText;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); } catch (e) { btn.textContent = '复制失败'; }
+        document.body.removeChild(ta);
+      }
+      btn.addEventListener('click', function () {
+        var text = body.innerText || '';
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(text).then(done, fallback);
+        } else { fallback(); }
+      });
+    })();
+  </script>
+</BaseLayout>

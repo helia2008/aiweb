@@ -9,7 +9,9 @@ saveHoursPerWeek: 1
 publishedAt: "2026-09-04"
 updatedAt: "2026-09-04"
 draft: false
-tags: ["新人培训", "SOP", "行政", "操作手册"]
+tags: ["SOP 培训", "文件整理"]
+featured: true
+order: 4
 # 首页「我踩过的坑」固定展示这一条（必须来自正文真实内容）
 showcase: "演示到一半就点了「结束」，后半段步骤全丢了，它还不会提醒我"
 faqs:

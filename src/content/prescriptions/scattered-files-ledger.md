@@ -9,7 +9,7 @@ saveHoursPerWeek: 2
 publishedAt: "2026-09-02"
 updatedAt: "2026-09-02"
 draft: false
-tags: ["文件归档", "台账", "微信"]
+tags: ["文件整理", "Excel 表格"]
 faqs:
   - q: "微信聊天记录它能读到吗？"
     a: "读不到聊天记录本身，也没必要读。把群文件导出到本地文件夹即可。"

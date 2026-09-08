@@ -9,7 +9,9 @@ saveHoursPerWeek: 4
 publishedAt: "2026-09-03"
 updatedAt: "2026-09-03"
 draft: false
-tags: ["比价", "报价单", "PDF提取", "采购"]
+tags: ["PDF 文档", "对账财务"]
+featured: true
+order: 2
 faqs:
   - q: "扫描件（图片型 PDF）能读吗？"
     a: "纯图片的 PDF 读不出文字，需要先做 OCR。现在的桌面 Agent 大多自带识别能力，但识别准确率会下降——扫描件的数字务必人工抽检几条。"

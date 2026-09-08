@@ -112,6 +112,17 @@ const steps = extractSteps(entry.body ?? '');
           </span>
         </div>
 
+        {(entry.data.tags || []).length > 0 && (
+          <div class="flex gap-2 flex-wrap">
+            {entry.data.tags.map((t) => (
+              <a
+                href={`/tags/${encodeURIComponent(t)}`}
+                class="tag bg-paper-2 text-ink-2 border border-rule hover:border-accent hover:text-accent transition"
+              >{t}</a>
+            ))}
+          </div>
+        )}
+
         <h1 class="text-[46px] leading-[60px] font-bold font-display text-ink">
           {entry.data.title}
         </h1>

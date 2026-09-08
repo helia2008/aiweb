@@ -24,6 +24,13 @@ const prescriptions = defineCollection({
     updatedAt: z.coerce.date().optional(),
     draft: z.boolean().default(false),
     tags: z.array(z.string()).default([]),
+    /**
+     * 编辑精选（2026-09-08 加）：用于「热门 / 精选」排序。
+     * 静态站没有浏览量数据，硬做「热门」会名不副实——
+     * 所以热门 = 人工指定的精选，order 小的排前，未精选的按发布时间兜底。
+     */
+    featured: z.boolean().default(false),
+    order: z.number().default(0),
     cover: z.string().optional(), // 封面图（可选）
     /**
      * 可选：首页「我踩过的坑」区块固定展示的这一条翻车。
@@ -62,4 +69,51 @@ const tools = defineCollection({
   }),
 });
 
-export const collections = { prescriptions, tools };
+// ============================================================
+// 提示词库（2026-09-08 新增）
+// 核心：拿来就能用。每条必须说清「哪些地方要改成你自己的」（variables）——
+// 提示词站最常见的不满就是复制过去跑不通，因为占位符没解释。
+// ============================================================
+const prompts = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/prompts' }),
+  schema: z.object({
+    title: z.string(), // 一句话说明解决什么
+    summary: z.string(), // 卡片上的一行话
+    scene: z.string(), // 场景（如「写周报」「整理发票」）
+    role: z.enum(['人事 / HR', '财务 / 采购', '行政 / 通用', '市场 / 运营', '通用']),
+    prompt: z.string(), // 提示词正文，用 {{变量}} 标出要替换的地方
+    variables: z
+      .array(z.object({ name: z.string(), desc: z.string(), example: z.string().optional() }))
+      .default([]),
+    /**
+     * 来源：从处方实测提取，或通用模板。
+     * 不冒充——通用模板不声称"我实测过"，这与全站"只写自己跑通过的"立场一致。
+     */
+    source: z.enum(['处方实测', '通用模板']).default('通用模板'),
+    fromPrescription: z.string().optional(), // 提取自哪篇处方（填其 id）
+    difficulty: z.enum(['入门', '进阶', '高阶']).default('入门'),
+    order: z.number().default(0),
+    tags: z.array(z.string()).default([]),
+  }),
+});
+
+// ============================================================
+// Agent 技能 · 能力清单（2026-09-08 新增）
+// 面向新手，每条只回答三个问题：能做什么 / 一句话怎么用 / 不能做什么。
+// 「不能做什么」是必填项——它是全站「我敢说坏话」信任风格的延续。
+// ============================================================
+const skills = defineCollection({
+  loader: glob({ pattern: '**/*.md', base: './src/content/skills' }),
+  schema: z.object({
+    name: z.string(), // 技能名（如「读取本地文件」）
+    summary: z.string(), // 一句话定位
+    level: z.enum(['基础', '进阶']),
+    can: z.array(z.string()), // 能做什么
+    howto: z.string(), // 一句话怎么用（可直接复制）
+    cannot: z.array(z.string()), // 不能做什么 / 边界
+    relatedPrescriptions: z.array(z.string()).default([]),
+    order: z.number().default(0),
+  }),
+});
+
+export const collections = { prescriptions, tools, prompts, skills };

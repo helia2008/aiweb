@@ -7,7 +7,7 @@ difficulty: 入门
 setupMinutes: 30
 saveHoursPerWeek: 1.5
 publishedAt: 2026-08-12
-tags: [周报, 内容, 文档]
+tags: ["周报汇报"]
 ---
 
 ## 这个活烦在哪

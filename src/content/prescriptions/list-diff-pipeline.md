@@ -7,7 +7,7 @@ difficulty: 入门
 setupMinutes: 20
 saveHoursPerWeek: 0.5
 publishedAt: 2026-08-22
-tags: [Excel, 名单, 对比]
+tags: ["Excel 表格", "文件整理"]
 ---
 
 ## 这个活烦在哪
