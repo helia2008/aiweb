@@ -26,6 +26,15 @@ const prescriptions = defineCollection({
     tags: z.array(z.string()).default([]),
     cover: z.string().optional(), // 封面图（可选）
     /**
+     * 可选：首页「我踩过的坑」区块固定展示的这一条翻车。
+     * 不写则回退到从正文自动提取第一条坑（随正文更新，零维护）。
+     *
+     * 2026-09-08 加：自动提取是按岗位桶取「最新一篇」，导致最有冲击力的翻车
+     * （例："我第一次直接交上去，被财务退回"）反而上不了首页。
+     * 想让某条固定露出，就在这里手写一句——**必须是正文里真实发生过的，不编造**。
+     */
+    showcase: z.string().optional(),
+    /**
      * 可选：真实 Q&A。只有写了才会输出 FAQPage schema。
      * 不要为了 schema 硬造问题——PAA 富摘要靠的是真问题，不是模板。
      */

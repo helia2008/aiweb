@@ -73,14 +73,18 @@ function firstPitfall(body) {
   return t.length > 56 ? t.slice(0, 56) + '…' : t;
 }
 
-// 每个岗位桶各取最新一篇：让财务/人事/行政/运营四类读者都能对号入座，
-// 而不是只展示某一类岗位的坑。
+// 每个岗位桶取一条，覆盖财务/人事/行政/运营四类读者。
+// 优先取写了 showcase 的（人工指定的、最有冲击力的翻车），该桶没人指定才回退到自动提取。
+// 纯自动提取只会按「最新一篇」取，导致"被财务退回"这类最狠的翻车反而上不了首页。
 const roleKeys = Array.from(new Set(prescriptions.map((p) => p.data.role)));
-const pitfallPicks = roleKeys
-  .map((r) => prescriptions.find((p) => p.data.role === r))
-  .filter(Boolean)
-  .map((p) => ({ p, pit: firstPitfall(p.body) }))
-  .filter((x) => x.pit);
+const pitfallPicks = [];
+for (const r of roleKeys) {
+  const inRole = prescriptions.filter((p) => p.data.role === r);
+  const picked = inRole.find((p) => p.data.showcase) || inRole[0];
+  if (!picked) continue;
+  const pit = picked.data.showcase || firstPitfall(picked.body);
+  if (pit) pitfallPicks.push({ p: picked, pit });
+}
 
 // 最近更新：按 updatedAt（无则 publishedAt）倒序。
 // 「每周三更新」此前只是口头承诺，页面上没有任何落地点——读者关掉就没理由回来。
