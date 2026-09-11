@@ -58,6 +58,13 @@ const isActive = (href: string) => {
     </nav>
 
     <div class="hidden lg:flex items-center gap-[18px]">
+      <a
+        href="/search"
+        class="w-[42px] h-[42px] inline-flex items-center justify-center rounded-[8px] border border-rule text-ink-2 hover:text-ink hover:border-accent transition"
+        aria-label="搜索全站内容"
+      >
+        <svg class="w-[20px] h-[20px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </a>
       <button
         type="button"
         class="theme-toggle w-[42px] h-[42px] inline-flex items-center justify-center rounded-[8px] border border-rule text-ink-2 hover:text-ink hover:border-accent transition"
@@ -73,6 +80,15 @@ const isActive = (href: string) => {
         class="h-[42px] px-[22px] inline-flex items-center btn-ai text-[14px]"
       >订阅更新</a>
     </div>
+
+    <!-- 移动端搜索入口 -->
+    <a
+      href="/search"
+      class="lg:hidden w-[42px] h-[42px] flex flex-col justify-center items-center rounded-[8px] border border-rule text-ink-2 hover:text-ink hover:border-accent transition"
+      aria-label="搜索全站内容"
+    >
+      <svg class="w-[20px] h-[20px]" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    </a>
 
     <!-- 移动端汉堡按钮 -->
     <button
@@ -106,6 +122,10 @@ const isActive = (href: string) => {
         >{item.label}</a>
       ))
     }
+    <a
+      href="/search"
+      class="block py-3 text-[16px] font-medium border-b border-rule/60 text-ink-2"
+    >搜索全站内容</a>
     <div class="flex gap-3 mt-3">
       <a
         href="/#subscribe"

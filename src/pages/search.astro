@@ -1,0 +1,279 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const TYPES = [
+  { value: '处方', label: '痛点处方' },
+  { value: '提示词', label: '提示词库' },
+  { value: '技能', label: 'Agent 技能' },
+  { value: '工具', label: '工具罗盘' },
+];
+---
+
+<BaseLayout
+  title="内容检索 · 全站搜索"
+  description="一站搜全站：痛点处方、提示词库、Agent 技能、工具罗盘。中文子串匹配，结果按板块分组、直达对应页面。"
+  breadcrumbs={[{ name: '首页', url: '/' }, { name: '内容检索', url: '/search' }]}
+>
+  <section class="px-5 sm:px-8 lg:px-[120px] pt-[80px] pb-[36px] bg-paper">
+    <div class="flex flex-col gap-3 max-w-[820px]">
+      <p class="mono-badge text-ai-1">内容检索</p>
+      <h1 class="text-[44px] leading-[56px] font-bold font-display">搜一下，全站内容都在这里</h1>
+      <p class="text-[17px] leading-[31px] text-ink-2 mt-2">
+        处方、提示词、技能、工具，一次搜完。支持中文子串匹配，结果按板块分组、直达对应页面。
+      </p>
+    </div>
+  </section>
+
+  <!-- 搜索框：吸顶在 header 之下，滚动时始终可见 -->
+  <section
+    class="px-5 sm:px-8 lg:px-[120px] pb-[16px] bg-paper sticky top-[68px] lg:top-[76px] z-30 border-b border-rule/60"
+  >
+    <div class="max-w-[1000px]">
+      <div class="relative">
+        <svg
+          class="absolute left-5 top-1/2 -translate-y-1/2 w-[22px] h-[22px] text-ink-3"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"
+        >
+          <circle cx="11" cy="11" r="7"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input
+          id="q"
+          type="search"
+          inputmode="search"
+          autocomplete="off"
+          placeholder="搜关键词，如：周报、Excel、find-skills、对账…"
+          class="w-full h-[60px] pl-[52px] pr-[52px] rounded-[14px] border border-rule bg-white text-[17px] text-ink placeholder:text-ink-3 outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition"
+          aria-label="搜索全站内容"
+        />
+        <button
+          id="clear"
+          type="button"
+          hidden
+          class="absolute right-4 top-1/2 -translate-y-1/2 w-[32px] h-[32px] inline-flex items-center justify-center rounded-full text-ink-3 hover:text-ink hover:bg-paper-2 transition"
+          aria-label="清空搜索词">✕</button
+        >
+      </div>
+      <div class="flex flex-wrap gap-2 mt-4">
+        {
+          TYPES.map((t) => (
+            <label class="inline-flex items-center gap-2 px-3 h-[34px] rounded-full border border-rule bg-white text-[14px] text-ink-2 cursor-pointer hover:border-accent transition has-[:checked]:border-accent has-[:checked]:text-accent has-[:checked]:bg-accent-tint">
+              <input
+                type="checkbox"
+                name="type"
+                value={t.value}
+                checked
+                class="accent-[var(--color-accent)] w-[15px] h-[15px]"
+              />
+              {t.label}
+            </label>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="px-5 sm:px-8 lg:px-[120px] py-[40px] bg-paper max-w-[1200px] mx-auto">
+    <p id="count" class="text-[14px] text-ink-3 mb-6" aria-live="polite"></p>
+    <div id="results" class="flex flex-col gap-12"></div>
+    <div id="empty" hidden class="flex flex-col items-center gap-3 py-[60px] text-center">
+      <p class="text-[18px] text-ink-2">没找到相关内容</p>
+      <p class="text-[15px] text-ink-3">换个关键词试试，或勾选更多板块。</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style is:global>
+  mark {
+    background: var(--color-accent-tint);
+    color: var(--color-accent);
+    padding: 0 2px;
+    border-radius: 3px;
+    font-weight: 600;
+  }
+</style>
+
+<script>
+  type Item = {
+    type: string;
+    title: string;
+    summary: string;
+    tags: string[];
+    role?: string;
+    url: string;
+    body: string;
+  };
+
+  const TYPES = ['处方', '提示词', '技能', '工具'];
+  let INDEX: Item[] = [];
+  let currentTokens: string[] = [];
+
+  const $input = document.getElementById('q') as HTMLInputElement;
+  const $results = document.getElementById('results') as HTMLElement;
+  const $count = document.getElementById('count') as HTMLElement;
+  const $empty = document.getElementById('empty') as HTMLElement;
+  const $clear = document.getElementById('clear') as HTMLButtonElement;
+  const $filters = Array.from(
+    document.querySelectorAll<HTMLInputElement>('input[name="type"]')
+  );
+
+  function esc(s: string): string {
+    return s.replace(/[&<>"']/g, (c) => {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c] as string;
+    });
+  }
+  function escapeRe(s: string): string {
+    return s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  }
+  function highlight(text: string, tokens: string[]): string {
+    let out = esc(text);
+    for (const t of tokens) {
+      if (!t) continue;
+      out = out.replace(new RegExp(escapeRe(esc(t)), 'gi'), (m) => `<mark>${m}</mark>`);
+    }
+    return out;
+  }
+  function stripMd(s: string): string {
+    return s
+      .replace(/```[\s\S]*?```/g, ' ')
+      .replace(/`([^`]+)`/g, '$1')
+      .replace(/!?\[([^\]]*)\]\([^)]*\)/g, '$1')
+      .replace(/[#>*_~|]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim();
+  }
+  function snippet(body: string, tokens: string[]): string {
+    const text = stripMd(body);
+    const low = text.toLowerCase();
+    for (const t of tokens) {
+      const i = low.indexOf(t.toLowerCase());
+      if (i >= 0) {
+        const start = Math.max(0, i - 30);
+        const end = Math.min(text.length, i + t.length + 40);
+        return (start > 0 ? '…' : '') + text.slice(start, end) + (end < text.length ? '…' : '');
+      }
+    }
+    return '';
+  }
+
+  function render(list: Item[]) {
+    if (!list.length) {
+      $results.innerHTML = '';
+      $empty.hidden = false;
+      $count.textContent = '';
+      return;
+    }
+    $empty.hidden = true;
+    const byType: Record<string, Item[]> = {};
+    for (const it of list) (byType[it.type] ??= []).push(it);
+    let html = '';
+    for (const type of TYPES) {
+      const items = byType[type];
+      if (!items || !items.length) continue;
+      html +=
+        '<section class="flex flex-col gap-6">' +
+        `<h2 class="text-[22px] font-semibold font-display text-ink-2 flex items-baseline gap-3">${type}` +
+        `<span class="text-[14px] text-ink-3 font-medium">${items.length} 条</span></h2>` +
+        '<div class="grid grid-cols-1 md:grid-cols-2 gap-5">';
+      for (const it of items) {
+        const roleTag = it.role
+          ? `<span class="tag bg-paper-2 text-ink-2">${esc(it.role)}</span>`
+          : '';
+        const tagChips = (it.tags || [])
+          .slice(0, 4)
+          .map((t) => `<span class="tag bg-paper-2 text-ink-2">${highlight(t, currentTokens)}</span>`)
+          .join('');
+        const snip = currentTokens.length && it.body ? snippet(it.body, currentTokens) : '';
+        const snipHtml = snip
+          ? `<p class="text-[13px] leading-[22px] text-ink-3 line-clamp-2">${highlight(snip, currentTokens)}</p>`
+          : '';
+        html +=
+          `<a href="${esc(it.url)}" class="bg-white border border-rule rounded-[12px] ai-card p-6 flex flex-col gap-3 hover:border-accent transition">` +
+          `<div class="flex gap-2 flex-wrap"><span class="tag bg-accent-tint text-accent">${type}</span>${roleTag}</div>` +
+          `<h3 class="text-[19px] leading-[28px] font-semibold font-display text-ink">${highlight(it.title, currentTokens)}</h3>` +
+          `<p class="text-[15px] leading-[26px] text-ink-2 line-clamp-2">${highlight(it.summary, currentTokens)}</p>` +
+          snipHtml +
+          `<div class="flex gap-2 flex-wrap">${tagChips}</div>` +
+          '</a>';
+      }
+      html += '</div></section>';
+    }
+    $results.innerHTML = html;
+    $count.textContent = `共 ${list.length} 条结果`;
+  }
+
+  function search(q: string) {
+    const query = q.trim().toLowerCase();
+    currentTokens = query.split(/\s+/).filter(Boolean);
+    const activeTypes = new Set($filters.filter((f) => f.checked).map((f) => f.value));
+    if (!currentTokens.length) {
+      const all = INDEX.filter((it) => activeTypes.has(it.type));
+      render(all);
+      $count.textContent = all.length ? `全站共 ${all.length} 条内容` : '';
+      return;
+    }
+    const scored: { it: Item; score: number }[] = [];
+    for (const it of INDEX) {
+      if (!activeTypes.has(it.type)) continue;
+      const hay = [it.title, it.summary, (it.tags || []).join(' '), it.role, it.body]
+        .join(' ')
+        .toLowerCase();
+      // 多词按 AND：每个 token 都要命中（中英混搜友好）
+      if (!currentTokens.every((t) => hay.includes(t))) continue;
+      const title = (it.title || '').toLowerCase();
+      const tags = (it.tags || []).join(' ').toLowerCase();
+      const summary = (it.summary || '').toLowerCase();
+      let score = 0;
+      if (currentTokens.every((t) => title.includes(t))) score += 3;
+      else if (currentTokens.every((t) => tags.includes(t))) score += 2;
+      else if (currentTokens.every((t) => summary.includes(t))) score += 1;
+      scored.push({ it, score });
+    }
+    scored.sort((a, b) => b.score - a.score);
+    render(scored.map((s) => s.it));
+  }
+
+  async function init() {
+    try {
+      const res = await fetch('/search-index.json');
+      INDEX = (await res.json()) as Item[];
+    } catch (e) {
+      $results.innerHTML = '<p class="text-ink-2">检索索引加载失败，请刷新页面重试。</p>';
+      return;
+    }
+    const params = new URLSearchParams(location.search);
+    const q = params.get('q') || '';
+    $input.value = q;
+    $input.focus();
+    search(q);
+  }
+
+  let timer: number | undefined;
+  $input.addEventListener('input', () => {
+    $clear.hidden = !$input.value;
+    window.clearTimeout(timer);
+    timer = window.setTimeout(() => {
+      search($input.value);
+      const p = new URLSearchParams(location.search);
+      if ($input.value) p.set('q', $input.value);
+      else p.delete('q');
+      history.replaceState(null, '', p.toString() ? `?${p}` : location.pathname);
+    }, 120);
+  });
+  $clear.addEventListener('click', () => {
+    $input.value = '';
+    $clear.hidden = true;
+    search('');
+    history.replaceState(null, '', location.pathname);
+    $input.focus();
+  });
+  $filters.forEach((f) => f.addEventListener('change', () => search($input.value)));
+
+  init();
+</script>
