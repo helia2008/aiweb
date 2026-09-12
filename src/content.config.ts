@@ -112,6 +112,11 @@ const skills = defineCollection({
     what: z.array(z.string()), // 能做什么
     invoke: z.string(), // 怎么调用（@skill:xxx / 面板搜索）
     cannot: z.array(z.string()).default([]), // 边界与注意
+    /**
+     * 最适合谁（2026-09-12 加）：与工具罗盘的 fit 口径一致。
+     * 让读者 3 秒判断「这技能是不是为我准备的」，再决定往下读。
+     */
+    fit: z.array(z.string()).default([]),
     relatedPrescriptions: z.array(z.string()).default([]),
     order: z.number().default(0),
   }),

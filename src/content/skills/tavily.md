@@ -12,6 +12,10 @@ cannot:
   - "需联网，且依赖第三方搜索额度"
   - "不保证覆盖所有小众站点"
   - "结果要你交叉验证，别直接当结论"
+fit:
+  - "要带来源的研究 / 舆情 / 竞品信息的人"
+  - "需要时效性信息（政策 / 新闻）的人"
+  - "不满足于通用搜索结果质量的人"
 relatedPrescriptions:
   - social-listening-summary
   - competitor-website-watcher

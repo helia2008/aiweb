@@ -1,0 +1,105 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const tools = await getCollection('tools');
+  return tools.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+---
+
+<BaseLayout
+  title={`${entry.data.name} 怎么样 · 工具体检卡`}
+  description={`${entry.data.tag}。适合谁、不适合谁、上手多久、成本多少、数据安全红线在哪——只写我自己真跑过的。`}
+  showSubscribe={false}
+  breadcrumbs={[
+    { name: '首页', url: '/' },
+    { name: '工具罗盘', url: '/tools' },
+    { name: entry.data.name, url: `/tools/${entry.id}` },
+  ]}
+>
+  <article class="pt-0 pb-[110px] bg-paper">
+    <nav aria-label="面包屑" class="px-5 sm:px-8 lg:px-[120px] pt-[30px] pb-2 flex items-center gap-[9px]">
+      <a href="/tools" class="text-[13px] font-medium text-ink-3 hover:text-accent">工具罗盘</a>
+      <span class="text-ink-3" aria-hidden="true">/</span>
+      <span class="text-[13px] font-medium text-ink-3">{entry.data.type}</span>
+    </nav>
+
+    <div class="px-5 sm:px-8 lg:px-[120px] flex justify-center">
+      <div class="w-full max-w-[800px] flex flex-col gap-[26px]">
+        <div class="flex gap-2 flex-wrap">
+          <span class="tag bg-paper-2 text-ink-2">{entry.data.type}</span>
+        </div>
+
+        <h1 class="text-[40px] leading-[54px] font-bold font-display text-ink">
+          {entry.data.name}
+        </h1>
+
+        <p class="text-[18px] leading-[32px] text-ink-2">{entry.data.tag}</p>
+
+        <!-- 体检卡：与列表页同一口径，深页保留完整数据 -->
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div class="bg-paper-2 border border-rule rounded-[10px] p-4">
+            <p class="text-[12px] text-ink-3">上手耗时</p>
+            <p class="text-[17px] font-semibold text-ink mt-1">{entry.data.setupTime}</p>
+          </div>
+          <div class="bg-paper-2 border border-rule rounded-[10px] p-4">
+            <p class="text-[12px] text-ink-3">成本</p>
+            <p class="text-[17px] font-semibold text-ink mt-1">{entry.data.cost}</p>
+          </div>
+          <div class="bg-paper-2 border border-rule rounded-[10px] p-4">
+            <p class="text-[12px] text-ink-3">类型</p>
+            <p class="text-[17px] font-semibold text-ink mt-1">{entry.data.type}</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div class="flex flex-col gap-2">
+            <p class="text-[12px] font-medium tracking-[1.2px] text-ink-3">适合</p>
+            <ul class="flex flex-col gap-1.5">
+              {entry.data.fit.map((f) => (
+                <li class="text-[14px] leading-[24px] text-ink-2 flex gap-2">
+                  <span class="text-accent shrink-0">＋</span>{f}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div class="tool-unfit flex flex-col gap-2">
+            <p class="text-[12px] font-medium tracking-[1.2px]">不适合</p>
+            <ul class="flex flex-col gap-1.5">
+              {entry.data.unfit.map((f) => (
+                <li class="text-[14px] leading-[23px] flex gap-2">
+                  <span class="shrink-0">－</span>{f}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+
+        <div class="bg-paper-2 border border-rule rounded-[10px] px-5 py-4">
+          <p class="text-[12px] text-ink-3">数据安全红线</p>
+          <p class="text-[14px] leading-[23px] text-ink-2 mt-1">{entry.data.dataBoundary}</p>
+        </div>
+
+        <div class="article-prose">
+          <Content />
+        </div>
+
+        <a
+          href="/prescriptions"
+          class="bg-paper-2 border border-rule rounded-[12px] p-5 flex flex-col gap-1 hover:border-accent transition self-stretch"
+        >
+          <p class="text-[12px] text-ink-3">装好了不知道拿来干嘛？</p>
+          <p class="text-[16px] font-semibold font-display text-ink">
+            去痛点处方看看它具体怎么用 →
+          </p>
+        </a>
+
+        <a href="/tools" class="text-[14px] text-accent hover:underline self-start">← 返回全部工具</a>
+      </div>
+    </div>
+  </article>
+</BaseLayout>

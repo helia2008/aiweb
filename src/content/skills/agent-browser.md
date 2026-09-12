@@ -12,6 +12,10 @@ cannot:
   - "遇验证码 / 登录态易卡，敏感操作需你接管"
   - "反爬严格的站点可能失败"
   - "自动填表有风险，涉及支付 / 隐私先确认"
+fit:
+  - "要定期巡网页后台、盯竞品页面变化的人"
+  - "总在重复「开网页 → 截图 → 抄数据」的人"
+  - "想跑多步网页流程但不会写爬虫的人"
 relatedPrescriptions:
   - competitor-website-watcher
   - social-listening-summary

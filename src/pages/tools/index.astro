@@ -29,7 +29,9 @@ const tools = (await getCollection('tools')).sort((a, b) => a.data.order - b.dat
         <div class="bg-white border border-rule rounded-[12px] ai-card p-9 grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-10">
           <div class="flex flex-col gap-5">
             <div>
-              <h2 class="text-[28px] font-bold font-display text-ink">{t.data.name}</h2>
+              <h2 class="text-[28px] font-bold font-display text-ink">
+                <a href={`/tools/${t.id}`} class="hover:text-accent transition">{t.data.name}</a>
+              </h2>
               <p class="text-[13px] font-medium text-accent mt-1">{t.data.type} · {t.data.tag}</p>
             </div>
             <p class="text-[15px] leading-[27px] text-ink-2">{t.body}</p>

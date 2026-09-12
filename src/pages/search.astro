@@ -45,8 +45,9 @@ const TYPES = [
         </svg>
         <input
           id="q"
-          type="search"
+          type="text"
           inputmode="search"
+          enterkeyhint="search"
           autocomplete="off"
           placeholder="搜关键词，如：周报、Excel、find-skills、对账…"
           class="w-full h-[60px] pl-[52px] pr-[52px] rounded-[14px] border border-rule bg-white text-[17px] text-ink placeholder:text-ink-3 outline-none focus:border-accent focus:ring-2 focus:ring-accent/20 transition"
@@ -88,16 +89,6 @@ const TYPES = [
     </div>
   </section>
 </BaseLayout>
-
-<style is:global>
-  mark {
-    background: var(--color-accent-tint);
-    color: var(--color-accent);
-    padding: 0 2px;
-    border-radius: 3px;
-    font-weight: 600;
-  }
-</style>
 
 <script>
   type Item = {
@@ -274,6 +265,23 @@ const TYPES = [
     $input.focus();
   });
   $filters.forEach((f) => f.addEventListener('change', () => search($input.value)));
+
+  // 键盘可达性：Esc 清空、Enter 跳首条结果（搜索页标准预期）
+  $input.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      $input.value = '';
+      $clear.hidden = true;
+      search('');
+      history.replaceState(null, '', location.pathname);
+    } else if (e.key === 'Enter') {
+      search($input.value);
+      const first = $results.querySelector('a[href]');
+      if (first) {
+        e.preventDefault();
+        location.href = (first as HTMLAnchorElement).getAttribute('href') || '';
+      }
+    }
+  });
 
   init();
 </script>

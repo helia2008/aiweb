@@ -12,6 +12,10 @@ cannot:
   - "只认本地 vault 的 Markdown，不碰云同步冲突"
   - "画布 / 图谱视图它改不了，只动文本与 frontmatter"
   - "批量改名前最好先备份 vault"
+fit:
+  - "Obsidian 老用户，想批量整理积压笔记"
+  - "想给笔记补双链、建 MOC 的人"
+  - "笔记全在本地 Markdown、看重数据主权的人"
 relatedPrescriptions: []
 order: 21
 ---

@@ -1,0 +1,169 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getCollection, render } from 'astro:content';
+
+export async function getStaticPaths() {
+  const skills = await getCollection('skills');
+  return skills.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+
+// 反查真实处方标题：relatedPrescriptions 只存 id，展示时必须带标题，
+// 否则读者面对两个「相关处方 →」链接无从选择（列表页同款问题在此一并根治）。
+const prescriptions = await getCollection('prescriptions');
+const titleOf = (id: string) => prescriptions.find((p) => p.id === id)?.data.title ?? id;
+const related = (entry.data.relatedPrescriptions ?? []).filter((id) =>
+  prescriptions.some((p) => p.id === id),
+);
+---
+
+<BaseLayout
+  title={`${entry.data.name} · Agent 技能`}
+  description={`${entry.data.summary} 能做什么、怎么调用、最适合谁、边界在哪——一页说清。`}
+  showSubscribe={false}
+  breadcrumbs={[
+    { name: '首页', url: '/' },
+    { name: 'Agent 技能', url: '/skills' },
+    { name: entry.data.name, url: `/skills/${entry.id}` },
+  ]}
+>
+  <article class="pt-0 pb-[110px] bg-paper">
+    <nav aria-label="面包屑" class="px-5 sm:px-8 lg:px-[120px] pt-[30px] pb-2 flex items-center gap-[9px]">
+      <a href="/skills" class="text-[13px] font-medium text-ink-3 hover:text-accent">Agent 技能</a>
+      <span class="text-ink-3" aria-hidden="true">/</span>
+      <span class="text-[13px] font-medium text-ink-3">{entry.data.category}</span>
+    </nav>
+
+    <div class="px-5 sm:px-8 lg:px-[120px] flex justify-center">
+      <div class="w-full max-w-[800px] flex flex-col gap-[26px]">
+        <div class="flex gap-2 flex-wrap">
+          <span class="tag bg-paper-2 text-ink-2">{entry.data.category}</span>
+          <span class="tag bg-accent-tint text-accent">@{entry.data.skillId}</span>
+        </div>
+
+        <h1 class="text-[40px] leading-[54px] font-bold font-display text-ink">
+          {entry.data.name}
+        </h1>
+
+        <p class="text-[18px] leading-[32px] text-ink-2">{entry.data.summary}</p>
+
+        <!-- 怎么调用：放最前——读者第一件事是「怎么用上」，一键复制 -->
+        <div class="flex flex-col gap-3">
+          <p class="mono-badge text-ai-1">怎么调用</p>
+          <div class="instruction-block !my-0" id="invoke-body">{entry.data.invoke}</div>
+          <button
+            id="copy-invoke"
+            type="button"
+            class="btn-ai h-[46px] px-[24px] text-[15px] self-start"
+          >
+            复制这句
+          </button>
+          <p id="copy-hint" class="text-[13px] font-medium text-accent hidden" role="status" aria-live="polite"></p>
+        </div>
+
+        <!-- 最适合谁：先筛人再讲功能，3 秒判断是不是为我准备的 -->
+        {entry.data.fit.length > 0 && (
+          <div class="flex flex-col gap-3">
+            <p class="mono-badge text-ai-1">最适合谁</p>
+            <ul class="flex flex-col gap-2">
+              {entry.data.fit.map((f) => (
+                <li class="text-[15px] leading-[26px] text-ink-2 flex gap-2">
+                  <span class="text-accent shrink-0">＋</span>{f}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <!-- 能做什么 -->
+        <div class="flex flex-col gap-3">
+          <p class="mono-badge text-ai-1">能做什么</p>
+          <ul class="flex flex-col gap-2">
+            {entry.data.what.map((w) => (
+              <li class="text-[15px] leading-[26px] text-ink-2 flex gap-2">
+                <span class="text-accent shrink-0">＋</span>{w}
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <!-- 边界在哪：全站信任风格——坏话比好话更醒目 -->
+        {entry.data.cannot.length > 0 && (
+          <div class="tool-unfit flex flex-col gap-2">
+            <p class="text-[12px] font-medium tracking-[1.2px]">边界在哪</p>
+            <ul class="flex flex-col gap-1.5">
+              {entry.data.cannot.map((c) => (
+                <li class="text-[14px] leading-[23px] flex gap-2">
+                  <span class="shrink-0">－</span>{c}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        <div class="article-prose">
+          <Content />
+        </div>
+
+        <!-- 相关处方：带真实标题（从处方集合反查），进得来也回得去 -->
+        {related.length > 0 && (
+          <section class="flex flex-col gap-3">
+            <p class="mono-badge text-ai-1">用到它的处方</p>
+            <div class="flex flex-col gap-3">
+              {related.map((rid) => {
+                const p = prescriptions.find((x) => x.id === rid)!;
+                return (
+                  <a
+                    href={`/prescriptions/${rid}`}
+                    class="bg-paper-2 border border-rule rounded-[12px] p-5 flex flex-col gap-1 hover:border-accent transition"
+                  >
+                    <p class="text-[16px] font-semibold font-display text-ink">{p.data.title}</p>
+                    <p class="text-[13px] text-ink-3">{p.data.summary}</p>
+                  </a>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        <a href="/skills" class="text-[14px] text-accent hover:underline self-start">← 返回全部技能</a>
+      </div>
+    </div>
+  </article>
+
+  <script is:inline>
+    (function () {
+      var btn = document.getElementById('copy-invoke');
+      var body = document.getElementById('invoke-body');
+      var hint = document.getElementById('copy-hint');
+      if (!btn || !body) return;
+      var origin = btn.textContent;
+      function done() {
+        if (hint) { hint.textContent = '已复制到剪贴板'; hint.classList.remove('hidden'); }
+        btn.textContent = '已复制 ✓';
+        setTimeout(function () {
+          btn.textContent = origin;
+          if (hint) hint.classList.add('hidden');
+        }, 1800);
+      }
+      function fallback() {
+        var ta = document.createElement('textarea');
+        ta.value = body.innerText;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); done(); } catch (e) { btn.textContent = '复制失败'; }
+        document.body.removeChild(ta);
+      }
+      btn.addEventListener('click', function () {
+        var text = body.innerText || '';
+        if (navigator.clipboard && window.isSecureContext) {
+          navigator.clipboard.writeText(text).then(done, fallback);
+        } else { fallback(); }
+      });
+    })();
+  </script>
+</BaseLayout>

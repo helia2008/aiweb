@@ -78,6 +78,18 @@ function extractSteps(body: string) {
   });
 }
 const steps = extractSteps(entry.body ?? '');
+
+/**
+ * 双向互链（2026-09-12）：反向计算本篇关联的提示词 / 技能。
+ * 数据源只有一处——prompts 的 fromPrescription、skills 的 relatedPrescriptions，
+ * 处方自身不维护关联字段，两边永远同步、零维护，也不会出现单边链接。
+ */
+const allPrompts = await getCollection('prompts');
+const allSkills = await getCollection('skills');
+const usedPrompts = allPrompts.filter((p) => p.data.fromPrescription === entry.id);
+const usedSkills = allSkills.filter((s) =>
+  (s.data.relatedPrescriptions ?? []).includes(entry.id),
+);
 ---
 
 <BaseLayout
@@ -293,6 +305,44 @@ const steps = extractSteps(entry.body ?? '');
         </script>
 
         <hr class="border-t border-rule mt-12" />
+
+        <!-- 本篇配套（双向互链·反向侧）：直接可抄的提示词 / 背后调用的技能 -->
+        {(usedPrompts.length > 0 || usedSkills.length > 0) && (
+          <section class="mt-2 flex flex-col gap-5">
+            {usedPrompts.length > 0 && (
+              <div class="flex flex-col gap-3">
+                <h2 class="text-[20px] font-bold font-display text-ink">本篇的提示词，直接抄</h2>
+                <div class="flex flex-col gap-3">
+                  {usedPrompts.map((p) => (
+                    <a
+                      href={`/prompts/${p.id}`}
+                      class="bg-white border border-rule rounded-[10px] ai-card p-5 flex flex-col gap-1 hover:border-accent transition"
+                    >
+                      <p class="text-[16px] leading-[24px] font-semibold font-display text-ink">{p.data.title}</p>
+                      <p class="text-[13px] text-ink-3">{p.data.summary}</p>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+            {usedSkills.length > 0 && (
+              <div class="flex flex-col gap-3">
+                <h2 class="text-[20px] font-bold font-display text-ink">背后用到的技能</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {usedSkills.map((s) => (
+                    <a
+                      href={`/skills/${s.id}`}
+                      class="bg-white border border-rule rounded-[10px] ai-card p-5 flex flex-col gap-1 hover:border-accent transition"
+                    >
+                      <p class="text-[15px] leading-[23px] font-semibold font-display text-ink">{s.data.name}</p>
+                      <p class="text-[13px] text-ink-3">{s.data.summary}</p>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+          </section>
+        )}
 
         <!-- 相关处方：主题集群内链，把权重聚到同类目 -->
         {related.length > 0 && (

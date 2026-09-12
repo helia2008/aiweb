@@ -12,6 +12,10 @@ cannot:
   - "识别依赖音频质量，杂音大则错漏多"
   - "涉密会议注意数据边界，别把敏感内容外传"
   - "不替你开会，只整理你给的材料"
+fit:
+  - "每周开一堆会、纪要总拖欠的人"
+  - "要按公司固定模板出纪要的助理 / PM"
+  - "散会就要同步待办清单的团队"
 relatedPrescriptions:
   - meeting-notes-to-action-items
 order: 31

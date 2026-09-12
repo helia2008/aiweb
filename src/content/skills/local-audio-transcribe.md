@@ -12,6 +12,10 @@ cannot:
   - "首次需下载模型，体积不小、耗时看机器"
   - "方言 / 噪点重的识别率会降"
   - "长文件分段处理，超长需耐心"
+fit:
+  - "有涉密录音、不能上传云端的人"
+  - "要消化培训 / 访谈 / 会议录音的人"
+  - "在离线或弱网环境工作的人"
 relatedPrescriptions:
   - sop-from-screen-recording
   - meeting-notes-to-action-items

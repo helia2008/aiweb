@@ -51,8 +51,9 @@ export const GET: APIRoute = async () => {
       summary: s.data.summary,
       tags: [s.data.skillId, s.data.category],
       role: s.data.category,
-      url: '/skills',
-      body: [...(s.data.what ?? []), ...(s.data.cannot ?? [])].join(' '),
+      // 2026-09-12：技能详情页上线，搜索直接命中深链而非列表页
+      url: `/skills/${s.id}`,
+      body: [...(s.data.what ?? []), ...(s.data.fit ?? []), ...(s.data.cannot ?? []), bodyOf(s)].join(' '),
     });
   }
 
@@ -63,8 +64,8 @@ export const GET: APIRoute = async () => {
       summary: t.data.tag,
       tags: [t.data.type],
       role: t.data.type,
-      url: '/tools',
-      body: [...(t.data.fit ?? []), ...(t.data.unfit ?? []), t.data.dataBoundary ?? ''].join(' '),
+      url: `/tools/${t.id}`,
+      body: [...(t.data.fit ?? []), ...(t.data.unfit ?? []), t.data.dataBoundary ?? '', bodyOf(t)].join(' '),
     });
   }
 

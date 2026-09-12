@@ -12,6 +12,10 @@ cannot:
   - "复杂表格 / 浮动图片位置不如手动精修"
   - "合同等法律风险文档最终需人工复核条款"
   - "不替代专业排版软件做印刷级成品"
+fit:
+  - "要交正式 .docx（合同 / 报告 / 说明书）的人"
+  - "内容有了、不想手动排版的人"
+  - "要把 Markdown 稿转成带目录 Word 的人"
 relatedPrescriptions:
   - contract-terms-extraction
 order: 13
