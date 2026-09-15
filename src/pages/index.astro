@@ -2,6 +2,8 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 import { SITE } from '../lib/site.js';
+// 资讯雷达 Top 10 快照（单一数据源，与 /news 共用）：首页引流卡取各源第 1 条
+import { snapshotDate, ghTop, phTop, aibaseTop } from '../lib/news-snapshot.js';
 
 const prescriptions = (await getCollection('prescriptions', ({ data }) => !data.draft))
   .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
@@ -456,10 +458,13 @@ const totalHoursPerMonth = Math.round(
       <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {
           tools.map((t) => (
-            // 原为 <a href="/tools">：指向的就是当前列表页，点了等于没点（假可点）。
-            // 工具没有详情页，故改为非链接卡片，去掉 hover 以免误导；下方统一给一个入口。
-            <div class="bg-white border border-rule rounded-[12px] ai-card p-[30px] flex flex-col gap-[11px]">
-              <h3 class="text-[20px] font-semibold">{t.data.name}</h3>
+            // 2026-09-15 回改：工具详情页（/tools/[id]）已上线，卡片从「非链接」改回
+            // 真链接直达详情——原注释「工具没有详情页」已过时，假不可点反而浪费了深链入口。
+            <a
+              href={`/tools/${t.id}`}
+              class="bg-white border border-rule rounded-[12px] ai-card p-[30px] flex flex-col gap-[11px] hover:border-accent transition"
+            >
+              <h3 class="text-[20px] font-semibold font-display text-ink">{t.data.name}</h3>
               <p class="text-[13px] font-medium text-accent">{t.data.tag}</p>
               <p class="text-[14px] leading-[25px] text-ink-2 line-clamp-3">{t.data.fit[0]}</p>
               <div class="h-px bg-rule my-2"></div>
@@ -469,7 +474,7 @@ const totalHoursPerMonth = Math.round(
                 <b>不适合：</b>{t.data.unfit[0]}
               </p>
               <p class="text-[13px] font-medium text-ink-3">上手 {t.data.setupTime} · {t.data.cost}</p>
-            </div>
+            </a>
           ))
         }
       </div>
@@ -593,6 +598,59 @@ const totalHoursPerMonth = Math.round(
           }
         })();
       </script>
+    </div>
+  </section>
+
+  <!-- ============== 资讯雷达引流卡 ==============
+     提示词库 / Agent 技能 / 资讯雷达三个新板块此前在首页零露出，只靠导航被发现。
+     这里用「三源实况 Top 1」引流：有真实数据（不是空卡），点击直达原文，
+     「看 Top 10」进 /news 完整版。数据与 /news 共用单一来源（news-snapshot.js）。 -->
+  <section class="px-5 sm:px-8 lg:px-[120px] py-[80px] bg-paper-2">
+    <div class="flex flex-col gap-[38px]">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div class="flex flex-col gap-4 max-w-[760px]">
+          <p class="mono-badge text-ai-1">资讯雷达 · 快照 {snapshotDate}</p>
+          <h2 class="text-[32px] leading-[44px] font-bold font-display text-ink">今日 AI 圈在发生什么</h2>
+          <p class="text-[16px] leading-[29px] text-ink-2">
+            三个一手信息源的实况：开源新项目在涨、新产品在首发、行业大新闻在传。
+            每周一刷新，点进都是原文，不做二手搬运。
+          </p>
+        </div>
+        <a href="/news" class="text-[15px] font-medium text-accent hover:underline">去资讯雷达看 Top 10 →</a>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+        <!-- 开源风向：GitHub Trending Top 1 -->
+        <div class="bg-white border border-rule rounded-[12px] ai-card p-[26px] flex flex-col gap-3">
+          <div class="flex items-center justify-between gap-2">
+            <p class="text-[12px] font-medium tracking-[1.2px] text-ink-3">开源风向 · GitHub Trending</p>
+            <a href={ghTop[0].url} target="_blank" rel="noopener noreferrer" class="text-[12px] font-medium text-accent hover:underline shrink-0">原文 ↗</a>
+          </div>
+          <a href={ghTop[0].url} target="_blank" rel="noopener noreferrer" class="text-[17px] leading-[25px] font-semibold font-display text-ink hover:text-accent transition">{ghTop[0].name}</a>
+          <p class="text-[13px] leading-[22px] text-ink-2">{ghTop[0].desc}</p>
+          <p class="text-[13px] font-semibold text-accent mt-auto">今日 {ghTop[0].metric} Star</p>
+        </div>
+        <!-- 新产品首发：Product Hunt Top 1 -->
+        <div class="bg-white border border-rule rounded-[12px] ai-card p-[26px] flex flex-col gap-3">
+          <div class="flex items-center justify-between gap-2">
+            <p class="text-[12px] font-medium tracking-[1.2px] text-ink-3">新产品首发 · Product Hunt</p>
+            <a href="/news" class="text-[12px] font-medium text-accent hover:underline shrink-0">看当日榜 →</a>
+          </div>
+          <p class="text-[17px] leading-[25px] font-semibold font-display text-ink">{phTop[0].name}</p>
+          <p class="text-[13px] leading-[22px] text-ink-2">{phTop[0].desc}</p>
+          <p class="text-[13px] font-semibold text-accent mt-auto">今日第 1 · {phTop[0].metric}</p>
+        </div>
+        <!-- 行业大新闻：AI Base Top 1 -->
+        <div class="bg-white border border-rule rounded-[12px] ai-card p-[26px] flex flex-col gap-3">
+          <div class="flex items-center justify-between gap-2">
+            <p class="text-[12px] font-medium tracking-[1.2px] text-ink-3">行业大新闻 · AI Base</p>
+            <a href={aibaseTop[0].url} target="_blank" rel="noopener noreferrer" class="text-[12px] font-medium text-accent hover:underline shrink-0">原文 ↗</a>
+          </div>
+          <a href={aibaseTop[0].url} target="_blank" rel="noopener noreferrer" class="text-[17px] leading-[25px] font-semibold font-display text-ink hover:text-accent transition">{aibaseTop[0].name}</a>
+          <p class="text-[13px] leading-[22px] text-ink-2">{aibaseTop[0].desc}</p>
+          <p class="text-[13px] font-semibold text-accent mt-auto">{aibaseTop[0].metric}</p>
+        </div>
+      </div>
     </div>
   </section>
 
