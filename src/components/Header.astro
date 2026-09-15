@@ -5,7 +5,8 @@ export interface Props {
 const { pathname = '/' } = Astro.props;
 
 // 2026-09-15：新增「资讯雷达」板块，主导航到 7 项。
-// 「资讯雷达」用短标签控制宽度；1280px 以下若挤压，优先把「关于」移出主导航（Footer 有入口）。
+// 断点策略：7 项在 1024-1279px 会逐字竖排折行（截图实测），故完整导航
+// 只在 xl(≥1280px) 显示；1024-1279px 与手机统一走汉堡菜单（含搜索入口）。
 const navItems = [
   { label: '首页', href: '/' },
   { label: '痛点处方', href: '/prescriptions' },
