@@ -92,6 +92,21 @@ import { SITE } from '../lib/site.js';
         }
       </div>
 
+      <h2>每周一更新什么（流程公开）</h2>
+      <p>
+        「资讯雷达」的 Top 10 快照和「工具罗盘」的本周精选，每周一人工刷新一次。流程就四步，全在两个数据文件里改：
+      </p>
+      <ol>
+        <li>抓当天一手榜单：GitHub Trending（今日新增 Star）、Product Hunt（当日榜 + 赞数）、AI Base 新闻列表页（浏览量）</li>
+        <li>改 <code>src/lib/news-snapshot.js</code>——三源 Top 10 与快照日期（首页引流卡与资讯页共用这一份）</li>
+        <li>改 <code>src/pages/tools/index.astro</code> 顶部的 <code>weeklyPicks</code>——按五条标准筛 4-6 条，链接只放当天实际抓到的</li>
+        <li>提交推送，Cloudflare 自动构建上线——不需要手动部署</li>
+      </ol>
+      <p>
+        筛选标准也公开：真实用户反馈、开源或免费、解决具体痛点、可靠来源、可立即上手——至少满足三条才上榜。
+        静态站做不了实时，快照页都标了「数据截至」日期，每个榜单都留了「看实时榜」入口，随时可去一手源核对。
+      </p>
+
       <h2>什么不写</h2>
       <ul>
         <li>不写"AI 工具合集"、"年度十大"——同质化严重、衰减极快</li>

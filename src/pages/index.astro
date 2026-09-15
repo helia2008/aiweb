@@ -5,6 +5,10 @@ import { SITE } from '../lib/site.js';
 // 资讯雷达 Top 10 快照（单一数据源，与 /news 共用）：首页引流卡取各源第 1 条
 import { snapshotDate, ghTop, phTop, aibaseTop } from '../lib/news-snapshot.js';
 
+// 「拿来就用」双卡计数：提示词与技能两个板块此前首页零露出
+const prompts = await getCollection('prompts');
+const skills = await getCollection('skills');
+
 const prescriptions = (await getCollection('prescriptions', ({ data }) => !data.draft))
   .sort((a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime());
 
@@ -446,8 +450,54 @@ const totalHoursPerMonth = Math.round(
     </div>
   </section>
 
+  <!-- ============== 拿来就用（提示词库 + Agent 技能引流） ==============
+     两个板块此前只靠导航被发现。双卡并列、计数真实（跟着集合自动变），
+     每张卡只讲一件事 + 一句信任状 + 一个入口。 -->
+  <section class="px-5 sm:px-8 lg:px-[120px] py-[80px] bg-paper">
+    <div class="flex flex-col gap-[34px]">
+      <div class="flex flex-col gap-4 max-w-[760px]">
+        <p class="mono-badge text-ai-1">拿来就用</p>
+        <h2 class="text-[32px] leading-[44px] font-bold font-display text-ink">两排货架，抄走就能用</h2>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        <a
+          href="/prompts"
+          class="bg-white border border-rule rounded-[12px] ai-card p-[30px] flex flex-col gap-3 hover:border-accent transition"
+        >
+          <div class="flex items-center justify-between gap-3 flex-wrap">
+            <h3 class="text-[22px] font-bold font-display text-ink">提示词库</h3>
+            <span class="tag bg-accent-tint text-accent">{prompts.length} 条 · 全部标好变量</span>
+          </div>
+          <p class="text-[15px] leading-[26px] text-ink-2">
+            从周报到对账再到发票合并，每条都写清
+            <b class="text-ink">哪些地方要改成你自己的</b>——提示词站最常见的「复制过去跑不通」，这里从根上杜绝。
+          </p>
+          <p class="text-[14px] font-medium text-accent mt-auto">翻提示词库 →</p>
+        </a>
+
+        <a
+          href="/skills"
+          class="bg-white border border-rule rounded-[12px] ai-card p-[30px] flex flex-col gap-3 hover:border-accent transition"
+        >
+          <div class="flex items-center justify-between gap-3 flex-wrap">
+            <h3 class="text-[22px] font-bold font-display text-ink">Agent 技能</h3>
+            <span class="tag bg-accent-tint text-accent">{skills.length} 个 · 真实可装</span>
+          </div>
+          <p class="text-[15px] leading-[26px] text-ink-2">
+            不是「AI 能做什么」的空话，是搜得到、装得上的真实 skill。
+            每张卡三件事：<b class="text-ink">怎么调用、能做什么、边界在哪</b>——最后一条写得最认真。
+          </p>
+          <p class="text-[14px] font-medium text-accent mt-auto">逛技能目录 →</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
   <!-- ============== 工具罗盘 ============== -->
-  <section class="px-5 sm:px-8 lg:px-[120px] py-[92px] bg-paper">
+  <!-- 2026-09-15：与「拿来就用」区互换背景（本区 paper→paper-2），
+       保持整页 paper / paper-2 交替节奏不被新板块打断。 -->
+  <section class="px-5 sm:px-8 lg:px-[120px] py-[92px] bg-paper-2">
     <div class="flex flex-col gap-[42px]">
       <div class="flex flex-col gap-4">
         <p class="mono-badge text-ai-1">工具罗盘</p>
@@ -605,7 +655,7 @@ const totalHoursPerMonth = Math.round(
      提示词库 / Agent 技能 / 资讯雷达三个新板块此前在首页零露出，只靠导航被发现。
      这里用「三源实况 Top 1」引流：有真实数据（不是空卡），点击直达原文，
      「看 Top 10」进 /news 完整版。数据与 /news 共用单一来源（news-snapshot.js）。 -->
-  <section class="px-5 sm:px-8 lg:px-[120px] py-[80px] bg-paper-2">
+  <section class="px-5 sm:px-8 lg:px-[120px] py-[80px] bg-paper">
     <div class="flex flex-col gap-[38px]">
       <div class="flex flex-wrap items-end justify-between gap-4">
         <div class="flex flex-col gap-4 max-w-[760px]">
