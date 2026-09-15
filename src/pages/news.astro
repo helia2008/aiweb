@@ -1,0 +1,272 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+/**
+ * 资讯雷达（2026-09-15 新增板块）
+ * 定位：不替你做新闻聚合（静态站做不到实时），而是两件更实在的事：
+ * 1) 告诉你「每天该去哪看」——3 个一手信息源，带看法与节奏建议；
+ * 2) 给你一份精选博主清单——X 中英文区，每条写清「看什么」，不堆名字。
+ * 博主清单按 2026-09 多来源交叉核对（含 handle），只收长期稳定输出的账号。
+ */
+
+const sources = [
+  {
+    name: 'GitHub Trending',
+    url: 'https://github.com/trending',
+    tag: '开源风向标',
+    what: '每天/每周被 star 最多的开源项目。AI Agent、本地模型、自动化工具往往先在这里冒头。',
+    how: '每天扫一眼日榜，周末看周榜。重点看 star 增速而不是总量——增速代表「正在发生」。',
+    cadence: '每天 3 分钟',
+  },
+  {
+    name: 'Product Hunt',
+    url: 'https://www.producthunt.com/',
+    tag: '新产品首发地',
+    what: '全球新产品的首发舞台。AI 工具、浏览器插件、效率应用几乎都会来这里打首发。',
+    how: '看当日 Top 5 就够。注意分辨：有 demo 视频 + 创始人亲自答评论的，通常比纯营销页靠谱。',
+    cadence: '每天 3 分钟',
+  },
+  {
+    name: 'AI Base 新闻',
+    url: 'https://news.aibase.com/',
+    tag: 'AI 资讯聚合',
+    what: '中文友好的 AI 资讯聚合：新模型发布、融资动态、大厂产品更新，按时间线整理。',
+    how: '适合「今天 AI 圈发生了什么」的补课——不刷 X 的人靠它保持不掉队。',
+    cadence: '每天 2 分钟',
+  },
+];
+
+const bloggersCN = [
+  {
+    name: '宝玉',
+    handle: 'dotey',
+    role: 'AI 实战与提示词工程',
+    why: '中文 AI 圈高频信息源：提示词技巧、模型解读、前沿工具，翻译和点评都快且准。新手第一关注。',
+  },
+  {
+    name: '歸藏',
+    handle: 'op7418',
+    role: 'AIGC / 设计工作流',
+    why: 'AIGC 周刊主理人。AI 绘画、视频生成、设计工作流的趋势观察，创意方向必看。',
+  },
+  {
+    name: '向阳乔木',
+    handle: 'vista8',
+    role: 'AI 产品与工作流',
+    why: '偏 AI 产品、工作流和 Vibe Coding，兼具产品感和表达力，读完能直接抄做法。',
+  },
+  {
+    name: 'Axton',
+    handle: 'AxtonLiu',
+    role: '技术科普与方法论',
+    why: '擅长把复杂 AI 技术讲清楚：产品、开发实践、工具应用心得，信息密度高。',
+  },
+  {
+    name: '李继刚',
+    handle: 'lijigang_com',
+    role: '提示词与创意应用',
+    why: '提示词时代的代表人物：AI 思考、创意应用与方法论总结，看想法比看教程更有收获。',
+  },
+  {
+    name: '小互',
+    handle: 'imxiaohu',
+    role: 'AI 资讯日报',
+    why: '每天的第一手 AI 资讯和动态整理，适合当「信息流水线」——快，但记得交叉验证。',
+  },
+  {
+    name: 'WaytoAGI',
+    handle: 'WaytoAGI',
+    role: '体系化 AI 知识库',
+    why: '中文 AI 知识整理型头部账号，适合想系统学习而不是只刷碎片的人。',
+  },
+];
+
+const bloggersEN = [
+  {
+    name: 'Andrej Karpathy',
+    handle: 'karpathy',
+    role: '模型原理第一解读',
+    why: 'OpenAI 创始成员、前 Tesla AI 负责人，2026 年加入 Anthropic。能把 LLM 讲到普通工程师懂，「vibe coding」就是他提出的。',
+  },
+  {
+    name: 'Simon Willison',
+    handle: 'simonw',
+    role: 'LLM 工程实践',
+    why: '构建 LLM 应用的最高价值关注：真实 prompt、真实翻车、工具链拆解。他写 prompt injection 的文章是行业引用标准。',
+  },
+  {
+    name: 'Ethan Mollick',
+    handle: 'emollick',
+    role: 'AI 与工作实证研究',
+    why: '沃顿商学院教授。研究「普通人到底该怎么用 AI」，自己跑实验再发结论，不传二手恐慌。',
+  },
+  {
+    name: 'swyx',
+    handle: 'swyx',
+    role: 'AI 工程生态地图',
+    why: '「AI Engineer」概念提出者、Latent Space 播客主理人。他的时间线像行业目录：哪些工具、模式正在真被采用。',
+  },
+  {
+    name: 'Andrew Ng',
+    handle: 'AndrewYNg',
+    role: '应用 AI 教育',
+    why: '吴恩达。低频但每次都有干货：课程、工程模式、劳动力市场观察，适合不追热点只看方向的人。',
+  },
+  {
+    name: 'Jim Fan',
+    handle: 'DrJimFan',
+    role: '具身智能 / 机器人',
+    why: 'NVIDIA 研究员，物理 AI 与机器人方向的代表声音，演示视频质量极高。',
+  },
+  {
+    name: 'Logan Kilpatrick',
+    handle: 'OfficialLoganK',
+    role: 'Gemini 生态与开发者动态',
+    why: 'Google AI Studio / Gemini API 负责人，曾负责 OpenAI 开发者关系。两家亲历者视角，产品发布一手信息。',
+  },
+  {
+    name: 'Demis Hassabis',
+    handle: 'demishassabis',
+    role: '前沿研究里程碑',
+    why: 'DeepMind 联合创始人、诺贝尔奖得主。发帖少但条条重磅：里程碑论文、科学应用、长期视角。',
+  },
+];
+---
+
+<BaseLayout
+  title="资讯雷达 · 每天 10 分钟不落后"
+  description="AI 资讯不用刷一天：3 个一手信息源（GitHub Trending / Product Hunt / AI Base）+ X 中英文区精选 AI 博主清单，每条都写清「看什么」。"
+  breadcrumbs={[
+    { name: '首页', url: '/' },
+    { name: '资讯雷达', url: '/news' },
+  ]}
+>
+  <section class="px-5 sm:px-8 lg:px-[120px] py-[80px] bg-paper">
+    <div class="flex flex-col gap-4 max-w-[860px]">
+      <p class="mono-badge text-ai-1">资讯雷达</p>
+      <h1 class="text-[48px] leading-[60px] font-bold font-display">
+        每天 10 分钟，不落后
+      </h1>
+      <p class="text-[17px] leading-[31px] text-ink-2 mt-2">
+        AI 资讯最大的坑不是少，是<b class="text-ink">多到刷不完</b>。这个板块不替你聚合新闻（聚合出来的都是二手），
+        只做两件事：告诉你<b class="text-ink">该去哪看一手信息</b>，以及给你一份
+        <b class="text-ink">值得长期关注的博主清单</b>——每条都写清「看什么」，不堆名字。
+      </p>
+    </div>
+  </section>
+
+  <!-- 一手信息源 -->
+  <section class="px-5 sm:px-8 lg:px-[120px] pb-[70px] bg-paper">
+    <div class="flex flex-col gap-6">
+      <div class="flex flex-col gap-2">
+        <h2 class="text-[28px] font-bold font-display text-ink">三个每天该去的地方</h2>
+        <p class="text-[15px] text-ink-3">都是一手信息源，加起来每天不到 10 分钟。</p>
+      </div>
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {sources.map((s) => (
+          <a
+            href={s.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            class="bg-white border border-rule rounded-[12px] ai-card p-[28px] flex flex-col gap-4 hover:border-accent transition"
+          >
+            <div class="flex items-center justify-between gap-2">
+              <h3 class="text-[20px] font-bold font-display text-ink">{s.name}</h3>
+              <span class="mono-badge !text-[11px] !py-[2px] !px-[8px] text-ai-1 bg-accent-tint shrink-0">{s.cadence}</span>
+            </div>
+            <p class="text-[13px] font-medium text-accent">{s.tag}</p>
+            <p class="text-[14px] leading-[24px] text-ink-2">{s.what}</p>
+            <div class="tool-unfit flex flex-col gap-1.5 mt-auto">
+              <p class="text-[12px] font-medium tracking-[1.2px]">怎么看</p>
+              <p class="text-[13px] leading-[21px]">{s.how}</p>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- 博主清单 -->
+  <section class="px-5 sm:px-8 lg:px-[120px] pb-[100px] bg-paper">
+    <div class="flex flex-col gap-[54px]">
+      <div class="flex flex-col gap-2">
+        <h2 class="text-[28px] font-bold font-display text-ink">X 上值得长期关注的 AI 博主</h2>
+        <p class="text-[15px] text-ink-3">
+          中文区学「怎么用」，英文区看「正在发生」。全部为长期稳定输出的真实账号（2026-09 核对），
+          关注 5-6 个就够，别贪多——时间线只会更吵。
+        </p>
+      </div>
+
+      <div class="flex flex-col gap-6">
+        <div class="flex items-center gap-3">
+          <h3 class="text-[21px] font-bold font-display text-ink">中文区</h3>
+          <span class="text-[13px] text-ink-3">共 {bloggersCN.length} 个 · 信息密度优先</span>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {bloggersCN.map((b) => (
+            <div class="bg-white border border-rule rounded-[12px] ai-card p-[24px] flex flex-col gap-3">
+              <div class="flex items-center justify-between gap-3 flex-wrap">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h4 class="text-[18px] font-bold font-display text-ink">{b.name}</h4>
+                  <span class="mono-badge !text-[11px] !py-[2px] !px-[8px] text-ai-1 bg-accent-tint">@{b.handle}</span>
+                </div>
+                <span class="text-[12px] font-medium text-accent">{b.role}</span>
+              </div>
+              <p class="text-[14px] leading-[24px] text-ink-2">{b.why}</p>
+              <a
+                href={`https://x.com/${b.handle}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-[13px] font-medium text-accent hover:underline self-start"
+              >去 X 关注 @{b.handle} ↗</a>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-6">
+        <div class="flex items-center gap-3">
+          <h3 class="text-[21px] font-bold font-display text-ink">英文区</h3>
+          <span class="text-[13px] text-ink-3">共 {bloggersEN.length} 个 · 一手信息优先</span>
+        </div>
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {bloggersEN.map((b) => (
+            <div class="bg-white border border-rule rounded-[12px] ai-card p-[24px] flex flex-col gap-3">
+              <div class="flex items-center justify-between gap-3 flex-wrap">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <h4 class="text-[18px] font-bold font-display text-ink">{b.name}</h4>
+                  <span class="mono-badge !text-[11px] !py-[2px] !px-[8px] text-ai-1 bg-accent-tint">@{b.handle}</span>
+                </div>
+                <span class="text-[12px] font-medium text-accent">{b.role}</span>
+              </div>
+              <p class="text-[14px] leading-[24px] text-ink-2">{b.why}</p>
+              <a
+                href={`https://x.com/${b.handle}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                class="text-[13px] font-medium text-accent hover:underline self-start"
+              >去 X 关注 @{b.handle} ↗</a>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      <!-- 自己动手：把选博主 / 选工具的提示词交给读者 -->
+      <div class="bg-paper-2 border border-rule rounded-[12px] p-7 flex flex-col gap-3">
+        <p class="mono-badge text-ai-1">自己动手</p>
+        <h3 class="text-[20px] font-bold font-display text-ink">想自己筛一批？两条提示词拿去用</h3>
+        <p class="text-[14px] leading-[25px] text-ink-2">
+          清单会过时，方法不会。让 AI 按你的关注方向实时推荐：
+        </p>
+        <div class="flex flex-wrap gap-3">
+          <a href="/prompts/x-ai-bloggers" class="text-[14px] font-medium text-accent hover:underline">
+            提示词：推荐值得关注的 AI 博主 →
+          </a>
+          <a href="/prompts/ai-tool-hunter-weekly" class="text-[14px] font-medium text-accent hover:underline">
+            提示词：盘点过去 7 天的 AI 工具 →
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

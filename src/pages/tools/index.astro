@@ -3,6 +3,56 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getCollection } from 'astro:content';
 
 const tools = (await getCollection('tools')).sort((a, b) => a.data.order - b.data.order);
+
+/**
+ * 本周 AI 工具精选（2026-09-15 更新）
+ * 筛选口径来自「AI 工具猎手」提示词（/prompts/ai-tool-hunter-weekly）：
+ * 真实用户反馈 / 开源或免费 / 解决具体痛点 / 可靠来源 / 可立即上手，至少满足 3 条。
+ * 数据窗口：2026-09-08 ~ 09-15。每周只更新本数组，渲染零改动。
+ * 注意：链接只放有把握的官方域名，其余统一指向报道来源，不编 URL。
+ */
+const weeklyPicks = [
+  {
+    name: 'Activepieces',
+    core: '可自托管的开源 Zapier 替代，450+ 应用集成。',
+    scenes: ['给团队搭自动工作流，不按执行次数付费', '把表单 / 邮件 / IM 通知串成流水线'],
+    why: '开源 + 自托管直接绕开 SaaS 自动化按次计费，自带可视化编排器和 450+ 集成，办公自动化的性价比天花板。',
+    link: 'https://www.activepieces.com',
+    source: 'https://www.indianic.com/digest',
+  },
+  {
+    name: 'Cline Desktop App',
+    core: 'AI 编码助手走出 IDE，升级为独立桌面级 Agent。',
+    scenes: ['让它直接读整个项目目录干活', '非 IDE 场景的批量代码任务'],
+    why: '从 IDE 插件升级成系统级应用：文件上下文更完整、流程不被打断，Agent 干活的体验整段升一级。',
+    link: 'https://cline.bot',
+    source: 'https://www.indianic.com/digest',
+  },
+  {
+    name: 'OpenCode',
+    core: '开源 AI IDE：本地跑或走私有 API，代码不出内网。',
+    scenes: ['公司禁用云端编码工具时的合规替代', '敏感项目本地跑 Agent'],
+    why: '主打「代码不外泄」：本地运行或只路由到你信任的私有 API，绕开企业合规障碍，开源免费。',
+    link: 'https://opencode.ai',
+    source: 'https://www.indianic.com/digest',
+  },
+  {
+    name: 'Pi Agent Toolkit',
+    core: '命令行里一键搭起自定义 AI Agent 的预置环境。',
+    scenes: ['不想从零拼框架的开发者', '快速原型一个命令行 Agent'],
+    why: '本周冲上 GitHub Trending：把碎片化的 Agent 框架整合成开箱即用的 CLI 环境，省掉选型与拼装时间。',
+    link: 'https://www.indianic.com/digest',
+    source: 'https://www.indianic.com/digest',
+  },
+  {
+    name: 'MakePodcast.io',
+    core: '把文案快速变成高质量播客音频。',
+    scenes: ['营销团队试水音频内容', '把周报 / 公告转成可听的简报'],
+    why: '音频内容制作又慢又贵是老痛点，本周登上 Product Hunt 趋势榜，把音频格式化的门槛打了下来。',
+    link: 'https://www.indianic.com/digest',
+    source: 'https://www.indianic.com/digest',
+  },
+];
 ---
 
 <BaseLayout
@@ -22,6 +72,71 @@ const tools = (await getCollection('tools')).sort((a, b) => a.data.order - b.dat
       </p>
     </div>
   </section>
+
+  <!-- 本周 AI 工具精选：口径来自「AI 工具猎手」提示词，每周更新 -->
+  {
+    weeklyPicks.length > 0 && (
+      <section class="px-5 sm:px-8 lg:px-[120px] pb-[70px] bg-paper">
+        <div class="flex flex-col gap-6">
+          <div class="flex flex-col gap-2">
+            <div class="flex items-center gap-3 flex-wrap">
+              <h2 class="text-[28px] font-bold font-display text-ink">本周 AI 工具精选</h2>
+              <span class="mono-badge !text-[11px] !py-[2px] !px-[8px] text-ai-1 bg-accent-tint">2026-09-15 更新</span>
+            </div>
+            <p class="text-[15px] text-ink-3">
+              用「AI 工具猎手」提示词筛过去 7 天动态：真实反馈 / 免费开源 / 解决具体痛点，至少满足 3 条才上榜。
+              只放有把握的链接，没官网把握的统一指向报道来源——不编 URL。
+            </p>
+          </div>
+
+          <div class="flex flex-col gap-5">
+            {weeklyPicks.map((p, i) => (
+              <div class="bg-white border border-rule rounded-[12px] ai-card p-[26px] flex flex-col gap-3">
+                <div class="flex items-center gap-3 flex-wrap">
+                  <span class="mono-badge text-ai-1">{String(i + 1).padStart(2, '0')}</span>
+                  <h3 class="text-[20px] font-bold font-display text-ink">{p.name}</h3>
+                </div>
+                <p class="text-[15px] leading-[25px] font-medium text-ink">🔥 {p.core}</p>
+                <div class="flex flex-col gap-1">
+                  <p class="text-[12px] font-medium tracking-[1.2px] text-ink-3">📌 实用场景</p>
+                  <ul class="flex flex-col gap-1">
+                    {p.scenes.map((s) => (
+                      <li class="text-[14px] leading-[23px] text-ink-2 flex gap-2">
+                        <span class="text-accent shrink-0">＋</span>{s}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+                <p class="text-[14px] leading-[24px] text-ink-2">🚀 {p.why}</p>
+                <div class="flex flex-wrap gap-x-5 gap-y-1 pt-1 border-t border-rule">
+                  <a
+                    href={p.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-[13px] font-medium text-accent hover:underline"
+                  >🔗 {p.link.startsWith('http') && p.link.includes('indianic') ? '报道来源 ↗' : '下载 / 试用 ↗'}</a>
+                  <a
+                    href={p.source}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="text-[13px] text-ink-3 hover:text-accent transition"
+                  >💬 用户反馈 / 报道 ↗</a>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <div class="bg-paper-2 border border-rule rounded-[10px] px-5 py-4">
+            <p class="text-[13px] leading-[23px] text-ink-2">
+              想自己每周跑一遍？拿这条提示词：
+              <a href="/prompts/ai-tool-hunter-weekly" class="text-accent hover:underline font-medium">AI 工具猎手 →</a>
+              配合<a href="/news" class="text-accent hover:underline font-medium">资讯雷达</a>的三个信息源交叉确认。
+            </p>
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   <section class="px-5 sm:px-8 lg:px-[120px] pb-[100px] bg-paper">
     <div class="flex flex-col gap-6">

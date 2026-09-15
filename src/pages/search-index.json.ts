@@ -69,6 +69,17 @@ export const GET: APIRoute = async () => {
     });
   }
 
+  // 资讯雷达（静态页，非内容集合——手动收录，正文要点供搜索命中）
+  index.push({
+    type: '资讯',
+    title: '资讯雷达：每天 10 分钟不落后',
+    summary: '3 个一手信息源（GitHub Trending / Product Hunt / AI Base）+ X 中英文区精选 AI 博主清单。',
+    tags: ['GitHub Trending', 'Product Hunt', 'AI Base', '博主', '信息源'],
+    role: '通用',
+    url: '/news',
+    body: 'GitHub Trending 开源风向标 每天扫日榜周末看周榜 star 增速 Product Hunt 新产品首发 当日Top5 demo视频 创始人答评论 AI Base 中文AI资讯聚合 新模型发布 融资动态 大厂产品更新 中文区博主 宝玉 dotey 歸藏 op7418 向阳乔木 vista8 Axton AxtonLiu 李继刚 lijigang_com 小互 imxiaohu WaytoAGI 英文区博主 Andrej Karpathy karpathy Simon Willison simonw Ethan Mollick emollick swyx Andrew Ng AndrewYNg Jim Fan DrJimFan Logan Kilpatrick OfficialLoganK Demis Hassabis demishassabis 每天该去哪看 一手信息源',
+  });
+
   return new Response(JSON.stringify(index), {
     headers: { 'Content-Type': 'application/json; charset=utf-8' },
   });
