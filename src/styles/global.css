@@ -47,25 +47,30 @@
 
 /* ============================================================
    全局样式
+   ⚠️ 元素级规则必须放进 @layer base（2026-09-15 修复）：
+   Tailwind v4 用真实级联层，未分层的 h1{color} 会压过 @layer utilities
+   里的 text-deep-ink 等工具类——白天模式下 hero 标题与深底同色隐形。
+   base 层让位于 utilities 层，工具类恢复正常生效。
    ============================================================ */
+@layer base {
+  html {
+    font-family: var(--font-sans);
+    background: var(--color-paper);
+    color: var(--color-ink);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
 
-html {
-  font-family: var(--font-sans);
-  background: var(--color-paper);
-  color: var(--color-ink);
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-}
+  body {
+    background: var(--color-paper);
+  }
 
-body {
-  background: var(--color-paper);
-}
-
-/* 衬线标题 */
-h1, h2, h3, h4 {
-  font-family: var(--font-display);
-  color: var(--color-ink);
-  letter-spacing: -0.01em;
+  /* 衬线标题 */
+  h1, h2, h3, h4 {
+    font-family: var(--font-display);
+    color: var(--color-ink);
+    letter-spacing: -0.01em;
+  }
 }
 
 /* 选区 */
