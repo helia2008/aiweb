@@ -5,52 +5,72 @@ import { getCollection } from 'astro:content';
 const tools = (await getCollection('tools')).sort((a, b) => a.data.order - b.data.order);
 
 /**
- * 本周 AI 工具精选（2026-09-15 更新）
+ * 本周 AI 工具精选（2026-09-15 更新 · 第 1 期实跑）
  * 筛选口径来自「AI 工具猎手」提示词（/prompts/ai-tool-hunter-weekly）：
- * 真实用户反馈 / 开源或免费 / 解决具体痛点 / 可靠来源 / 可立即上手，至少满足 3 条。
- * 数据窗口：2026-09-08 ~ 09-15。每周只更新本数组，渲染零改动。
- * 注意：链接只放有把握的官方域名，其余统一指向报道来源，不编 URL。
+ * 真实用户反馈 / 开源免费 / 解决具体痛点 / 可靠来源 / 立即可上手，至少满足 3 条。
+ * 数据来源：2026-09-15 当日一手抓取 GitHub Trending + Product Hunt（数据窗口 09-08~09-15）。
+ * 链接纪律：只放当天实际抓到的一手 URL（GitHub 仓库页 / Product Hunt 榜单），不编 URL。
  */
 const weeklyPicks = [
   {
-    name: 'Activepieces',
-    core: '可自托管的开源 Zapier 替代，450+ 应用集成。',
-    scenes: ['给团队搭自动工作流，不按执行次数付费', '把表单 / 邮件 / IM 通知串成流水线'],
-    why: '开源 + 自托管直接绕开 SaaS 自动化按次计费，自带可视化编排器和 450+ 集成，办公自动化的性价比天花板。',
-    link: 'https://www.activepieces.com',
-    source: 'https://www.indianic.com/digest',
+    name: 'Agent-Reach',
+    core: '一个 CLI 给 AI Agent 装上「全网眼睛」：读搜 Twitter、Reddit、YouTube、GitHub、B站、小红书，零 API 费。',
+    scenes: ['舆情 / 竞品动态自动盯', '选题与调研素材抓取', '配合本站「舆情日报」处方直接用'],
+    why: '本周 GitHub Trending（81k+ star、日增 640+）：六大平台搜索聚合进一个免费 CLI，Agent 联网调研的成本直接归零。',
+    link: 'https://github.com/Panniantong/Agent-Reach',
+    linkLabel: '下载 / 试用 ↗',
+    source: 'https://github.com/Panniantong/Agent-Reach',
+    sourceLabel: '💬 Star 数与 issue 反馈 ↗',
   },
   {
-    name: 'Cline Desktop App',
-    core: 'AI 编码助手走出 IDE，升级为独立桌面级 Agent。',
-    scenes: ['让它直接读整个项目目录干活', '非 IDE 场景的批量代码任务'],
-    why: '从 IDE 插件升级成系统级应用：文件上下文更完整、流程不被打断，Agent 干活的体验整段升一级。',
-    link: 'https://cline.bot',
-    source: 'https://www.indianic.com/digest',
+    name: 'Oats',
+    core: '免费、开源、完全本地运行的 AI 会议记录器。',
+    scenes: ['涉密会议录音转纪要', '散会即出待办清单', '配合「会议纪要转行动项」处方'],
+    why: 'Product Hunt 今日 Top 5（211 赞）：云端纪要工具的隐私焦虑它全没有——本地跑，录音不出机。',
+    link: 'https://www.producthunt.com/',
+    linkLabel: 'Product Hunt 今日榜 ↗',
+    source: 'https://www.producthunt.com/',
+    sourceLabel: '💬 Product Hunt 讨论区 ↗',
   },
   {
-    name: 'OpenCode',
-    core: '开源 AI IDE：本地跑或走私有 API，代码不出内网。',
-    scenes: ['公司禁用云端编码工具时的合规替代', '敏感项目本地跑 Agent'],
-    why: '主打「代码不外泄」：本地运行或只路由到你信任的私有 API，绕开企业合规障碍，开源免费。',
-    link: 'https://opencode.ai',
-    source: 'https://www.indianic.com/digest',
+    name: 'Slashy Assistant',
+    core: '替你处理邮件的 AI 助手：草拟、回复、跟进一条龙。',
+    scenes: ['收件箱每天过百封的运营 / 销售', '客户跟进自动提醒', '英文邮件润色与回复'],
+    why: 'Product Hunt 今日 Top 4（228 赞）：邮件是普通人最重的重复劳动之一，垂直工具比通用聊天框顺手得多。',
+    link: 'https://www.producthunt.com/',
+    linkLabel: 'Product Hunt 今日榜 ↗',
+    source: 'https://www.producthunt.com/',
+    sourceLabel: '💬 Product Hunt 讨论区 ↗',
   },
   {
-    name: 'Pi Agent Toolkit',
-    core: '命令行里一键搭起自定义 AI Agent 的预置环境。',
-    scenes: ['不想从零拼框架的开发者', '快速原型一个命令行 Agent'],
-    why: '本周冲上 GitHub Trending：把碎片化的 Agent 框架整合成开箱即用的 CLI 环境，省掉选型与拼装时间。',
-    link: 'https://www.indianic.com/digest',
-    source: 'https://www.indianic.com/digest',
+    name: 'VoiceStudio',
+    core: '开源全本地的 ElevenLabs 替代：声音克隆、配音、转写、听书，646 种语言。',
+    scenes: ['课程 / 宣传片配音', '播客与有声书制作', '隐私敏感的语音转写'],
+    why: '本周 GitHub 日增 2,774 star（总 29k+）：语音生成零订阅费、文件不出本机，创作团队最划算的一条路。',
+    link: 'https://github.com/debpalash/VoiceStudio',
+    linkLabel: '下载 / 试用 ↗',
+    source: 'https://github.com/debpalash/VoiceStudio',
+    sourceLabel: '💬 Star 数与 issue 反馈 ↗',
   },
   {
-    name: 'MakePodcast.io',
-    core: '把文案快速变成高质量播客音频。',
-    scenes: ['营销团队试水音频内容', '把周报 / 公告转成可听的简报'],
-    why: '音频内容制作又慢又贵是老痛点，本周登上 Product Hunt 趋势榜，把音频格式化的门槛打了下来。',
-    link: 'https://www.indianic.com/digest',
-    source: 'https://www.indianic.com/digest',
+    name: 'colibri',
+    core: '在你已有的硬件上跑前沿 MoE 大模型：纯 C、零依赖，专家权重从磁盘流式加载。',
+    scenes: ['无显卡旧电脑本地跑大模型', '离线环境的 AI 推理', '省 API 费的本地实验场'],
+    why: '今日 GitHub Trending 日增 2,233 star（总 32k+）：「内存装不下模型」这个本地部署最大障碍被绕开了。',
+    link: 'https://github.com/JustVugg/colibri',
+    linkLabel: '下载 / 试用 ↗',
+    source: 'https://github.com/JustVugg/colibri',
+    sourceLabel: '💬 Star 数与 issue 反馈 ↗',
+  },
+  {
+    name: 'Open Code Review',
+    core: '阿里开源的混合架构代码审查：确定性规则管道 + LLM Agent，行级精准评论。',
+    scenes: ['团队 PR 自动审查', 'NPE / 线程安全 / SQL 注入规则集兜底', '兼容 OpenAI 与 Anthropic 接口'],
+    why: '本周 GitHub 日增 1,796 star（总 25k+）：阿里实战规模验证过的审查管线，接口标准、拿来即接。',
+    link: 'https://github.com/alibaba/open-code-review',
+    linkLabel: '下载 / 试用 ↗',
+    source: 'https://github.com/alibaba/open-code-review',
+    sourceLabel: '💬 Star 数与 issue 反馈 ↗',
   },
 ];
 ---
@@ -114,13 +134,13 @@ const weeklyPicks = [
                     target="_blank"
                     rel="noopener noreferrer"
                     class="text-[13px] font-medium text-accent hover:underline"
-                  >🔗 {p.link.startsWith('http') && p.link.includes('indianic') ? '报道来源 ↗' : '下载 / 试用 ↗'}</a>
+                  >🔗 {p.linkLabel}</a>
                   <a
                     href={p.source}
                     target="_blank"
                     rel="noopener noreferrer"
                     class="text-[13px] text-ink-3 hover:text-accent transition"
-                  >💬 用户反馈 / 报道 ↗</a>
+                  >{p.sourceLabel}</a>
                 </div>
               </div>
             ))}
