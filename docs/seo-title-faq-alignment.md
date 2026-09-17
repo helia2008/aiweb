@@ -1,6 +1,6 @@
 # SEO 对齐方案：16 篇处方标题 / Description / FAQ 对照表
 
-> 状态：**待审**（2026-09-15 起草）。审通过后批量改 frontmatter，一次推送。
+> 状态：**已执行**（2026-09-17 落地：16 篇 title 前置搜索词 + 32 FAQ 补入 frontmatter，构建验证 FAQPage 全 16 页各 2 Question）。审通过后批量改 frontmatter，一次推送。
 > 原则：正文一字不动，只动 `title` / `summary` 不动（summary 是卡片话术）——**只改 title + 补 faqs**。
 > 标题公式：`真实搜索词 + 场景钩子`，保留站点的「自测过」口吻，不堆砌。
 
