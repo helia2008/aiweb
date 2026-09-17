@@ -13,6 +13,14 @@ unfit:
 setupTime: 一个周末
 cost: 自建免费 · 官方云 20 欧/月起
 dataBoundary: 数据全程不出你自己的服务器
+usedIn:
+  - monthly-expense-reports
+  - weekly-report-automation
+  - attendance-exception-triage
+  - employee-roster-auto-update
+  - shipment-monthly-summary
+  - social-listening-summary
+  - competitor-website-watcher
 order: 3
 ---
 

@@ -52,43 +52,57 @@ const tested = prompts.filter((p) => p.data.source === '处方实测').length;
       </div>
       <p id="prompt-filter-status" class="sr-only" role="status" aria-live="polite"></p>
 
-      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5" id="prompt-grid">
+      <!-- 按岗位分组建 H2：结构更清晰、可锚点跳转，也利于长文档 SEO 分段 -->
+      <div id="prompt-groups" class="flex flex-col gap-[40px]">
         {
-          prompts.map((p) => (
-            <div
-              data-role={p.data.role}
-              class="bg-white border border-rule rounded-[12px] ai-card p-[24px] flex flex-col gap-[13px]"
-            >
-              <div class="flex gap-2 flex-wrap">
-                <span class="tag bg-paper-2 text-ink-2">{p.data.role}</span>
-                <span class="tag bg-accent-tint text-accent">{p.data.source}</span>
-              </div>
-              <a href={`/prompts/${p.id}`} class="flex flex-col gap-2 group">
-                <h3 class="text-[19px] leading-[28px] font-semibold font-display text-ink group-hover:text-accent transition">
-                  {p.data.title}
-                </h3>
-                <p class="text-[14px] leading-[24px] text-ink-2 line-clamp-3">{p.data.summary}</p>
-              </a>
-              {p.data.variables.length > 0 && (
-                <p class="text-[12px] text-ink-3">
-                  要改 {p.data.variables.length} 处：
-                  {p.data.variables.map((v) => v.name).join(' / ')}
-                </p>
-              )}
-              <div class="flex items-center gap-3 mt-auto pt-2">
-                <button
-                  type="button"
-                  class="copy-prompt text-[13px] font-medium text-accent hover:underline"
-                  data-prompt={p.data.prompt}
-                >
-                  复制提示词
-                </button>
-                <a href={`/prompts/${p.id}`} class="text-[13px] font-medium text-ink-3 hover:text-ink">
-                  看说明 →
-                </a>
-              </div>
-            </div>
-          ))
+          roles
+            .filter((r) => r !== '全部')
+            .map((role) => {
+              const items = prompts.filter((p) => p.data.role === role);
+              if (!items.length) return null;
+              return (
+                <section class="prompt-group" data-role={role}>
+                  <h2 class="text-[24px] font-bold font-display text-ink mb-5">{role}</h2>
+                  <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                    {items.map((p) => (
+                      <div
+                        data-role={p.data.role}
+                        class="prompt-card bg-white border border-rule rounded-[12px] ai-card p-[24px] flex flex-col gap-[13px]"
+                      >
+                        <div class="flex gap-2 flex-wrap">
+                          <span class="tag bg-paper-2 text-ink-2">{p.data.role}</span>
+                          <span class="tag bg-accent-tint text-accent">{p.data.source}</span>
+                        </div>
+                        <a href={`/prompts/${p.id}`} class="flex flex-col gap-2 group">
+                          <h3 class="text-[19px] leading-[28px] font-semibold font-display text-ink group-hover:text-accent transition">
+                            {p.data.title}
+                          </h3>
+                          <p class="text-[14px] leading-[24px] text-ink-2 line-clamp-3">{p.data.summary}</p>
+                        </a>
+                        {p.data.variables.length > 0 && (
+                          <p class="text-[12px] text-ink-3">
+                            要改 {p.data.variables.length} 处：
+                            {p.data.variables.map((v) => v.name).join(' / ')}
+                          </p>
+                        )}
+                        <div class="flex items-center gap-3 mt-auto pt-2">
+                          <button
+                            type="button"
+                            class="copy-prompt text-[13px] font-medium text-accent hover:underline"
+                            data-prompt={p.data.prompt}
+                          >
+                            复制提示词
+                          </button>
+                          <a href={`/prompts/${p.id}`} class="text-[13px] font-medium text-ink-3 hover:text-ink">
+                            看说明 →
+                          </a>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </section>
+              );
+            })
         }
       </div>
     </div>
@@ -98,10 +112,11 @@ const tested = prompts.filter((p) => p.data.source === '处方实测').length;
     // 岗位筛选（与首页处方筛选同口径：role=group + aria-pressed + 状态播报）
     (function () {
       var bar = document.querySelector('.cat-tabs');
-      var grid = document.getElementById('prompt-grid');
+      var groups = document.getElementById('prompt-groups');
       var status = document.getElementById('prompt-filter-status');
-      if (!bar || !grid) return;
-      var cards = Array.prototype.slice.call(grid.querySelectorAll('[data-role]'));
+      if (!bar || !groups) return;
+      var cards = Array.prototype.slice.call(groups.querySelectorAll('.prompt-card'));
+      var groupEls = Array.prototype.slice.call(groups.querySelectorAll('.prompt-group'));
       bar.addEventListener('click', function (e) {
         var btn = e.target.closest('.cat-tab');
         if (!btn) return;
@@ -116,6 +131,13 @@ const tested = prompts.filter((p) => p.data.source === '处方实测').length;
           var show = f === '全部' || c.getAttribute('data-role') === f;
           c.style.display = show ? '' : 'none';
           if (show) shown++;
+        });
+        // 隐藏无可见卡片的分组（含其 H2），筛选后不留空标题
+        groupEls.forEach(function (g) {
+          var anyVisible = Array.prototype.slice.call(g.querySelectorAll('.prompt-card')).some(
+            function (c) { return c.style.display !== 'none'; },
+          );
+          g.style.display = anyVisible ? '' : 'none';
         });
         if (status) status.textContent = '已按「' + f + '」筛选，显示 ' + shown + ' 条提示词';
       });

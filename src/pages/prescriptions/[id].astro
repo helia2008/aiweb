@@ -79,6 +79,10 @@ function extractSteps(body: string) {
 }
 const steps = extractSteps(entry.body ?? '');
 
+// HowTo schema：直接复用正文「一步步怎么配」自动抽取的步骤（零编造），
+// 与上方可视化步骤条同源——Google 富摘要的步骤与页面可见步骤完全一致。
+const howTo = steps.length > 0 ? { name: entry.data.title, steps } : null;
+
 /**
  * 双向互链（2026-09-12）：反向计算本篇关联的提示词 / 技能。
  * 数据源只有一处——prompts 的 fromPrescription、skills 的 relatedPrescriptions，
@@ -101,6 +105,7 @@ const usedSkills = allSkills.filter((s) =>
   updatedAt={entry.data.updatedAt}
   tags={entry.data.tags}
   faqs={faqs}
+  howTo={howTo}
   breadcrumbs={[
     { name: '首页', url: '/' },
     { name: '痛点处方', url: '/prescriptions' },

@@ -30,6 +30,13 @@ export interface Props {
   breadcrumbs?: Breadcrumb[];
   /** 传了就输出 FAQPage schema */
   faqs?: { q: string; a: string }[];
+  /**
+   * HowTo schema：把「一步步怎么配」的步骤流结构化，抢「步骤富摘要」。
+   * 步骤必须来自正文真实内容（处方页用 extractSteps 自动抽取），不要编造。
+   */
+  howTo?: { name: string; steps: string[] } | null;
+  /** 设 true 则输出 noindex,follow（薄内容/重复页用，如 /search） */
+  noindex?: boolean;
 }
 
 const {
@@ -42,6 +49,8 @@ const {
   tags = [],
   breadcrumbs = [],
   faqs = [],
+  howTo = null,
+  noindex = false,
 } = Astro.props;
 
 const SITE_NAME = '桌面 Agent 实战手册';
@@ -121,11 +130,29 @@ const faqSchema =
       }
     : null;
 
+const howToSchema =
+  howTo && howTo.steps.length > 0
+    ? {
+        '@type': 'HowTo',
+        name: howTo.name,
+        step: howTo.steps.map((s, i) => ({
+          '@type': 'HowToStep',
+          position: i + 1,
+          name: s,
+          text: s,
+        })),
+      }
+    : null;
+
 const graph = {
   '@context': 'https://schema.org',
-  '@graph': [organization, website, breadcrumbSchema, articleSchema, faqSchema].filter(Boolean),
+  '@graph': [organization, website, breadcrumbSchema, articleSchema, faqSchema, howToSchema].filter(
+    Boolean,
+  ),
 };
 ---
+
+{noindex && <meta name="robots" content="noindex,follow" />}
 
 <link rel="canonical" href={canonical} />
 <title>{fullTitle}</title>

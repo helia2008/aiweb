@@ -11,7 +11,12 @@ const SITE = process.env.SITE_URL || 'https://aiwind.eu.cc';
 export default defineConfig({
   site: SITE,
   trailingSlash: 'never',
-  integrations: [sitemap()],
+  integrations: [
+    sitemap({
+      // 薄内容/重复页不进索引：/search 是 JS 检索页，无独立可收录内容
+      filter: (page) => !page.includes('/search'),
+    }),
+  ],
   vite: {
     plugins: [tailwindcss()],
   },

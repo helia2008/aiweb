@@ -13,6 +13,11 @@ unfit:
 setupTime: 90 分钟
 cost: 免费额度够用 · 超出按 token 计费
 dataBoundary: 文件全部经过 Anthropic API · 不要把客户隐私原文发出去
+usedIn:
+  - quote-pdf-to-table
+  - list-diff-pipeline
+  - contract-terms-extraction
+  - sop-from-screen-recording
 order: 1
 ---
 

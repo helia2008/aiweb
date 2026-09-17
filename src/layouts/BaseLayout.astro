@@ -23,6 +23,10 @@ export interface Props {
   breadcrumbs?: { name: string; url: string }[];
   /** FAQ（输出 FAQPage schema，用于抢 People Also Ask 富摘要） */
   faqs?: { q: string; a: string }[];
+  /** HowTo（输出 HowTo schema，用于抢步骤富摘要） */
+  howTo?: { name: string; steps: string[] } | null;
+  /** 设 true 则输出 noindex,follow（薄内容/重复页用） */
+  noindex?: boolean;
 }
 
 const {
@@ -37,6 +41,8 @@ const {
   tags,
   breadcrumbs,
   faqs,
+  howTo,
+  noindex,
 } = Astro.props;
 
 /**
@@ -82,6 +88,8 @@ const isProd = Astro.url.hostname === 'aiwind.eu.cc';
       tags={tags}
       breadcrumbs={breadcrumbs}
       faqs={faqs}
+      howTo={howTo}
+      noindex={noindex}
     />
 
     <!-- Search Console 验证（面板配 PUBLIC_GSC_VERIFICATION 环境变量后自动输出） -->

@@ -1,0 +1,127 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getCollection } from 'astro:content';
+import { SITE } from '../lib/site.js';
+
+const prescriptions = (await getCollection('prescriptions')).sort(
+  (a, b) => b.data.publishedAt.getTime() - a.data.publishedAt.getTime(),
+);
+
+// 头部词枢纽：按 4 个岗位桶聚成集群（hub → cluster → 处方），
+// 既能接住「办公自动化 / AI 自动化 / 职场提效」这类泛搜索词，
+// 又把权重顺着内链聚到每篇处方，避免首页筛选栏之外的第二个入口。
+const clusters = [
+  { role: '财务 / 采购', desc: '对账、报销、供应商函证——数字最密、最不能错的活。' },
+  { role: '人事 / HR', desc: '简历、考勤、花名册——重复量大、又涉及个人隐私的活。' },
+  { role: '行政 / 通用', desc: '文件、会议纪要、设备提醒——谁都逃不掉的杂活。' },
+  { role: '市场 / 运营', desc: '周报、舆情、竞品监控——要快、要跟得上的活。' },
+];
+const byRole = (role: string) => prescriptions.filter((p) => p.data.role === role);
+---
+
+<BaseLayout
+  title="办公自动化 · 把每周重复的活交出去"
+  description="办公自动化不是买最贵的软件，而是先找出每周那几小时重复活，用桌面 Agent 一步步交出去。按岗位挑处方，每条都跑通过。"
+  breadcrumbs={[
+    { name: '首页', url: '/' },
+    { name: '办公自动化', url: '/office-automation' },
+  ]}
+>
+  <section class="px-5 sm:px-8 lg:px-[120px] pt-[80px] pb-[40px] bg-paper">
+    <div class="flex flex-col gap-4 max-w-[880px]">
+      <p class="mono-badge text-ai-1">办公自动化</p>
+      <h1 class="text-[44px] sm:text-[52px] leading-[60px] font-bold font-display text-ink">
+        办公自动化，从把每周那几小时重复活交出去开始
+      </h1>
+      <p class="text-[17px] leading-[31px] text-ink-2 mt-2">
+        你说的是「AI 自动化」「职场提效」，还是「不想再手填周报」——本质都是同一件事：
+        把固定流程、固定格式的活，交给桌面上跑的 Agent。这里没有「最全工具清单」，
+        只有<b class="text-ink">我自己真跑通过、每周确实省下时间的处方</b>。
+      </p>
+    </div>
+  </section>
+
+  <!-- 概念澄清：接住「什么是办公自动化 / AI 自动化」的搜索意图 -->
+  <section class="px-5 sm:px-8 lg:px-[120px] pb-[20px] bg-paper">
+    <div class="max-w-[880px] bg-paper-2 border border-rule rounded-[14px] p-7 flex flex-col gap-3">
+      <h2 class="text-[22px] font-bold font-display text-ink">桌面 Agent 做办公自动化，到底是什么意思</h2>
+      <p class="text-[15px] leading-[27px] text-ink-2">
+        不是让 AI 替你做决策，而是把「打开 A → 复制 → 粘到 B → 按规则改 → 存到 C」这种
+        <b class="text-ink">你已经做了一百遍、步骤固定</b>的活，写成可以重复跑的指令。
+        它读你的本地文件、连你的账号、按你定的规则执行——你只复核结果。
+      </p>
+      <p class="text-[15px] leading-[27px] text-ink-2">
+        所以「办公自动化」的入手点不是学编程，而是<b class="text-ink">先列出你每周最烦的那三件事</b>。
+        下面按岗位给你现成的：点进去就是步骤、指令和坑。
+      </p>
+    </div>
+  </section>
+
+  <!-- 4 个岗位集群：hub → cluster → 处方 内链 -->
+  <section class="px-5 sm:px-8 lg:px-[120px] py-[44px] bg-paper flex flex-col gap-[48px]">
+    {
+      clusters.map((c) => {
+        const items = byRole(c.role);
+        if (!items.length) return null;
+        return (
+          <div class="flex flex-col gap-5">
+            <div class="flex flex-col gap-1">
+              <h2 class="text-[28px] font-bold font-display text-ink">{c.role} 的办公自动化处方</h2>
+              <p class="text-[15px] leading-[25px] text-ink-3">{c.desc}</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+              {items.map((p) => (
+                <a
+                  href={`/prescriptions/${p.id}`}
+                  class="bg-white border border-rule rounded-[12px] ai-card p-[22px] flex flex-col gap-2 hover:border-accent transition"
+                >
+                  <div class="flex gap-2 flex-wrap">
+                    <span class="tag bg-accent-tint text-accent">省 {p.data.saveHoursPerWeek} 小时/周</span>
+                    <span class="tag bg-paper-2 text-ink-2">{p.data.difficulty}</span>
+                  </div>
+                  <p class="text-[17px] leading-[26px] font-semibold font-display text-ink">{p.data.title}</p>
+                  <p class="text-[13px] leading-[22px] text-ink-2 line-clamp-2">{p.data.summary}</p>
+                </a>
+              ))}
+            </div>
+          </div>
+        );
+      })
+    }
+  </section>
+
+  <!-- 怎么开始：把相邻板块织进来 -->
+  <section class="px-5 sm:px-8 lg:px-[120px] pb-[60px] bg-paper">
+    <div class="max-w-[880px] flex flex-col gap-5">
+      <h2 class="text-[24px] font-bold font-display text-ink">从哪开始最省力</h2>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <a href="/start-here" class="bg-paper-2 border border-rule rounded-[12px] p-5 flex flex-col gap-1 hover:border-accent transition">
+          <p class="text-[16px] font-semibold font-display text-ink">三条入门路线</p>
+          <p class="text-[13px] text-ink-3">按你现在的水平挑一条 →</p>
+        </a>
+        <a href="/prompts" class="bg-paper-2 border border-rule rounded-[12px] p-5 flex flex-col gap-1 hover:border-accent transition">
+          <p class="text-[16px] font-semibold font-display text-ink">提示词库</p>
+          <p class="text-[13px] text-ink-3">拿来就能用的指令 →</p>
+        </a>
+        <a href="/tools" class="bg-paper-2 border border-rule rounded-[12px] p-5 flex flex-col gap-1 hover:border-accent transition">
+          <p class="text-[16px] font-semibold font-display text-ink">工具罗盘</p>
+          <p class="text-[13px] text-ink-3">先看清用什么工具 →</p>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- 转化：痛点门诊（站内唯一投稿入口） -->
+  <section class="px-5 sm:px-8 lg:px-[120px] pb-[100px] bg-paper">
+    <div class="max-w-[880px] bg-deep text-deep-ink rounded-[16px] p-8 flex flex-col gap-3">
+      <h2 class="text-[22px] font-bold font-display text-deep-ink">有想自动化、但卡住的活？</h2>
+      <p class="text-[15px] leading-[26px] text-deep-ink-2">
+        把你的重复活发到痛点门诊，我挑能跑通的写成新处方。也欢迎投稿你自己的自动化方案。
+      </p>
+      <a
+        href={`mailto:${SITE.email}?subject=痛点门诊：想自动化的一件重复活`}
+        class="btn-ai h-[46px] px-[24px] text-[15px] self-start mt-1"
+      >发到痛点门诊 →</a>
+    </div>
+  </section>
+</BaseLayout>

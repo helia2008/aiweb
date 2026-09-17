@@ -9,6 +9,11 @@ export async function getStaticPaths() {
 
 const { entry } = Astro.props;
 const { Content } = await render(entry);
+
+// 相关处方：usedIn 只存 id，展示必须带真实标题（与技能页同款反查）
+const prescriptions = await getCollection('prescriptions');
+const titleOf = (id: string) => prescriptions.find((p) => p.id === id)?.data.title ?? id;
+const usedIn = (entry.data.usedIn ?? []).filter((id) => prescriptions.some((p) => p.id === id));
 ---
 
 <BaseLayout
@@ -97,6 +102,24 @@ const { Content } = await render(entry);
             去痛点处方看看它具体怎么用 →
           </p>
         </a>
+
+        <!-- 相关处方：把工具织进内容网（措辞「同类型活儿」，不声称本处方用了该工具） -->
+        {usedIn.length > 0 && (
+          <section class="flex flex-col gap-3">
+            <p class="mono-badge text-ai-1">相关处方（同类型活儿）</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {usedIn.map((rid) => (
+                <a
+                  href={`/prescriptions/${rid}`}
+                  class="bg-paper-2 border border-rule rounded-[12px] p-5 flex flex-col gap-1 hover:border-accent transition"
+                >
+                  <p class="text-[16px] font-semibold font-display text-ink">{titleOf(rid)}</p>
+                  <p class="text-[13px] text-ink-3">看完整处方 →</p>
+                </a>
+              ))}
+            </div>
+          </section>
+        )}
 
         <a href="/tools" class="text-[14px] text-accent hover:underline self-start">← 返回全部工具</a>
       </div>

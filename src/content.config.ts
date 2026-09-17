@@ -65,6 +65,12 @@ const tools = defineCollection({
     setupTime: z.string(), // "20 分钟"
     cost: z.string(), // "免费 / 有付费版"
     dataBoundary: z.string(), // 数据安全说明
+    /**
+     * 相关处方（2026-09-17 加）：与提示词/技能同口径的反向互链——
+     * 工具详情页据此渲染「相关处方」，把工具罗盘织进内容网。
+     * 只填同类型场景的处方 id，不声称"本处方用了该工具"，措辞用「相关处方」。
+     */
+    usedIn: z.array(z.string()).default([]),
     order: z.number().default(0),
   }),
 });

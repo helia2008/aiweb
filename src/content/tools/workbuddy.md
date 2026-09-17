@@ -12,6 +12,11 @@ unfit:
 setupTime: 20 分钟
 cost: 有免费版 · Pro 30 元/月
 dataBoundary: 任务执行可在本地 · LLM 调用走云端，按需可切换
+usedIn:
+  - scattered-files-ledger
+  - meeting-notes-to-action-items
+  - equipment-maintenance-reminder
+  - resume-screening-pipeline
 order: 2
 ---
 
