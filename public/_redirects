@@ -2,6 +2,10 @@
 # 1) 接住 /sitemap.xml 默认探测，指向 @astrojs/sitemap 实际生成的索引
 /sitemap.xml /sitemap-index.xml 301
 
-# 2) 全局去尾斜杠：canonical / sitemap 均为无斜杠形式，
-#    避免 Cloudflare 对目录式 URL 返回 200 造成重复地址。
-/:splat/ /:splat 301
+# 2) 【切勿再加「全局去尾斜杠」规则】
+#    2026-09-18 事故复盘：这里曾写过 `/:splat/ /:splat 301`，
+#    与 Cloudflare Pages 自带的尾斜杠归一化（/foo → 308 → /foo/）互相打架，
+#    形成 /foo/ --301--> /foo --308--> /foo/ 的无限重定向循环，
+#    导致 /prescriptions/、/tools/、/prompts/、/skills/、/tags/、/start-here/、
+#    /office-automation/ 等全部一级子页面 ERR_TOO_MANY_REDIRECTS 打不开。
+#    Cloudflare Pages 自身已正确处理尾斜杠，不要再手工去除。
